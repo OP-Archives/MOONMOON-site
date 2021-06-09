@@ -99,7 +99,7 @@ export default function Vods(props) {
             return (
               <Link
                 key={data.id}
-                href={`/vods/${props.vod.id}?part=${index + 1}`}
+                href={`/${data.type === "live" ? "live" : "vods"}/${props.vod.id}?part=${index + 1}`}
                 style={{ textDecoration: "none" }}
               >
                 <MenuItem className={classes.item}>Part {index + 1}</MenuItem>
@@ -134,7 +134,7 @@ export default function Vods(props) {
                   <div style={{ marginBottom: "0.1rem" }}>
                     <Link
                       className={classes.title}
-                      href={`/vods/${vod.id}`}
+                      href={`/${showLiveVods ? "live" : "vods"}/${vod.id}`}
                       variant="caption"
                     >
                       {vod.title}
@@ -145,7 +145,7 @@ export default function Vods(props) {
               {vod.youtube.length > 1 ? <IsolatedMenu vod={vod} /> : <></>}
             </div>
             <div className={classes.imageBox}>
-              <Link href={`/vods/${vod.id}`}>
+              <Link href={`/${showLiveVods ? "live" : "vods"}/${vod.id}`}>
                 <img alt="" src={vod.thumbnail_url} className={classes.image} />
               </Link>
               <div className={classes.corners}>
@@ -169,7 +169,7 @@ export default function Vods(props) {
     );
     setLoading(false);
     return;
-  }, [vodList, classes, isMobile]);
+  }, [vodList, classes, isMobile, showLiveVods]);
 
   const fetchNextVods = async () => {
     if (allVodsLoaded) return;
