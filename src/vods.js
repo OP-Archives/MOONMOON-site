@@ -99,7 +99,9 @@ export default function Vods(props) {
             return (
               <Link
                 key={data.id}
-                href={`/${data.type === "live" ? "live" : "vods"}/${props.vod.id}?part=${index + 1}`}
+                href={`/${data.type === "live" ? "live" : "vods"}/${
+                  props.vod.id
+                }?part=${index + 1}`}
                 style={{ textDecoration: "none" }}
               >
                 <MenuItem className={classes.item}>Part {index + 1}</MenuItem>
@@ -195,9 +197,11 @@ export default function Vods(props) {
         });
 
         setVodList(
-          vods.filter((vod) =>
-            vod.youtube.every(
-              (data) => data.type === (showLiveVods ? "live" : "vod")
+          vodList.concat(
+            vods.filter((vod) =>
+              vod.youtube.some((data) => {
+                return data.type === (showLiveVods ? "live" : "vod");
+              })
             )
           )
         );
