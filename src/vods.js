@@ -31,7 +31,7 @@ export default function Vods(props) {
   const channel = props.channel;
 
   useEffect(() => {
-    document.title = "VODS - Moonmoon";
+    document.title = `VODS - ${channel.charAt(0).toUpperCase() + channel.slice(1)}`;
     const fetchVods = async () => {
       await fetch(
         `https://archive.overpowered.tv/${channel}/vods?$limit=50&$sort[createdAt]=-1`,

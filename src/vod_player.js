@@ -48,7 +48,7 @@ class VodPlayer extends Component {
   }
 
   componentDidMount() {
-    document.title = `${this.props.match.params.vodId} Vod - Moonmoon`;
+    document.title = `${this.props.match.params.vodId} Vod - ${this.channel.charAt(0).toUpperCase() + this.channel.slice(1)}`;
     this.fetchVodData();
     this.loadBadges();
     this.loadChannelBadges(this.twitchId);
