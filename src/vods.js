@@ -25,7 +25,7 @@ export default function Vods(props) {
   const [vods, setVods] = React.useState([]);
   const [skip, setSkip] = React.useState(0);
   const [loading, setLoading] = React.useState(true);
-  const [showLiveVods, setShowLiveVods] = React.useState(false);
+  const [showLiveVods, setShowLiveVods] = React.useState(true);
   const [vodList, setVodList] = React.useState([]);
   const [allVodsLoaded, setAllVodsLoaded] = React.useState(false);
   const channel = props.channel;
