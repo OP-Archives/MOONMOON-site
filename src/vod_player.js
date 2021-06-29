@@ -636,7 +636,9 @@ class VodPlayer extends Component {
                     <Typography variant="body2" className={classes.title}>
                       {vodData.title}
                     </Typography>
-                    <div className={`${classes.marginRight} ${classes.marginLeft}`}>
+                    <div
+                      className={`${classes.marginRight} ${classes.marginLeft}`}
+                    >
                       <FormControl className={classes.formControl}>
                         <InputLabel className={classes.label} id="select-label">
                           Part
@@ -660,7 +662,11 @@ class VodPlayer extends Component {
                           }}
                         >
                           {youtube_data.map((data, i) => {
-                            return <MenuItem value={i}>Part {i + 1}</MenuItem>;
+                            return (
+                              <MenuItem key={data.id} value={i}>
+                                Part {i + 1}
+                              </MenuItem>
+                            );
                           })}
                         </Select>
                       </FormControl>
@@ -668,9 +674,7 @@ class VodPlayer extends Component {
                     {isMobile ? (
                       <></>
                     ) : (
-                      <div
-                        className={`${classes.marginRight}`}
-                      >
+                      <div className={`${classes.marginRight}`}>
                         <Button
                           component={Link}
                           href={`https://drive.google.com/u/2/uc?id=${driveId}`}
@@ -891,8 +895,6 @@ const useStyles = () => ({
   title: {
     color: "#fff",
     overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
   },
 });
 
