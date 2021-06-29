@@ -5,6 +5,13 @@ import {
   Container,
   useMediaQuery,
   CircularProgress,
+  Typography,
+  Button,
+  Link,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
 } from "@material-ui/core";
 import Youtube from "react-youtube";
 import SimpleBar from "simplebar-react";
@@ -69,6 +76,11 @@ class VodPlayer extends Component {
         ? 0
         : this.vodDuration - this.totalYoutubeDuration;
     console.info(`Chat Delay: ${this.delay} seconds`);
+    for (let drive of this.state.vodData.drive) {
+      if (this.type !== drive.type) continue;
+      this.setState({ driveId: drive.id });
+      break;
+    }
   }
 
   componentWillUnmount() {
@@ -184,6 +196,15 @@ class VodPlayer extends Component {
         evt.target.mute();
       }
     });
+  };
+
+  handleChange = (event) => {
+    const part = event.target.value;
+    this.clearLoopTimeout();
+    if (this.state.youtube_data[part].id) {
+      this.setState({ part: part });
+      this.player.loadVideoById(this.state.youtube_data[part].id);
+    }
   };
 
   onPlay = async (evt) => {
@@ -568,7 +589,8 @@ class VodPlayer extends Component {
 
   render() {
     const { classes, isMobile } = this.props;
-    const { vodData, chatLoading, messages } = this.state;
+    const { vodData, chatLoading, messages, driveId, part, youtube_data } =
+      this.state;
     return !vodData ? (
       <div className={classes.parent}>
         <div style={{ textAlign: "center" }}>
@@ -584,25 +606,88 @@ class VodPlayer extends Component {
           flexDirection={isMobile ? "column" : "row"}
           className={classes.playerParent}
         >
-          <Youtube
-            containerClassName={classes.player}
-            id="player"
-            opts={{
-              height: "100%",
-              width: "100%",
-              playerVars: {
-                autoplay: 1,
-                playsinline: 1,
-                rel: 0,
-                modestbranding: 1,
-              },
-            }}
-            onReady={this.onReady}
-            onPlay={this.onPlay}
-            onPause={this.clearLoopTimeout}
-            onEnd={this.onEnd}
-            onError={this.playerError}
-          />
+          <div style={{ width: "100%" }}>
+            <Youtube
+              containerClassName={classes.player}
+              id="player"
+              opts={{
+                height: "100%",
+                width: "100%",
+                playerVars: {
+                  autoplay: 1,
+                  playsinline: 1,
+                  rel: 0,
+                  modestbranding: 1,
+                },
+              }}
+              onReady={this.onReady}
+              onPlay={this.onPlay}
+              onPause={this.clearLoopTimeout}
+              onEnd={this.onEnd}
+              onError={this.playerError}
+            />
+            <Box display="flex" flexGrow="1">
+              <div className={classes.container}>
+                <div className={classes.row}>
+                  <Box display="flex" alignItems="center">
+                    <div className={classes.marginRight}>
+                      <img alt="" src={vodData.chapters[0].image} />
+                    </div>
+                    <Typography variant="body2" className={classes.title}>
+                      {vodData.title}
+                    </Typography>
+                    <div className={`${classes.marginRight} ${classes.marginLeft}`}>
+                      <FormControl className={classes.formControl}>
+                        <InputLabel className={classes.label} id="select-label">
+                          Part
+                        </InputLabel>
+                        <Select
+                          labelId="select-label"
+                          value={part}
+                          onChange={this.handleChange}
+                          autoWidth
+                          className={classes.dropdownSelect}
+                          MenuProps={{
+                            classes: { paper: classes.dropdownStyle },
+                          }}
+                          classes={{
+                            root: classes.dropdownRoot,
+                          }}
+                          inputProps={{
+                            classes: {
+                              icon: classes.dropdownIcon,
+                            },
+                          }}
+                        >
+                          {youtube_data.map((data, i) => {
+                            return <MenuItem value={i}>Part {i + 1}</MenuItem>;
+                          })}
+                        </Select>
+                      </FormControl>
+                    </div>
+                    {isMobile ? (
+                      <></>
+                    ) : (
+                      <div
+                        className={`${classes.marginRight}`}
+                      >
+                        <Button
+                          component={Link}
+                          href={`https://drive.google.com/u/2/uc?id=${driveId}`}
+                          rel="noopener noreferrer"
+                          target="_blank"
+                          variant="contained"
+                          className={classes.button}
+                        >
+                          Download Vod
+                        </Button>
+                      </div>
+                    )}
+                  </Box>
+                </div>
+              </div>
+            </Box>
+          </div>
           <div className={classes.chatContainer}>
             <Resizable
               defaultSize={
@@ -690,7 +775,7 @@ const useStyles = () => ({
     width: "100%",
   },
   player: {
-    height: "100%",
+    height: "calc(100% - 6rem)",
     width: "100%",
   },
   text: {
@@ -735,6 +820,79 @@ const useStyles = () => ({
     verticalAlign: "middle",
     border: "none",
     maxWidth: "100%",
+  },
+  row: {
+    padding: "1rem",
+  },
+  form: {
+    flexGrow: 1,
+    position: "relative",
+  },
+  container: {
+    backgroundColor: "#1d1d1d",
+    borderLeft: "1px solid hsla(0,0%,100%,.1)",
+    borderRight: "1px solid hsla(0,0%,100%,.1)",
+    borderTop: "1px solid hsla(0,0%,100%,.1)",
+    borderBottom: "1px solid hsla(0,0%,100%,.1)",
+    borderBottomRightRadius: "4px",
+    borderBottomLeftRadius: "4px",
+    borderTopLeftRadius: "4px",
+    borderTopRightRadius: "4px",
+    width: "100%",
+    paddingBottom: "2.6rem",
+  },
+  marginRight: {
+    marginRight: "1rem",
+  },
+  marginLeft: {
+    marginLeft: "1rem",
+  },
+  button: {
+    backgroundColor: "#0251e2c2",
+    color: `#fff`,
+    "&:hover": {
+      backgroundColor: "#0251e2c2",
+      opacity: "0.7",
+      textDecoration: "none",
+      color: `#fff`,
+    },
+    whiteSpace: "nowrap",
+    textTransform: "none",
+    borderRadius: "1rem",
+  },
+  formControl: {
+    margin: "1rem",
+    minWidth: 120,
+  },
+  label: {
+    color: "#fff",
+    "&.Mui-focused": {
+      color: "#fff",
+    },
+  },
+  dropdownStyle: {
+    color: "#fff",
+    backgroundColor: "#1d1d1d",
+  },
+  dropdownRoot: {
+    color: "#fff",
+  },
+  dropdownSelect: {
+    "&:before": {
+      borderColor: "#fff",
+    },
+    "&:after": {
+      borderColor: "#fff",
+    },
+  },
+  dropdownIcon: {
+    fill: "#fff",
+  },
+  title: {
+    color: "#fff",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
   },
 });
 
