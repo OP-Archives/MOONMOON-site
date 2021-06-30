@@ -81,6 +81,11 @@ class VodPlayer extends Component {
       this.setState({ driveId: drive.id });
       break;
     }
+    if(this.state.vodData.chapters[0].image) {
+      this.gameBoxArt = this.state.vodData.chapters[0].image;
+      this.gameBoxArt = this.gameBoxArt.replace("{width}", "40");
+      this.gameBoxArt = this.gameBoxArt.replace("{height}", "53");
+    }
   }
 
   componentWillUnmount() {
@@ -631,7 +636,7 @@ class VodPlayer extends Component {
                 <div className={classes.row}>
                   <Box display="flex" alignItems="center">
                     <div className={classes.marginRight}>
-                      <img alt="" src={vodData.chapters[0].image} />
+                      <img alt="" src={this.gameBoxArt} />
                     </div>
                     <Typography variant="body2" className={classes.title}>
                       {vodData.title}
