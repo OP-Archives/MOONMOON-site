@@ -673,7 +673,14 @@ class VodPlayer extends Component {
                     {!isMobile && (
                       <div className={`${classes.marginRight}`}>
                         {driveId != null && (
-                          <Button component={Link} href={`https://drive.google.com/u/2/uc?id=${driveId}`} rel="noopener noreferrer" target="_blank" variant="contained" sx={{ color: "white" }}>
+                          <Button
+                            component={Link}
+                            href={`https://drive.google.com/u/2/uc?id=${driveId}`}
+                            rel="noopener noreferrer"
+                            target="_blank"
+                            variant="contained"
+                            sx={{ color: "white !important" }}
+                          >
                             Download Vod
                           </Button>
                         )}
