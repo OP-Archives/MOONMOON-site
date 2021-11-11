@@ -1,23 +1,12 @@
 import React, { Component } from "react";
-import {
-  withStyles,
-  Box,
-  Container,
-  useMediaQuery,
-  CircularProgress,
-  Typography,
-  Button,
-  Link,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
-} from "@material-ui/core";
+import { Box, Typography, useMediaQuery, Link, Container, Button, MenuItem, CircularProgress, FormControl, InputLabel, Select, FormGroup, Switch, FormControlLabel } from "@mui/material";
+import { withStyles } from "@mui/styles";
 import Youtube from "react-youtube";
 import SimpleBar from "simplebar-react";
 import canAutoPlay from "can-autoplay";
-import Logo from "./assets/logo.jpg";
+import Logo from "./assets/dribble.gif";
 import { Resizable } from "re-resizable";
+import { useParams, useLocation } from "react-router-dom";
 
 function toSeconds(str) {
   var p = str.split(":"),
@@ -36,15 +25,14 @@ class VodPlayer extends Component {
   constructor(props) {
     super(props);
 
-    this.BADGES_TWITCH_URL =
-      "https://badges.twitch.tv/v1/badges/global/display?language=en";
-    this.BASE_TWITCH_CDN = "https://static-cdn.jtvnw.net/";
-    this.BASE_FFZ_EMOTE_API = "https://api.frankerfacez.com/v1/";
-    this.BASE_BTTV_EMOTE_API = "https://api.betterttv.net/3/";
-    this.BASE_BTTV_CDN = "https://cdn.betterttv.net/";
-    this.vodId = props.match.params.vodId;
+    this.BADGES_TWITCH_URL = "https://badges.twitch.tv/v1/badges/global/display?language=en";
+    this.BASE_TWITCH_CDN = "https://static-cdn.jtvnw.net";
+    this.BASE_FFZ_EMOTE_API = "https://api.frankerfacez.com/v1";
+    this.BASE_BTTV_EMOTE_API = "https://api.betterttv.net/3";
+    this.BASE_BTTV_CDN = "https://cdn.betterttv.net";
+    this.BASE_7TV_EMOTE_API = "https://api.7tv.app/v2";
+    this.vodId = props.vodId;
     this.twitchId = props.twitchId;
-    this.type = props.type;
     this.player = null;
     this.chatRef = React.createRef();
     this.messageCount = 0;
@@ -64,33 +52,35 @@ class VodPlayer extends Component {
       messages: [],
       stoppedAtIndex: 0,
       comments: [],
+      type: props.type,
     };
   }
 
   async componentDidMount() {
-    document.title = `${this.props.match.params.vodId} Vod - ${
-      this.channel.charAt(0).toUpperCase() + this.channel.slice(1)
-    }`;
+    document.title = `${this.props.vodId} Vod - ${this.channel.charAt(0).toUpperCase() + this.channel.slice(1)}`;
     await this.fetchVodData();
     this.loadBadges();
     this.loadChannelBadges(this.twitchId);
     this.loadFFZEmotes(this.twitchId);
     this.loadBTTVGlobalEmotes(this.twitchId);
     this.loadBTTVChannelEmotes(this.twitchId);
+    this.load7TVEmotes();
+    this.totalYoutubeDuration = 0;
     for (let video of this.state.youtube_data) {
       this.totalYoutubeDuration += video.duration;
     }
     this.vodDuration = toSeconds(this.state.vodData.duration);
-    this.delay =
-      this.vodDuration - this.totalYoutubeDuration < 0
-        ? 0
-        : this.vodDuration - this.totalYoutubeDuration;
+    this.delay = this.vodDuration - this.totalYoutubeDuration < 0 ? 0 : this.vodDuration - this.totalYoutubeDuration;
     console.info(`Chat Delay: ${this.delay} seconds`);
-    for (let drive of this.state.vodData.drive) {
-      if (this.type !== drive.type) continue;
-      this.setState({ driveId: drive.id });
-      break;
-    }
+    let driveId;
+    if (this.state.vodData.drive)
+      for (let drive of this.state.vodData.drive) {
+        if (this.state.type === drive.type) {
+          driveId = drive.id;
+          break;
+        }
+      }
+    this.setState({ driveId: driveId });
     if (this.state.vodData.chapters[0].image) {
       this.gameBoxArt = this.state.vodData.chapters[0].image;
       this.gameBoxArt = this.gameBoxArt.replace("{width}", "40");
@@ -103,20 +93,17 @@ class VodPlayer extends Component {
   }
 
   fetchVodData = async () => {
-    await fetch(
-      `https://archive.overpowered.tv/${this.channel}/vods/${this.vodId}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    )
+    await fetch(`https://archive.overpowered.tv/${this.channel}/vods/${this.vodId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
       .then((response) => response.json())
       .then((data) => {
         this.setState({
           vodData: data,
-          youtube_data: data.youtube.filter((data) => data.type === this.type),
+          youtube_data: data.youtube.filter((data) => data.type === this.state.type),
         });
       })
       .catch((e) => {
@@ -125,11 +112,12 @@ class VodPlayer extends Component {
   };
 
   loadBTTVGlobalEmotes = () => {
-    fetch(`${this.BASE_BTTV_EMOTE_API}cached/emotes/global`, {
+    fetch(`${this.BASE_BTTV_EMOTE_API}/cached/emotes/global`, {
       method: "GET",
     })
       .then((response) => response.json())
       .then((data) => {
+        if (data.status >= 400) return;
         this.BTTVGlobalEmotes = data;
       })
       .catch((e) => {
@@ -138,11 +126,12 @@ class VodPlayer extends Component {
   };
 
   loadBTTVChannelEmotes = (twitchId) => {
-    fetch(`${this.BASE_BTTV_EMOTE_API}cached/users/twitch/${twitchId}`, {
+    fetch(`${this.BASE_BTTV_EMOTE_API}/cached/users/twitch/${twitchId}`, {
       method: "GET",
     })
       .then((response) => response.json())
       .then((data) => {
+        if (data.status >= 400) return;
         this.BTTVEmotes = data.sharedEmotes.concat(data.channelEmotes);
       })
       .catch((e) => {
@@ -151,12 +140,27 @@ class VodPlayer extends Component {
   };
 
   loadFFZEmotes = (twitchId) => {
-    fetch(`${this.BASE_FFZ_EMOTE_API}room/id/${twitchId}`, {
+    fetch(`${this.BASE_FFZ_EMOTE_API}/room/id/${twitchId}`, {
       method: "GET",
     })
       .then((response) => response.json())
       .then((data) => {
+        if (data.status >= 400) return;
         this.FFZEmotes = data.sets[data.room.set].emoticons;
+      })
+      .catch((e) => {
+        console.error(e);
+      });
+  };
+
+  load7TVEmotes = () => {
+    fetch(`${this.BASE_7TV_EMOTE_API}/users/${this.channel}/emotes`, {
+      method: "GET",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status >= 400) return;
+        this.SevenTVEmotes = data;
       })
       .catch((e) => {
         console.error(e);
@@ -172,6 +176,7 @@ class VodPlayer extends Component {
     })
       .then((response) => response.json())
       .then((data) => {
+        if (data.status >= 400) return;
         this.badgeSets = data.badge_sets;
       })
       .catch((e) => {
@@ -188,6 +193,7 @@ class VodPlayer extends Component {
     })
       .then((response) => response.json())
       .then((data) => {
+        if (data.status >= 400) return;
         this.channelBadges = data;
       })
       .catch((e) => {
@@ -234,17 +240,9 @@ class VodPlayer extends Component {
       if (this.state.comments.length > 0) {
         const lastComment = this.state.comments[this.state.comments.length - 1];
         const firstComment = this.state.comments[0];
-        if (
-          offset - lastComment.content_offset_seconds <= 30 &&
-          offset > firstComment.content_offset_seconds
-        ) {
+        if (offset - lastComment.content_offset_seconds <= 30 && offset > firstComment.content_offset_seconds) {
           //IF: rewinded?
-          if (
-            this.state.comments[this.state.stoppedAtIndex]
-              .content_offset_seconds -
-              offset >=
-            4
-          ) {
+          if (this.state.comments[this.state.stoppedAtIndex].content_offset_seconds - offset >= 4) {
             this.setState(
               {
                 stoppedAtIndex: 0,
@@ -279,7 +277,7 @@ class VodPlayer extends Component {
   onEnd = (evt) => {
     this.clearLoopTimeout();
     const nextPart = this.state.part + 1;
-    if (this.state.youtube_data[nextPart].id) {
+    if (this.state.youtube_data[nextPart]?.id) {
       this.setState({ part: nextPart });
       this.player.loadVideoById(this.state.youtube_data[nextPart].id);
     }
@@ -298,15 +296,12 @@ class VodPlayer extends Component {
   };
 
   fetchComments = async (offset) => {
-    await fetch(
-      `https://archive.overpowered.tv/${this.channel}/v1/vods/${this.vodId}/comments?content_offset_seconds=${offset}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    )
+    await fetch(`https://archive.overpowered.tv/${this.channel}/v1/vods/${this.vodId}/comments?content_offset_seconds=${offset}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
       .then((response) => response.json())
       .then((data) => {
         this.setState({
@@ -321,15 +316,12 @@ class VodPlayer extends Component {
   };
 
   fetchNextComments = async () => {
-    await fetch(
-      `https://archive.overpowered.tv/${this.channel}/v1/vods/${this.vodId}/comments?cursor=${this.state.cursor}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    )
+    await fetch(`https://archive.overpowered.tv/${this.channel}/v1/vods/${this.vodId}/comments?cursor=${this.state.cursor}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
       .then((response) => response.json())
       .then((data) => {
         this.setState({
@@ -375,23 +367,11 @@ class VodPlayer extends Component {
             key={this.badgesCount++}
             crossOrigin="anonymous"
             className={this.props.classes.badges}
-            src={`${this.BASE_TWITCH_CDN}badges/v1/${
-              twitchBadge.versions[badge.version]
-                ? twitchBadge.versions[badge.version].image_url_1x
-                : twitchBadge.versions[0].image_url_1x
-            }`}
-            srcSet={`${this.BASE_TWITCH_CDN}badges/v1/${
-              twitchBadge.versions[badge.version]
-                ? twitchBadge.versions[badge.version].image_url_1x
-                : twitchBadge.versions[0].image_url_1x
-            } 1x, ${this.BASE_TWITCH_CDN}badges/v1/${
-              twitchBadge.versions[badge.version]
-                ? twitchBadge.versions[badge.version].image_url_2x
-                : twitchBadge.versions[0].image_url_2x
-            } 2x, ${this.BASE_TWITCH_CDN}badges/v1/${
-              twitchBadge.versions[badge.version]
-                ? twitchBadge.versions[badge.version].image_url_4x
-                : twitchBadge.versions[0].image_url_4x
+            src={`${this.BASE_TWITCH_CDN}/badges/v1/${twitchBadge.versions[badge.version] ? twitchBadge.versions[badge.version].image_url_1x : twitchBadge.versions[0].image_url_1x}`}
+            srcSet={`${this.BASE_TWITCH_CDN}/badges/v1/${twitchBadge.versions[badge.version] ? twitchBadge.versions[badge.version].image_url_1x : twitchBadge.versions[0].image_url_1x} 1x, ${
+              this.BASE_TWITCH_CDN
+            }/badges/v1/${twitchBadge.versions[badge.version] ? twitchBadge.versions[badge.version].image_url_2x : twitchBadge.versions[0].image_url_2x} 2x, ${this.BASE_TWITCH_CDN}/badges/v1/${
+              twitchBadge.versions[badge.version] ? twitchBadge.versions[badge.version].image_url_4x : twitchBadge.versions[0].image_url_4x
             } 4x`}
             alt=""
           />
@@ -440,8 +420,8 @@ class VodPlayer extends Component {
                   <div key={this.messageCount++} style={{ display: "inline" }}>
                     <img
                       className={this.props.classes.chatEmote}
-                      src={`${this.BASE_BTTV_CDN}emote/${bttv_emote.id}/1x`}
-                      srcSet={`${this.BASE_BTTV_CDN}emote/${bttv_emote.id}/1x 1x, ${this.BASE_BTTV_CDN}emote/${bttv_emote.id}/2x 2x, ${this.BASE_BTTV_CDN}emote/${bttv_emote.id}/3x 4x`}
+                      src={`${this.BASE_BTTV_CDN}/emote/${bttv_emote.id}/1x`}
+                      srcSet={`${this.BASE_BTTV_CDN}/emote/${bttv_emote.id}/1x 1x, ${this.BASE_BTTV_CDN}/emote/${bttv_emote.id}/2x 2x, ${this.BASE_BTTV_CDN}/emote/${bttv_emote.id}/3x 4x`}
                       alt=""
                     />
                     {` `}
@@ -461,8 +441,8 @@ class VodPlayer extends Component {
                   <div key={this.messageCount++} style={{ display: "inline" }}>
                     <img
                       className={this.props.classes.chatEmote}
-                      src={`${this.BASE_BTTV_CDN}emote/${bttv_emote.id}/1x`}
-                      srcSet={`${this.BASE_BTTV_CDN}emote/${bttv_emote.id}/1x 1x, ${this.BASE_BTTV_CDN}emote/${bttv_emote.id}/2x 2x, ${this.BASE_BTTV_CDN}emote/${bttv_emote.id}/3x 4x`}
+                      src={`${this.BASE_BTTV_CDN}/emote/${bttv_emote.id}/1x`}
+                      srcSet={`${this.BASE_BTTV_CDN}/emote/${bttv_emote.id}/1x 1x, ${this.BASE_BTTV_CDN}/emote/${bttv_emote.id}/2x 2x, ${this.BASE_BTTV_CDN}/emote/${bttv_emote.id}/3x 4x`}
                       alt=""
                     />
                     {` `}
@@ -474,9 +454,29 @@ class VodPlayer extends Component {
             if (found) continue;
           }
 
-          textFragments.push(
-            <span key={this.messageCount++}>{`${message} `}</span>
-          );
+          if (this.SevenTVEmotes) {
+            for (let sevenTVEmote of this.SevenTVEmotes) {
+              if (message === sevenTVEmote.name) {
+                found = true;
+                textFragments.push(
+                  <div key={this.messageCount++} style={{ display: "inline" }}>
+                    <img
+                      crossOrigin="anonymous"
+                      className={this.props.classes.chatEmote}
+                      src={`${sevenTVEmote.urls[0][1]}`}
+                      srcSet={`${sevenTVEmote.urls[0][1]} 1x, ${sevenTVEmote.urls[1][1]} 2x, ${sevenTVEmote.urls[2][1]} 3x, ${sevenTVEmote.urls[3][1]} 4x`}
+                      alt=""
+                    />
+                    {` `}
+                  </div>
+                );
+                break;
+              }
+            }
+            if (found) continue;
+          }
+
+          textFragments.push(<span key={this.messageCount++}>{`${message} `}</span>);
         }
       } else {
         textFragments.push(
@@ -484,10 +484,10 @@ class VodPlayer extends Component {
             <img
               crossOrigin="anonymous"
               className={this.props.classes.chatEmote}
-              src={`${this.BASE_TWITCH_CDN}emoticons/v2/${messageFragment.emoticon.emoticon_id}/default/dark/1.0`}
+              src={`${this.BASE_TWITCH_CDN}/emoticons/v2/${messageFragment.emoticon.emoticon_id}/default/dark/1.0`}
               srcSet={
                 messageFragment.emoticon.emoticon_set_id
-                  ? `${this.BASE_TWITCH_CDN}emoticons/v2/${messageFragment.emoticon.emoticon_set_id}/default/dark/1.0 1x, ${this.BASE_TWITCH_CDN}emoticons/v2/${messageFragment.emoticon.emoticon_set_id}/default/dark/2.0 2x`
+                  ? `${this.BASE_TWITCH_CDN}/emoticons/v2/${messageFragment.emoticon.emoticon_set_id}/default/dark/1.0 1x, ${this.BASE_TWITCH_CDN}/emoticons/v2/${messageFragment.emoticon.emoticon_set_id}/default/dark/2.0 2x`
                   : ""
               }
               alt=""
@@ -511,11 +511,7 @@ class VodPlayer extends Component {
     playerCurrentTime += this.delay;
 
     let pastIndex = this.state.comments.length - 1;
-    for (
-      let i = this.state.stoppedAtIndex.valueOf();
-      i < this.state.comments.length;
-      i++
-    ) {
+    for (let i = this.state.stoppedAtIndex.valueOf(); i < this.state.comments.length; i++) {
       const comment = this.state.comments[i];
       if (comment.content_offset_seconds > playerCurrentTime) {
         pastIndex = i;
@@ -526,11 +522,7 @@ class VodPlayer extends Component {
     if (this.state.comments.length - 1 === pastIndex) {
       await this.fetchNextComments();
     }
-    if (
-      this.state.stoppedAtIndex === pastIndex &&
-      this.state.stoppedAtIndex !== 0
-    )
-      return;
+    if (this.state.stoppedAtIndex === pastIndex && this.state.stoppedAtIndex !== 0) return;
 
     let messages = this.state.messages.slice(0);
     for (let i = this.state.stoppedAtIndex.valueOf(); i < pastIndex; i++) {
@@ -538,22 +530,9 @@ class VodPlayer extends Component {
       if (!comment.message) continue;
       messages.push(
         <li key={comment.id} style={{ width: "100%" }}>
-          <Box
-            alignItems="flex-start"
-            display="flex"
-            flexWrap="nowrap"
-            width="100%"
-            paddingLeft="0.5rem"
-            paddingTop="0.5rem"
-            paddingBottom="0.5rem"
-          >
+          <Box alignItems="flex-start" display="flex" flexWrap="nowrap" width="100%" paddingLeft="0.5rem" paddingTop="0.5rem" paddingBottom="0.5rem">
             <Box width="100%">
-              <Box
-                alignItems="flex-start"
-                display="flex"
-                flexWrap="nowrap"
-                color="#fff"
-              >
+              <Box alignItems="flex-start" display="flex" flexWrap="nowrap" color="#fff">
                 <Box flexGrow={1}>
                   {this.transformBadges(comment.user_badges)}
                   <div
@@ -563,11 +542,7 @@ class VodPlayer extends Component {
                       display: "inline",
                     }}
                   >
-                    <span
-                      style={{ color: comment.user_color, fontWeight: "700" }}
-                    >
-                      {comment.display_name}
-                    </span>
+                    <span style={{ color: comment.user_color, fontWeight: "700" }}>{comment.display_name}</span>
                   </div>
                   <Box display="inline">
                     <span>: </span>
@@ -602,10 +577,35 @@ class VodPlayer extends Component {
     }, 1000);
   };
 
+  changeTypeHandler = () => {
+    this.clearLoopTimeout();
+    this.setState({ type: this.state.type === "live" ? "vod" : "live" }, async () => {
+      await this.fetchVodData();
+      this.totalYoutubeDuration = 0;
+      for (let video of this.state.youtube_data) {
+        this.totalYoutubeDuration += video.duration;
+      }
+      this.delay = this.vodDuration - this.totalYoutubeDuration < 0 ? 0 : this.vodDuration - this.totalYoutubeDuration;
+      console.info(`Chat Delay: ${this.delay} seconds`);
+      let driveId;
+      if (this.state.vodData.drive)
+        for (let drive of this.state.vodData.drive) {
+          if (this.state.type === drive.type) {
+            driveId = drive.id;
+            break;
+          }
+        }
+      this.setState({ driveId: driveId });
+      if (this.state.youtube_data[this.state.part].id) {
+        this.player.loadVideoById(this.state.youtube_data[this.state.part].id);
+      }
+    });
+  };
+
   render() {
     const { classes, isMobile } = this.props;
-    const { vodData, chatLoading, messages, driveId, part, youtube_data } =
-      this.state;
+    const { vodData, chatLoading, messages, driveId, part, youtube_data, type } = this.state;
+
     return !vodData ? (
       <div className={classes.parent}>
         <div style={{ textAlign: "center" }}>
@@ -617,10 +617,7 @@ class VodPlayer extends Component {
       </div>
     ) : (
       <Container maxWidth={false} disableGutters style={{ height: "100%" }}>
-        <Box
-          flexDirection={isMobile ? "column" : "row"}
-          className={classes.playerParent}
-        >
+        <Box flexDirection={isMobile ? "column" : "row"} className={classes.playerParent}>
           <div style={{ width: "100%" }}>
             <Youtube
               containerClassName={classes.player}
@@ -651,55 +648,35 @@ class VodPlayer extends Component {
                     <Typography variant="body2" className={classes.title}>
                       {vodData.title}
                     </Typography>
-                    <div
-                      className={`${classes.marginRight} ${classes.marginLeft}`}
-                    >
-                      <FormControl className={classes.formControl}>
+                    <div className={`${classes.marginRight} ${classes.marginLeft}`}>
+                      <FormControl variant="standard" sx={{ m: 1, minWidth: 80 }}>
                         <InputLabel className={classes.label} id="select-label">
                           Part
                         </InputLabel>
-                        <Select
-                          labelId="select-label"
-                          value={part}
-                          onChange={this.handleChange}
-                          autoWidth
-                          className={classes.dropdownSelect}
-                          MenuProps={{
-                            classes: { paper: classes.dropdownStyle },
-                          }}
-                          classes={{
-                            root: classes.dropdownRoot,
-                          }}
-                          inputProps={{
-                            classes: {
-                              icon: classes.dropdownIcon,
-                            },
-                          }}
-                        >
+                        <Select labelId="select-label" value={part} onChange={this.handleChange} autoWidth>
                           {youtube_data.map((data, i) => {
                             return (
                               <MenuItem key={data.id} value={i}>
-                                Part {i + 1}
+                                {i + 1}
                               </MenuItem>
                             );
                           })}
                         </Select>
                       </FormControl>
                     </div>
-                    {isMobile ? (
-                      <></>
-                    ) : (
+                    <FormGroup>
+                      <FormControlLabel
+                        control={<Switch checked={type === "live"} onChange={this.changeTypeHandler} disabled={!vodData.youtube.some((data) => data.type === (type === "live" ? "vod" : "live"))} />}
+                        label="Live Vod"
+                      />
+                    </FormGroup>
+                    {!isMobile && (
                       <div className={`${classes.marginRight}`}>
-                        <Button
-                          component={Link}
-                          href={`https://drive.google.com/u/2/uc?id=${driveId}`}
-                          rel="noopener noreferrer"
-                          target="_blank"
-                          variant="contained"
-                          className={classes.button}
-                        >
-                          Download Vod
-                        </Button>
+                        {driveId != null && (
+                          <Button component={Link} href={`https://drive.google.com/u/2/uc?id=${driveId}`} rel="noopener noreferrer" target="_blank" variant="contained">
+                            Download Vod
+                          </Button>
+                        )}
                       </div>
                     )}
                   </Box>
@@ -712,7 +689,7 @@ class VodPlayer extends Component {
               defaultSize={
                 isMobile
                   ? {
-                      height: "350px",
+                      height: "600px",
                       width: "100%",
                     }
                   : {
@@ -720,7 +697,7 @@ class VodPlayer extends Component {
                       height: "100%",
                     }
               }
-              maxHeight={isMobile ? "350px" : "100%"}
+              maxHeight={isMobile ? "600px" : "100%"}
               minHeight={isMobile ? "100px" : "100%"}
               minWidth={isMobile ? "100%" : "340px"}
               enable={
@@ -748,26 +725,13 @@ class VodPlayer extends Component {
               }
             >
               {chatLoading ? (
-                <div
-                  style={{
-                    textAlign: "center",
-                    marginTop: isMobile ? "3rem" : "20vh",
-                  }}
-                >
+                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
                   <CircularProgress size="3rem" />
-                </div>
+                </Box>
               ) : (
                 <div className={classes.chat}>
-                  <SimpleBar
-                    scrollableNodeProps={{ ref: this.chatRef }}
-                    className={classes.scroll}
-                  >
-                    <Box
-                      display="flex"
-                      height="100%"
-                      justifyContent="flex-end"
-                      flexDirection="column"
-                    >
+                  <SimpleBar scrollableNodeProps={{ ref: this.chatRef }} className={classes.scroll}>
+                    <Box display="flex" height="100%" justifyContent="flex-end" flexDirection="column">
                       <ul className={classes.ul}>{messages}</ul>
                     </Box>
                   </SimpleBar>
@@ -858,7 +822,6 @@ const useStyles = () => ({
     borderTopLeftRadius: "4px",
     borderTopRightRadius: "4px",
     width: "100%",
-    paddingBottom: "2.6rem",
   },
   marginRight: {
     marginRight: "1rem",
@@ -867,10 +830,10 @@ const useStyles = () => ({
     marginLeft: "1rem",
   },
   button: {
-    backgroundColor: "#0251e2c2",
+    backgroundColor: "#008230",
     color: `#fff`,
     "&:hover": {
-      backgroundColor: "#0251e2c2",
+      backgroundColor: "#008230",
       opacity: "0.7",
       textDecoration: "none",
       color: `#fff`,
@@ -910,8 +873,17 @@ const useStyles = () => ({
   title: {
     color: "#fff",
     overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    display: "block",
   },
 });
+
+const withRouter = (WrappedComponent) => (props) => {
+  const params = useParams();
+  const location = useLocation();
+  return <WrappedComponent {...props} vodId={params.vodId} location={location} />;
+};
 
 const withMediaQuery =
   (...args) =>
@@ -921,6 +893,4 @@ const withMediaQuery =
     return <Component isMobile={mediaQuery} {...props} />;
   };
 
-export default withStyles(useStyles)(
-  withMediaQuery("(max-width: 600px)")(VodPlayer)
-);
+export default withStyles(useStyles)(withMediaQuery("(max-width: 600px)")(withRouter(VodPlayer)));

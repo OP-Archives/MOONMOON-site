@@ -1,61 +1,96 @@
-import { BrowserRouter, Route, Switch } from "react-router-dom";
-import Frontpage from "./frontpage";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Vods from "./vods";
 import VodPlayer from "./vod_player";
 import Navbar from "./navbar";
-import background from "./assets/background.png";
+import { createTheme, ThemeProvider, responsiveFontSizes } from "@mui/material/styles";
+import { CssBaseline, styled } from "@mui/material";
+import { blue } from "@mui/material/colors";
+
+const channel = "moonmoon",
+  twitchId = "121059319";
 
 export default function App() {
-  const channel = "moonmoon", twitchId = "121059319";
+  let darkTheme = createTheme({
+    palette: {
+      mode: "dark",
+      background: {
+        default: "#0e0e10",
+      },
+      primary: {
+        main: blue[500],
+      },
+      secondary: {
+        main: "#292828",
+      },
+    },
+    components: {
+      MuiDrawer: {
+        styleOverrides: {
+          paper: {
+            color: "white",
+            backgroundImage: "none",
+          },
+        },
+      },
+    },
+  });
+
+  darkTheme = responsiveFontSizes(darkTheme);
+
   return (
-    <BrowserRouter>
-      <Switch>
-        <Route
-          exact
-          path="/"
-          render={(props) => (
-            <div
-              className="root background"
-              style={{
-                backgroundImage: `url(${background})`,
-              }}
-            >
-              <Navbar {...props} />
-              <Frontpage {...props} />
-            </div>
-          )}
-        />
-        <Route
-          exact
-          path="/vods"
-          render={(props) => (
-            <div
-              className="root"
-            >
-              <Navbar {...props} />
-              <Vods {...props} channel={channel} twitchId={twitchId} />
-            </div>
-          )}
-        />
-        <Route
-          exact
-          path="/vods/:vodId"
-          render={(props) => (
-            <div className="root">
-              <VodPlayer {...props} channel={channel} type={"vod"} twitchId={twitchId} />
-            </div>
-          )}
-        />
-        <Route
-          exact
-          path="/live/:vodId"
-          render={(props) => (
-            <div className="root">
-              <VodPlayer {...props} channel={channel} type={"live"} twitchId={twitchId} />
-            </div>
-          )}
-        />
-      </Switch>
-    </BrowserRouter>
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <BrowserRouter>
+        <Routes>
+          <Route
+            exact
+            path="/"
+            element={
+              <Parent>
+                <Navbar />
+                <Vods channel={channel} twitchId={twitchId} />
+              </Parent>
+            }
+          />
+          <Route
+            exact
+            path="/vods"
+            element={
+              <Parent>
+                <Navbar />
+                <Vods channel={channel} twitchId={twitchId} />
+              </Parent>
+            }
+          />
+          <Route
+            exact
+            path="/vods/:vodId"
+            element={
+              <Parent>
+                <VodPlayer channel={channel} type={"vod"} twitchId={twitchId} />
+              </Parent>
+            }
+          />
+          <Route
+            exact
+            path="/live/:vodId"
+            element={
+              <Parent>
+                <VodPlayer channel={channel} type={"live"} twitchId={twitchId} />
+              </Parent>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
+
+const Parent = styled((props) => <div {...props} />)`
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+`;

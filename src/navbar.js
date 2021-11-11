@@ -1,17 +1,8 @@
 import React from "react";
-import {
-  AppBar,
-  Toolbar,
-  makeStyles,
-  List,
-  ListItem,
-  ListItemText,
-  Typography,
-  Divider,
-  IconButton,
-  Drawer,
-} from "@material-ui/core";
-import MenuIcon from "@material-ui/icons/Menu";
+import { AppBar, Toolbar, List, ListItem, ListItemText, Divider, IconButton, Drawer, Box } from "@mui/material";
+import Menu from "@mui/icons-material/Menu";
+import Logo from "./assets/dribble.gif";
+import CustomLink from "./utils/CustomLink";
 
 const mainLinks = [
   { title: `Home`, path: `/` },
@@ -23,10 +14,7 @@ const socialLinks = [
   { title: `Youtube`, path: `https://www.youtube.com/channel/UCykE3qY-wFLmUMSuryhnS1g` },
 ];
 
-export default function NavBar(props) {
-  const { window } = props;
-  const classes = useStyles();
-
+export default function NavBar() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const handleDrawerToggle = () => {
     setDrawerOpen(!drawerOpen);
@@ -34,86 +22,53 @@ export default function NavBar(props) {
 
   const drawer = (
     <div>
-      <div className={classes.toolbar} />
-      <Typography variant="h6" noWrap className={classes.content}>
-        Moonmoon
-      </Typography>
-      <Divider classes={{ root: classes.divider }} />
+      <Box sx={{ alignItems: "stretch", justifyContent: "center", display: "flex", flexShrink: 1, flexGrow: 1, mb: 1, mt: 1 }}>
+        <Box sx={{ height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+          <a href="/">
+            <img alt="" height="45px" src={Logo} />
+          </a>
+        </Box>
+      </Box>
+      <Divider />
       <List>
         {mainLinks.map(({ title, path }) => (
-          <ListItem
-            key={title}
-            component="a"
-            href={path}
-            className={classes.linkText}
-          >
+          <ListItem key={title} component={CustomLink} href={path}>
             <ListItemText primary={title} />
           </ListItem>
         ))}
       </List>
-      <Divider classes={{ root: classes.divider }} />
+      <Divider />
       <List>
         {socialLinks.map(({ title, path }) => (
-          <ListItem
-            key={title}
-            component="a"
-            href={path}
-            target="_blank"
-            rel="noreferrer noopener"
-            className={classes.linkText}
-          >
+          <ListItem key={title} component={CustomLink} href={path} target="_blank" rel="noreferrer noopener">
             <ListItemText primary={title} />
           </ListItem>
         ))}
       </List>
-      <Divider classes={{ root: classes.divider }} />
-      <div style={{marginTop: "1rem"}}>
-        <Typography
-          variant="caption"
-          className={classes.content}
-          style={{ padding: "14px" }}
-        >
-          <a
-            href="https://twitter.com/overpowered"
-            target="_blank"
-            rel="noreferrer noopener"
-            className={classes.linkText}
-          >
-            Made by OP with 💜
-          </a>
-        </Typography>
-      </div>
+      <Divider />
     </div>
   );
 
-  const container =
-    window !== undefined ? () => window().document.body : undefined;
-
   return (
-    <div style={{ display: "flex" }}>
-      <AppBar position="static" color="inherit" className={classes.appBar}>
+    <Box sx={{ display: "flex" }}>
+      <AppBar position="static" color="inherit">
         <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            className={classes.menuButton}
-          >
-            <MenuIcon />
+          <IconButton color="inherit" aria-label="open drawer" edge="start" onClick={handleDrawerToggle}>
+            <Menu />
           </IconButton>
+          <Box sx={{ alignItems: "stretch", justifyContent: "center", display: "flex", flexShrink: 1, flexGrow: 1, mb: 1, mt: 1 }}>
+            <Box sx={{ height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+              <a href="/">
+                <img alt="" height="45px" src={Logo} />
+              </a>
+            </Box>
+          </Box>
         </Toolbar>
       </AppBar>
-      <nav className={classes.drawer} aria-label="navigation">
+      <nav aria-label="navigation">
         <Drawer
-          container={container}
-          variant="temporary"
-          anchor={"left"}
           open={drawerOpen}
           onClose={handleDrawerToggle}
-          classes={{
-            paper: classes.drawerPaper,
-          }}
           ModalProps={{
             keepMounted: true,
           }}
@@ -121,41 +76,6 @@ export default function NavBar(props) {
           {drawer}
         </Drawer>
       </nav>
-    </div>
+    </Box>
   );
 }
-
-const useStyles = makeStyles((theme) => ({
-  appBar: {
-    boxShadow: "none",
-    backgroundColor: "inherit",
-  },
-  divider: {
-    backgroundColor: "#868686",
-  },
-  drawer: {
-    width: "10rem",
-    flexShrink: 0,
-  },
-  menuButton: {
-    marginRight: theme.spacing(2),
-    color: "#fff",
-  },
-  toolbar: theme.mixins.toolbar,
-  drawerPaper: {
-    width: "10rem",
-    backgroundColor: "#0e0e10",
-    color: "#fff",
-  },
-  content: {
-    flexGrow: 1,
-    padding: theme.spacing(3),
-  },
-  linkText: {
-    textDecoration: `none`,
-    color: `#fff`,
-    "&:hover": {
-      opacity: "50%",
-    },
-  },
-}));
