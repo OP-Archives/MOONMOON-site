@@ -1,5 +1,22 @@
 import React, { Component } from "react";
-import { Box, Typography, useMediaQuery, Link, Container, Button, MenuItem, CircularProgress, FormControl, InputLabel, Select, FormGroup, Switch, FormControlLabel } from "@mui/material";
+import {
+  Box,
+  Typography,
+  useMediaQuery,
+  Link,
+  Button,
+  MenuItem,
+  CircularProgress,
+  FormControl,
+  InputLabel,
+  Select,
+  FormGroup,
+  Switch,
+  FormControlLabel,
+  IconButton,
+  styled,
+  Collapse,
+} from "@mui/material";
 import { withStyles } from "@mui/styles";
 import Youtube from "react-youtube";
 import SimpleBar from "simplebar-react";
@@ -7,6 +24,7 @@ import canAutoPlay from "can-autoplay";
 import Logo from "./assets/dribble.gif";
 import { Resizable } from "re-resizable";
 import { useParams, useLocation } from "react-router-dom";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 function toSeconds(str) {
   var p = str.split(":"),
@@ -53,6 +71,7 @@ class VodPlayer extends Component {
       stoppedAtIndex: 0,
       comments: [],
       type: props.type,
+      showMenu: true,
     };
   }
 
@@ -602,9 +621,13 @@ class VodPlayer extends Component {
     });
   };
 
+  handleExpandClick = () => {
+    this.setState({ showMenu: !this.state.showMenu });
+  };
+
   render() {
     const { classes, isMobile } = this.props;
-    const { vodData, chatLoading, messages, driveId, part, youtube_data, type } = this.state;
+    const { vodData, chatLoading, messages, driveId, part, youtube_data, showMenu, type } = this.state;
 
     return !vodData ? (
       <div className={classes.parent}>
@@ -616,29 +639,36 @@ class VodPlayer extends Component {
         </div>
       </div>
     ) : (
-      <Container maxWidth={false} disableGutters style={{ height: "100%" }}>
-        <Box flexDirection={isMobile ? "column" : "row"} className={classes.playerParent}>
-          <div style={{ width: "100%" }}>
-            <Youtube
-              containerClassName={classes.player}
-              id="player"
-              opts={{
-                height: "100%",
-                width: "100%",
-                playerVars: {
-                  autoplay: 1,
-                  playsinline: 1,
-                  rel: 0,
-                  modestbranding: 1,
-                },
-              }}
-              onReady={this.onReady}
-              onPlay={this.onPlay}
-              onPause={this.clearLoopTimeout}
-              onEnd={this.onEnd}
-              onError={this.playerError}
-            />
-            <Box display="flex" flexGrow="1">
+      <Box sx={{ flexDirection: isMobile ? "column" : "row", display: "flex", height: "100%", width: "100%" }}>
+        <Box sx={{ height: "100%", width: "100%", display: "flex", flexDirection: "column" }}>
+          <Youtube
+            containerClassName={classes.player}
+            id="player"
+            opts={{
+              height: "100%",
+              width: "100%",
+              playerVars: {
+                autoplay: 1,
+                playsinline: 1,
+                rel: 0,
+                modestbranding: 1,
+              },
+            }}
+            onReady={this.onReady}
+            onPlay={this.onPlay}
+            onPause={this.clearLoopTimeout}
+            onEnd={this.onEnd}
+            onError={this.playerError}
+          />
+          {!isMobile && (
+            <Box sx={{ position: "absolute", bottom: 0, left: "40%" }}>
+              <ExpandMore expand={showMenu} onClick={this.handleExpandClick} aria-expanded={showMenu} aria-label="show more">
+                <ExpandMoreIcon />
+              </ExpandMore>
+            </Box>
+          )}
+          <Collapse in={showMenu} timeout="auto" unmountOnExit sx={{ minHeight: "auto !important" }}>
+            <Box sx={{ display: "flex", height: "100%" }}>
               <div className={classes.container}>
                 <div className={classes.row}>
                   <Box display="flex" alignItems="center">
@@ -690,67 +720,68 @@ class VodPlayer extends Component {
                 </div>
               </div>
             </Box>
-          </div>
-          <div className={classes.chatContainer}>
-            <Resizable
-              defaultSize={
-                isMobile
-                  ? {
-                      height: "600px",
-                      width: "100%",
-                    }
-                  : {
-                      width: "340px",
-                      height: "100%",
-                    }
-              }
-              maxHeight={isMobile ? "600px" : "100%"}
-              minHeight={isMobile ? "100px" : "100%"}
-              minWidth={isMobile ? "100%" : "340px"}
-              enable={
-                isMobile
-                  ? {
-                      top: true,
-                      right: false,
-                      bottom: false,
-                      left: false,
-                      topRight: false,
-                      bottomRight: false,
-                      bottomLeft: false,
-                      topLeft: false,
-                    }
-                  : {
-                      top: false,
-                      right: false,
-                      bottom: false,
-                      left: true,
-                      topRight: false,
-                      bottomRight: false,
-                      bottomLeft: false,
-                      topLeft: false,
-                    }
-              }
-            >
-              {chatLoading ? (
-                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
-                  <CircularProgress size="3rem" />
-                </Box>
-              ) : (
-                <div className={classes.chat}>
-                  <SimpleBar scrollableNodeProps={{ ref: this.chatRef }} className={classes.scroll}>
-                    <Box display="flex" height="100%" justifyContent="flex-end" flexDirection="column">
-                      <ul className={classes.ul}>{messages}</ul>
-                    </Box>
-                  </SimpleBar>
-                </div>
-              )}
-            </Resizable>
-          </div>
+          </Collapse>
         </Box>
-      </Container>
+        <div className={classes.chatContainer}>
+          <Resizable
+            defaultSize={
+              isMobile
+                ? {
+                    height: "400px",
+                    width: "100%",
+                  }
+                : {
+                    width: "340px",
+                    height: "100%",
+                  }
+            }
+            maxHeight={isMobile ? "400px" : "100%"}
+            minHeight={isMobile ? "400px" : "100%"}
+            minWidth={isMobile ? "100%" : "340px"}
+            enable={
+              isMobile
+                ? {
+                    top: true,
+                    right: false,
+                    bottom: false,
+                    left: false,
+                    topRight: false,
+                    bottomRight: false,
+                    bottomLeft: false,
+                    topLeft: false,
+                  }
+                : {
+                    top: false,
+                    right: false,
+                    bottom: false,
+                    left: true,
+                    topRight: false,
+                    bottomRight: false,
+                    bottomLeft: false,
+                    topLeft: false,
+                  }
+            }
+          >
+            {chatLoading ? (
+              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
+                <CircularProgress size="3rem" />
+              </Box>
+            ) : (
+              <div className={classes.chat}>
+                <SimpleBar scrollableNodeProps={{ ref: this.chatRef }} className={classes.scroll}>
+                  <Box display="flex" height="100%" justifyContent="flex-end" flexDirection="column">
+                    <ul className={classes.ul}>{messages}</ul>
+                  </Box>
+                </SimpleBar>
+              </div>
+            )}
+          </Resizable>
+        </div>
+      </Box>
     );
   }
 }
+
 
 const useStyles = () => ({
   parent: {
@@ -765,7 +796,7 @@ const useStyles = () => ({
     width: "100%",
   },
   player: {
-    height: "calc(100% - 6rem)",
+    height: "100%",
     width: "100%",
   },
   text: {
@@ -885,6 +916,17 @@ const useStyles = () => ({
     display: "block",
   },
 });
+
+const ExpandMore = styled((props) => {
+  const { expand, ...other } = props;
+  return <IconButton {...other} />;
+})(({ theme, expand }) => ({
+  transform: !expand ? "rotate(0deg)" : "rotate(180deg)",
+  marginLeft: "auto",
+  transition: theme.transitions.create("transform", {
+    duration: theme.transitions.duration.shortest,
+  }),
+}));
 
 const withRouter = (WrappedComponent) => (props) => {
   const params = useParams();
