@@ -1,13 +1,16 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Vods from "./vods";
-import VodPlayer from "./vod_player";
+import Vods from "./vods/vods";
 import Navbar from "./navbar";
 import { createTheme, ThemeProvider, responsiveFontSizes } from "@mui/material/styles";
 import { CssBaseline, styled } from "@mui/material";
 import { blue } from "@mui/material/colors";
+import YoutubeVod from "./vods/YoutubeVod";
+import CustomVod from "./vods/CustomVod";
+import NotFound from "./utils/NotFound";
 
-const channel = "moonmoon",
-  twitchId = "121059319";
+const channel = "Moonmoon",
+  twitchId = "121059319",
+  VODS_API_BASE = `https://archive.overpowered.tv/${channel.toLowerCase()}`;
 
 export default function App() {
   let darkTheme = createTheme({
@@ -43,12 +46,20 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route
+            path="*"
+            element={
+              <Parent>
+                <NotFound />
+              </Parent>
+            }
+          />
+          <Route
             exact
             path="/"
             element={
               <Parent>
                 <Navbar />
-                <Vods channel={channel} twitchId={twitchId} />
+                <Vods channel={channel} twitchId={twitchId} VODS_API_BASE={VODS_API_BASE} />
               </Parent>
             }
           />
@@ -58,7 +69,7 @@ export default function App() {
             element={
               <Parent>
                 <Navbar />
-                <Vods channel={channel} twitchId={twitchId} />
+                <Vods channel={channel} twitchId={twitchId} VODS_API_BASE={VODS_API_BASE} />
               </Parent>
             }
           />
@@ -67,7 +78,7 @@ export default function App() {
             path="/vods/:vodId"
             element={
               <Parent>
-                <VodPlayer channel={channel} type={"vod"} twitchId={twitchId} />
+                <YoutubeVod channel={channel} twitchId={twitchId} type="vod" VODS_API_BASE={VODS_API_BASE} />
               </Parent>
             }
           />
@@ -76,7 +87,25 @@ export default function App() {
             path="/live/:vodId"
             element={
               <Parent>
-                <VodPlayer channel={channel} type={"live"} twitchId={twitchId} />
+                <YoutubeVod channel={channel} twitchId={twitchId} type="live" VODS_API_BASE={VODS_API_BASE} />
+              </Parent>
+            }
+          />
+          <Route
+            exact
+            path="/youtube/:vodId"
+            element={
+              <Parent>
+                <YoutubeVod channel={channel} twitchId={twitchId} VODS_API_BASE={VODS_API_BASE} />
+              </Parent>
+            }
+          />
+          <Route
+            exact
+            path="/manual/:vodId"
+            element={
+              <Parent>
+                <CustomVod channel={channel} twitchId={twitchId} type="manual" VODS_API_BASE={VODS_API_BASE} />
               </Parent>
             }
           />
@@ -93,4 +122,7 @@ const Parent = styled((props) => <div {...props} />)`
   bottom: 0;
   left: 0;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 `;
