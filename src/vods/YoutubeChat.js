@@ -74,9 +74,14 @@ export default function Chat(props) {
         },
       })
         .then((response) => response.json())
-        .then((data) => {
-          if (data.error) return;
-          emotes.current = data.data[0];
+        .then((response) => {
+          if (response.data.length === 0) {
+            loadBTTVGlobalEmotes();
+            load7TVEmotes();
+            loadFFZEmotes();
+            return;
+          }
+          emotes.current = response.data[0];
         })
         .catch((e) => {
           console.error(e);
