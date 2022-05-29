@@ -68,7 +68,7 @@ export default function Vods(props) {
   if (loading) return <Loading />;
 
   return (
-    <SimpleBar style={{ maxHeight: "calc(100% - 4rem)" }}>
+    <SimpleBar style={{ minHeight: "calc(100% - 5rem)" }}>
       <Box sx={{ padding: 2 }}>
         <Grid container spacing={2} sx={{ mt: 1, justifyContent: "center" }}>
           {vods.map((vod, i) => (
