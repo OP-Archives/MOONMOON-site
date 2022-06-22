@@ -4,6 +4,7 @@ import SimpleBar from "simplebar-react";
 import Loading from "../utils/Loading";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { collapseClasses } from "@mui/material/Collapse";
+import Twemoji from "react-twemoji";
 
 const GLOBAL_TWITCH_BADGES_API = "https://badges.twitch.tv/v1/badges/global/display?language=en";
 const BASE_TWITCH_CDN = "https://static-cdn.jtvnw.net";
@@ -18,7 +19,7 @@ let messageCount = 0;
 let badgesCount = 0;
 
 export default function Chat(props) {
-  const { isMobile, vodId, playerRef, playing, VODS_API_BASE, twitchId, channel } = props;
+  const { isMobile, vodId, playerRef, playing, VODS_API_BASE, twitchId, channel, userChatDelay, delay, youtube, part } = props;
   const [showChat, setShowChat] = useState(true);
   const [shownMessages, setShownMessages] = useState([]);
   const comments = useRef([]);
@@ -151,19 +152,29 @@ export default function Chat(props) {
     loadEmotes();
     loadChannelBadges();
     loadGlobalTwitchBadges();
-  }, [vodId, VODS_API_BASE, channel, twitchId]);
+  }, [vodId, VODS_API_BASE, twitchId, channel]);
 
   const getCurrentTime = useCallback(() => {
     if (!playerRef.current) return 0;
     let time = 0;
-    time += playerRef.current.currentTime();
-    time += props.delay;
+    if (youtube) {
+      for (let video of youtube) {
+        if (!video.part) break;
+        if (video.part >= part.part) break;
+        time += video.duration;
+      }
+      time += playerRef.current.getCurrentTime();
+    } else {
+      time += playerRef.current.currentTime();
+    }
+    time += delay;
+    time += userChatDelay;
     return time;
-  }, [playerRef, props.delay]);
+  }, [playerRef, youtube, delay, part, userChatDelay]);
 
   const buildComments = useCallback(() => {
-    if (!playerRef.current || comments.current.length === 0 || !cursor.current || stoppedAtIndex.current === null) return;
-    if (playerRef.current.paused()) return;
+    if (!playerRef.current || !comments.current || comments.current.length === 0 || !cursor.current || stoppedAtIndex.current === null) return;
+    if (youtube ? playerRef.current.getPlayerState() !== 1 : playerRef.current.paused()) return;
 
     const time = getCurrentTime();
     let lastIndex = comments.current.length - 1;
@@ -299,7 +310,11 @@ export default function Chat(props) {
               }
             }
 
-            textFragments.push(<Typography variant="body1" display="inline" key={messageCount++}>{`${text} `}</Typography>);
+            textFragments.push(
+              <Twemoji key={messageCount++} noWrapper options={{ className: "twemoji" }}>
+                <Typography variant="body1" display="inline">{`${text} `}</Typography>
+              </Twemoji>
+            );
           }
           continue;
         }
@@ -356,7 +371,7 @@ export default function Chat(props) {
     });
     stoppedAtIndex.current = lastIndex;
     if (comments.current.length - 1 === lastIndex) fetchNextComments();
-  }, [getCurrentTime, playerRef, vodId, VODS_API_BASE]);
+  }, [getCurrentTime, playerRef, vodId, VODS_API_BASE, youtube]);
 
   const loop = useCallback(() => {
     if (loopRef.current !== null) clearInterval(loopRef.current);

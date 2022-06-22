@@ -1,9 +1,9 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Vods from "./vods/vods";
-import Navbar from "./navbar";
 import { createTheme, ThemeProvider, responsiveFontSizes } from "@mui/material/styles";
 import { CssBaseline, styled } from "@mui/material";
 import { blue } from "@mui/material/colors";
+import Vods from "./vods/Vods";
+import Navbar from "./navbar/navbar";
 import YoutubeVod from "./vods/YoutubeVod";
 import CustomVod from "./vods/CustomVod";
 import NotFound from "./utils/NotFound";
@@ -49,7 +49,7 @@ export default function App() {
             path="*"
             element={
               <Parent>
-                <NotFound />
+                <NotFound channel={channel} />
               </Parent>
             }
           />
@@ -58,7 +58,7 @@ export default function App() {
             path="/"
             element={
               <Parent>
-                <Navbar />
+                <Navbar channel={channel} />
                 <Vods channel={channel} twitchId={twitchId} VODS_API_BASE={VODS_API_BASE} />
               </Parent>
             }
@@ -68,7 +68,7 @@ export default function App() {
             path="/vods"
             element={
               <Parent>
-                <Navbar />
+                <Navbar channel={channel} />
                 <Vods channel={channel} twitchId={twitchId} VODS_API_BASE={VODS_API_BASE} />
               </Parent>
             }
@@ -124,5 +124,4 @@ const Parent = styled((props) => <div {...props} />)`
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  min-height: 0;
 `;

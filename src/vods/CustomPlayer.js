@@ -95,7 +95,6 @@ export default function Player(props) {
       const vodDuration = toSeconds(vod.duration);
       const tmpDelay = vodDuration - playerDuration < 0 ? 0 : vodDuration - playerDuration;
       setDelay(tmpDelay);
-      console.info(`Chat Delay: ${tmpDelay} seconds`);
     };
 
     set();
