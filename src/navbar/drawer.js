@@ -13,7 +13,7 @@ const mainLinks = [
 
 const socials = [
   {
-    path: `https://twitter.com/moonmoon`,
+    path: `https://twitter.com/moonmoon_ow`,
     icon: <TwitterIcon color="primary" />,
   },
   {
