@@ -3,7 +3,7 @@ import { Box, Tooltip, IconButton, Menu, MenuItem, Typography } from "@mui/mater
 import humanize from "humanize-duration";
 
 export default function Chapters(props) {
-  const { chapters, chapter, setPart, youtube, setChapter, setInitalDuration } = props;
+  const { chapters, chapter, setPart, youtube, setChapter, setTimestamp } = props;
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handleClose = () => {
@@ -17,43 +17,42 @@ export default function Chapters(props) {
   const handleChapterClick = (data) => {
     if (youtube) {
       let part = 1,
-        duration = data.start;
-      if (duration > 0) {
+        timestamp = data?.start || toSeconds(data.duration);
+      if (timestamp > 1) {
         for (let data of youtube) {
-          if (data.duration > duration) {
-            part = data.part;
+          if (data.duration > timestamp) {
+            part = data?.part || 1;
             break;
           }
-          duration -= data.duration;
+          timestamp -= data.duration;
         }
       }
-      setPart({ part: part, duration: duration });
-      setChapter(data);
+      setPart({ part: part, timestamp: timestamp });
     } else {
-      setInitalDuration(data.start);
-      setChapter(data);
-      setAnchorEl(null);
+      setTimestamp(data?.start || toSeconds(data.duration));
     }
+    setChapter(data);
+    setAnchorEl(null);
   };
 
   return (
     <Box>
       <Tooltip title={chapter.name}>
         <IconButton onClick={handleClick}>
-          <img alt="" src={chapter.image} style={{ width: "40px", height: "53px" }} />
+          <img alt="" src={getImage(chapter.image)} style={{ width: "40px", height: "53px" }} />
         </IconButton>
       </Tooltip>
       <Menu anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose} sx={{ maxWidth: "280px", maxHeight: "400px" }}>
         {chapters.map((data, _) => {
           return (
-            <MenuItem onClick={() => handleChapterClick(data)} key={data.gameId + data.start} selected={data.start === chapter.start}>
+            <MenuItem onClick={() => handleChapterClick(data)} key={(data?.gameId || data.name) + (data?.start || data.duration)} selected={data.start === chapter.start}>
               <Box sx={{ display: "flex" }}>
                 <Box sx={{ mr: 1 }}>
-                  <img alt="" src={data.image} style={{ width: "40px", height: "53px" }} />
+                  <img alt="" src={getImage(data.image)} style={{ width: "40px", height: "53px" }} />
                 </Box>
                 <Box sx={{ display: "flex", flexDirection: "column" }}>
-                  <Typography color="inherit" variant="body2" noWrap>{`${data.name}`}</Typography>
-                  <Typography variant="caption" color="textSecondary" noWrap>{`${humanize(data.end * 1000, { largest: 2 })}`}</Typography>
+                  <Typography color="primary" variant="body2" noWrap>{`${data.name}`}</Typography>
+                  {data.end !== undefined && <Typography variant="caption" color="textSecondary" noWrap>{`${humanize(data.end * 1000, { largest: 2 })}`}</Typography>}
                 </Box>
               </Box>
             </MenuItem>
@@ -63,3 +62,17 @@ export default function Chapters(props) {
     </Box>
   );
 }
+
+//Support older vods that had {width}x{height} in the link
+const getImage = (link) => {
+  if (!link) return "https://static-cdn.jtvnw.net/ttv-static/404_boxart.jpg";
+  return link.replace("{width}x{height}", "40x53");
+};
+
+//Convert older chapter timestamps to seconds.
+const toSeconds = (hms) => {
+  if (!hms) return;
+  const time = hms.split(":");
+
+  return +time[0] * 60 * 60 + +time[1] * 60 + +time[2];
+};

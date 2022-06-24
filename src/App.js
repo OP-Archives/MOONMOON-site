@@ -1,12 +1,15 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { createTheme, ThemeProvider, responsiveFontSizes } from "@mui/material/styles";
 import { CssBaseline, styled } from "@mui/material";
 import { blue } from "@mui/material/colors";
-import Vods from "./vods/Vods";
-import Navbar from "./navbar/navbar";
-import YoutubeVod from "./vods/YoutubeVod";
-import CustomVod from "./vods/CustomVod";
-import NotFound from "./utils/NotFound";
+import Loading from "./utils/Loading";
+
+const Vods = lazy(() => import("./vods/Vods"));
+const Navbar = lazy(() => import("./navbar/navbar"));
+const YoutubeVod = lazy(() => import("./vods/YoutubeVod"));
+const CustomVod = lazy(() => import("./vods/CustomVod"));
+const NotFound = lazy(() => import("./utils/NotFound"));
 
 const channel = "Moonmoon",
   twitchId = "121059319",
@@ -44,72 +47,76 @@ export default function App() {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <BrowserRouter>
-        <Routes>
-          <Route
-            path="*"
-            element={
-              <Parent>
-                <NotFound channel={channel} />
-              </Parent>
-            }
-          />
-          <Route
-            exact
-            path="/"
-            element={
-              <Parent>
-                <Navbar channel={channel} />
-                <Vods channel={channel} twitchId={twitchId} VODS_API_BASE={VODS_API_BASE} />
-              </Parent>
-            }
-          />
-          <Route
-            exact
-            path="/vods"
-            element={
-              <Parent>
-                <Navbar channel={channel} />
-                <Vods channel={channel} twitchId={twitchId} VODS_API_BASE={VODS_API_BASE} />
-              </Parent>
-            }
-          />
-          <Route
-            exact
-            path="/vods/:vodId"
-            element={
-              <Parent>
-                <YoutubeVod channel={channel} twitchId={twitchId} type="vod" VODS_API_BASE={VODS_API_BASE} />
-              </Parent>
-            }
-          />
-          <Route
-            exact
-            path="/live/:vodId"
-            element={
-              <Parent>
-                <YoutubeVod channel={channel} twitchId={twitchId} type="live" VODS_API_BASE={VODS_API_BASE} />
-              </Parent>
-            }
-          />
-          <Route
-            exact
-            path="/youtube/:vodId"
-            element={
-              <Parent>
-                <YoutubeVod channel={channel} twitchId={twitchId} VODS_API_BASE={VODS_API_BASE} />
-              </Parent>
-            }
-          />
-          <Route
-            exact
-            path="/manual/:vodId"
-            element={
-              <Parent>
-                <CustomVod channel={channel} twitchId={twitchId} type="manual" VODS_API_BASE={VODS_API_BASE} />
-              </Parent>
-            }
-          />
-        </Routes>
+        <Parent>
+          <Suspense fallback={<Loading />}>
+            <Routes>
+              <Route
+                path="*"
+                element={
+                  <Parent>
+                    <NotFound channel={channel} />
+                  </Parent>
+                }
+              />
+              <Route
+                exact
+                path="/"
+                element={
+                  <Parent>
+                    <Navbar channel={channel} />
+                    <Vods channel={channel} twitchId={twitchId} VODS_API_BASE={VODS_API_BASE} />
+                  </Parent>
+                }
+              />
+              <Route
+                exact
+                path="/vods"
+                element={
+                  <Parent>
+                    <Navbar channel={channel} />
+                    <Vods channel={channel} twitchId={twitchId} VODS_API_BASE={VODS_API_BASE} />
+                  </Parent>
+                }
+              />
+              <Route
+                exact
+                path="/vods/:vodId"
+                element={
+                  <Parent>
+                    <YoutubeVod channel={channel} twitchId={twitchId} type="vod" VODS_API_BASE={VODS_API_BASE} />
+                  </Parent>
+                }
+              />
+              <Route
+                exact
+                path="/live/:vodId"
+                element={
+                  <Parent>
+                    <YoutubeVod channel={channel} twitchId={twitchId} type="live" VODS_API_BASE={VODS_API_BASE} />
+                  </Parent>
+                }
+              />
+              <Route
+                exact
+                path="/youtube/:vodId"
+                element={
+                  <Parent>
+                    <YoutubeVod channel={channel} twitchId={twitchId} VODS_API_BASE={VODS_API_BASE} />
+                  </Parent>
+                }
+              />
+              <Route
+                exact
+                path="/manual/:vodId"
+                element={
+                  <Parent>
+                    <CustomVod channel={channel} twitchId={twitchId} type="manual" VODS_API_BASE={VODS_API_BASE} />
+                  </Parent>
+                }
+              />
+            </Routes>
+          </Suspense>
+        </Parent>
       </BrowserRouter>
     </ThemeProvider>
   );
