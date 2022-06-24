@@ -50,70 +50,31 @@ export default function App() {
         <Parent>
           <Suspense fallback={<Loading />}>
             <Routes>
-              <Route
-                path="*"
-                element={
-                  <Parent>
-                    <NotFound channel={channel} />
-                  </Parent>
-                }
-              />
+              <Route path="*" element={<NotFound channel={channel} />} />
               <Route
                 exact
                 path="/"
                 element={
-                  <Parent>
+                  <>
                     <Navbar channel={channel} />
                     <Vods channel={channel} twitchId={twitchId} VODS_API_BASE={VODS_API_BASE} />
-                  </Parent>
+                  </>
                 }
               />
               <Route
                 exact
                 path="/vods"
                 element={
-                  <Parent>
+                  <>
                     <Navbar channel={channel} />
                     <Vods channel={channel} twitchId={twitchId} VODS_API_BASE={VODS_API_BASE} />
-                  </Parent>
+                  </>
                 }
               />
-              <Route
-                exact
-                path="/vods/:vodId"
-                element={
-                  <Parent>
-                    <YoutubeVod channel={channel} twitchId={twitchId} type="vod" VODS_API_BASE={VODS_API_BASE} />
-                  </Parent>
-                }
-              />
-              <Route
-                exact
-                path="/live/:vodId"
-                element={
-                  <Parent>
-                    <YoutubeVod channel={channel} twitchId={twitchId} type="live" VODS_API_BASE={VODS_API_BASE} />
-                  </Parent>
-                }
-              />
-              <Route
-                exact
-                path="/youtube/:vodId"
-                element={
-                  <Parent>
-                    <YoutubeVod channel={channel} twitchId={twitchId} VODS_API_BASE={VODS_API_BASE} />
-                  </Parent>
-                }
-              />
-              <Route
-                exact
-                path="/manual/:vodId"
-                element={
-                  <Parent>
-                    <CustomVod channel={channel} twitchId={twitchId} type="manual" VODS_API_BASE={VODS_API_BASE} />
-                  </Parent>
-                }
-              />
+              <Route exact path="/vods/:vodId" element={<YoutubeVod channel={channel} twitchId={twitchId} type="vod" VODS_API_BASE={VODS_API_BASE} />} />
+              <Route exact path="/live/:vodId" element={<YoutubeVod channel={channel} twitchId={twitchId} type="live" VODS_API_BASE={VODS_API_BASE} />} />
+              <Route exact path="/youtube/:vodId" element={<YoutubeVod channel={channel} twitchId={twitchId} VODS_API_BASE={VODS_API_BASE} />} />
+              <Route exact path="/manual/:vodId" element={<CustomVod channel={channel} twitchId={twitchId} type="manual" VODS_API_BASE={VODS_API_BASE} />} />
             </Routes>
           </Suspense>
         </Parent>
