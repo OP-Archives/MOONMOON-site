@@ -19,7 +19,7 @@ let messageCount = 0;
 let badgesCount = 0;
 
 export default function Chat(props) {
-  const { isMobile, vodId, playerRef, playing, VODS_API_BASE, twitchId, channel, userChatDelay, delay, youtube, part } = props;
+  const { isPortrait, vodId, playerRef, playing, VODS_API_BASE, twitchId, channel, userChatDelay, delay, youtube, part } = props;
   const [showChat, setShowChat] = useState(true);
   const [shownMessages, setShownMessages] = useState([]);
   const comments = useRef([]);
@@ -459,7 +459,7 @@ export default function Chat(props) {
       {showChat ? (
         <>
           <Box sx={{ display: "grid", alignItems: "center", p: 1 }}>
-            {!isMobile && (
+            {!isPortrait && (
               <Box sx={{ justifySelf: "left", gridColumnStart: 1, gridRowStart: 1 }}>
                 <Tooltip title="Collapse">
                   <ExpandMore expand={showChat} onClick={handleExpandClick} aria-expanded={showChat}>
@@ -486,7 +486,7 @@ export default function Chat(props) {
           </CustomCollapse>
         </>
       ) : (
-        !isMobile && (
+        !isPortrait && (
           <Box sx={{ position: "absolute", right: 0 }}>
             <Tooltip title="Expand">
               <ExpandMore expand={showChat} onClick={handleExpandClick} aria-expanded={showChat}>

@@ -15,7 +15,7 @@ import { parse } from "tinyduration";
 
 export default function Vod(props) {
   const location = useLocation();
-  const isMobile = useMediaQuery("(max-width: 600px)");
+  const isPortrait = useMediaQuery("(orientation: portrait)");
   const { vodId } = useParams();
   const { type, VODS_API_BASE, channel, twitchId } = props;
   const [vod, setVod] = useState(undefined);
@@ -129,18 +129,16 @@ export default function Vod(props) {
 
   return (
     <Box sx={{ height: "100%", width: "100%" }}>
-      <Box sx={{ display: "flex", flexDirection: isMobile ? "column" : "row", height: "100%", width: "100%" }}>
-        <Box sx={{ display: "flex", height: "100%", width: "100%", flexDirection: "column", alignItems: "flex-start", minWidth: 0, overflow: "hidden" }}>
+      <Box sx={{ display: "flex", flexDirection: isPortrait ? "column" : "row", height: "100%", width: "100%" }}>
+        <Box sx={{ display: "flex", height: "100%", width: "100%", flexDirection: "column", alignItems: "flex-start", minWidth: 0, overflow: "hidden", position: "relative" }}>
           <YoutubePlayer playerRef={playerRef} part={part} youtube={youtube} setCurrentTime={setCurrentTime} setPart={setPart} setPlaying={setPlaying} delay={delay} />
-          {!isMobile && (
-            <Box sx={{ position: "absolute", bottom: 0, left: "40%" }}>
-              <Tooltip title={showMenu ? "Collapse" : "Expand"}>
-                <ExpandMore expand={showMenu} onClick={handleExpandClick} aria-expanded={showMenu} aria-label="show menu">
-                  <ExpandMoreIcon />
-                </ExpandMore>
-              </Tooltip>
-            </Box>
-          )}
+          <Box sx={{ position: "absolute", bottom: 0, left: "50%", width: "100%" }}>
+            <Tooltip title={showMenu ? "Collapse" : "Expand"}>
+              <ExpandMore expand={showMenu} onClick={handleExpandClick} aria-expanded={showMenu} aria-label="show menu">
+                <ExpandMoreIcon />
+              </ExpandMore>
+            </Tooltip>
+          </Box>
           <Collapse in={showMenu} timeout="auto" unmountOnExit sx={{ minHeight: "auto !important", width: "100%" }}>
             <Box sx={{ display: "flex", p: 1, alignItems: "center" }}>
               {chapter && <Chapters chapters={vod.chapters} chapter={chapter} setPart={setPart} youtube={youtube} setChapter={setChapter} />}
@@ -166,7 +164,7 @@ export default function Vod(props) {
               <Box sx={{ ml: 1 }}>
                 {drive && drive[0] && (
                   <Tooltip title={`Download Vod`}>
-                    <IconButton component={Link} href={`https://drive.google.com/u/2/uc?id=${drive[0].id}`} color="primary" aria-label="Download Vod" rel="noopener noreferrer" target="_blank">
+                    <IconButton component={Link} href={`https://drive.google.com/u/2/open?id=${drive[0].id}`} color="primary" aria-label="Download Vod" rel="noopener noreferrer" target="_blank">
                       <CloudDownloadIcon />
                     </IconButton>
                   </Tooltip>
@@ -189,9 +187,9 @@ export default function Vod(props) {
             </Box>
           </Collapse>
         </Box>
-        {isMobile && <Divider />}
+        {isPortrait && <Divider />}
         <Chat
-          isMobile={isMobile}
+          isPortrait={isPortrait}
           vodId={vodId}
           playerRef={playerRef}
           playing={playing}
