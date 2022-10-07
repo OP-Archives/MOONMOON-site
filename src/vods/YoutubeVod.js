@@ -61,22 +61,27 @@ export default function Vod(props) {
       setYoutube(vod.youtube.filter((data) => data.type === type));
       setDrive(vod.drive.filter((data) => data.type === type));
     }
+    setChapter(vod.chapters ? vod.chapters[0] : null);
+    return;
+  }, [vod, type]);
+
+  useEffect(() => {
+    if (!youtube) return;
+
     const search = new URLSearchParams(location.search);
     let timestamp = search.get("t") !== null ? convertTimestamp(search.get("t")) : 0;
     let tmpPart = search.get("part") !== null ? parseInt(search.get("part")) : 1;
     if (timestamp > 0) {
-      for (let data of vod.youtube) {
+      for (let data of youtube) {
         if (data.duration > timestamp) {
-          tmpPart = data?.part || vod.youtube.indexOf(data) + 1;
+          tmpPart = data?.part || youtube.indexOf(data) + 1;
           break;
         }
         timestamp -= data.duration;
       }
     }
     setPart({ part: tmpPart, timestamp: timestamp });
-    setChapter(vod.chapters ? vod.chapters[0] : null);
-    return;
-  }, [vod, type, location.search]);
+  }, [location.search, youtube]);
 
   useEffect(() => {
     if (!playerRef.current || !vod || !vod.chapters) return;
