@@ -12,6 +12,8 @@ import Chapters from "./VodChapters";
 import ExpandMore from "../utils/CustomExpandMore";
 import CustomToolTip from "../utils/CustomToolTip";
 import { parse } from "tinyduration";
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { toHMS } from "../utils/hms";
 
 export default function Vod(props) {
   const location = useLocation();
@@ -128,6 +130,10 @@ export default function Vod(props) {
     console.info(`Chat Delay: ${userChatDelay + delay} seconds`);
   }, [userChatDelay, delay]);
 
+  const copyTimestamp = () => {
+    navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}?t=${toHMS(currentTime)}`);
+  }
+
   if (vod === undefined || drive === undefined || chapter === undefined || part === undefined || delay === undefined) return <Loading />;
 
   if (youtube.length === 0) return <NotFound channel={channel} />;
@@ -188,6 +194,13 @@ export default function Vod(props) {
                   size="small"
                   defaultValue={userChatDelay}
                 />
+              </Box>
+              <Box sx={{ ml: 1 }}>
+                <Tooltip title={`Copy Current Timestamp`}>
+                  <IconButton onClick={copyTimestamp} color="primary" aria-label="Copy Current Timestamp" rel="noopener noreferrer" target="_blank">
+                    <ContentCopyIcon />
+                  </IconButton>
+                </Tooltip>
               </Box>
             </Box>
           </Collapse>
