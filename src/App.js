@@ -8,12 +8,13 @@ import Loading from "./utils/Loading";
 const Vods = lazy(() => import("./vods/Vods"));
 const Navbar = lazy(() => import("./navbar/navbar"));
 const YoutubeVod = lazy(() => import("./vods/YoutubeVod"));
+const Games = lazy(() => import("./games/Games"));
 const CustomVod = lazy(() => import("./vods/CustomVod"));
 const NotFound = lazy(() => import("./utils/NotFound"));
 
-const channel = "Moonmoon",
-  twitchId = "121059319",
-  VODS_API_BASE = `https://archive.overpowered.tv/${channel.toLowerCase()}`;
+const channel = process.env.REACT_APP_CHANNEL,
+  twitchId = process.env.REACT_APP_TWITCH_ID,
+  VODS_API_BASE = process.env.REACT_APP_VODS_API_BASE;
 
 export default function App() {
   let darkTheme = createTheme({
@@ -74,6 +75,7 @@ export default function App() {
               <Route exact path="/vods/:vodId" element={<YoutubeVod channel={channel} twitchId={twitchId} type="vod" VODS_API_BASE={VODS_API_BASE} />} />
               <Route exact path="/live/:vodId" element={<YoutubeVod channel={channel} twitchId={twitchId} type="live" VODS_API_BASE={VODS_API_BASE} />} />
               <Route exact path="/youtube/:vodId" element={<YoutubeVod channel={channel} twitchId={twitchId} VODS_API_BASE={VODS_API_BASE} />} />
+              <Route exact path="/games/:vodId" element={<Games channel={channel} twitchId={twitchId} VODS_API_BASE={VODS_API_BASE} />} />
               <Route exact path="/manual/:vodId" element={<CustomVod channel={channel} twitchId={twitchId} type="manual" VODS_API_BASE={VODS_API_BASE} />} />
             </Routes>
           </Suspense>

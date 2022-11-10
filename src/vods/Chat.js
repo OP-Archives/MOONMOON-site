@@ -19,7 +19,7 @@ let messageCount = 0;
 let badgesCount = 0;
 
 export default function Chat(props) {
-  const { isPortrait, vodId, playerRef, playing, VODS_API_BASE, twitchId, channel, userChatDelay, delay, youtube, part } = props;
+  const { isPortrait, vodId, playerRef, playing, VODS_API_BASE, twitchId, channel, userChatDelay, delay, youtube, part, games } = props;
   const [showChat, setShowChat] = useState(true);
   const [shownMessages, setShownMessages] = useState([]);
   const comments = useRef([]);
@@ -164,17 +164,20 @@ export default function Chat(props) {
         time += video.duration;
       }
       time += playerRef.current.getCurrentTime();
+    } else if (games) {
+      time += parseFloat(games[part.part - 1].start_time);
+      time += playerRef.current.getCurrentTime();
     } else {
       time += playerRef.current.currentTime();
     }
     time += delay;
     time += userChatDelay;
     return time;
-  }, [playerRef, youtube, delay, part, userChatDelay]);
+  }, [playerRef, youtube, delay, part, userChatDelay, games]);
 
   const buildComments = useCallback(() => {
     if (!playerRef.current || !comments.current || comments.current.length === 0 || !cursor.current || stoppedAtIndex.current === null) return;
-    if (youtube ? playerRef.current.getPlayerState() !== 1 : playerRef.current.paused()) return;
+    if (youtube || games ? playerRef.current.getPlayerState() !== 1 : playerRef.current.paused()) return;
 
     const time = getCurrentTime();
     let lastIndex = comments.current.length - 1;
@@ -371,7 +374,7 @@ export default function Chat(props) {
     });
     stoppedAtIndex.current = lastIndex;
     if (comments.current.length - 1 === lastIndex) fetchNextComments();
-  }, [getCurrentTime, playerRef, vodId, VODS_API_BASE, youtube]);
+  }, [getCurrentTime, playerRef, vodId, VODS_API_BASE, youtube, games]);
 
   const loop = useCallback(() => {
     if (loopRef.current !== null) clearInterval(loopRef.current);
