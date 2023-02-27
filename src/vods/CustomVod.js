@@ -1,12 +1,11 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { Box, Typography, Tooltip, useMediaQuery, IconButton, Link, Collapse, Divider, TextField, InputAdornment } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Box, Typography, Tooltip, useMediaQuery, IconButton, Link, Collapse, Divider } from "@mui/material";
 import Loading from "../utils/Loading";
 import { useLocation, useParams } from "react-router-dom";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CustomPlayer from "./CustomPlayer";
 import Chat from "./Chat";
-import debounce from "lodash.debounce";
 import Chapters from "./VodChapters";
 import ExpandMore from "../utils/CustomExpandMore";
 import CustomWidthTooltip from "../utils/CustomToolTip";
@@ -72,16 +71,6 @@ export default function Vod(props) {
     setShowMenu(!showMenu);
   };
 
-  const debouncedDelay = useMemo(() => {
-    const delayChange = (evt) => {
-      if (evt.target.value.length === 0) return;
-      const value = Number(evt.target.value);
-      if (isNaN(value)) return;
-      setUserChatDelay(value);
-    };
-    return debounce(delayChange, 300);
-  }, []);
-
   useEffect(() => {
     if (delay === undefined) return;
     console.info(`Chat Delay: ${userChatDelay + delay} seconds`);
@@ -109,47 +98,34 @@ export default function Vod(props) {
                   <Typography>{`${vod.title}`}</Typography>
                 </Box>
               </CustomWidthTooltip>
-              <Box sx={{ ml: 1 }}>
-                {drive && drive[0] && (
-                  <Tooltip title={`Download Vod`}>
-                    <IconButton component={Link} href={`https://drive.google.com/u/2/open?id=${drive[0].id}`} color="primary" aria-label="Download Vod" rel="noopener noreferrer" target="_blank">
-                      <CloudDownloadIcon />
-                    </IconButton>
-                  </Tooltip>
-                )}
-              </Box>
-              <Box sx={{ ml: 1, mr: 1 }}>
-                <TextField
-                  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-                  InputProps={{
-                    endAdornment: <InputAdornment position="start">secs</InputAdornment>,
-                  }}
-                  sx={{ width: 100 }}
-                  onChange={debouncedDelay}
-                  label="Chat Delay"
-                  variant="filled"
-                  size="small"
-                  defaultValue={userChatDelay}
-                />
+              <Box sx={{ marginLeft: "auto", display: "flex", alignItems: "center" }}>
+                <Box sx={{ ml: 0.5 }}>
+                  {drive && drive[0] && (
+                    <Tooltip title={`Download Vod`}>
+                      <IconButton component={Link} href={`https://drive.google.com/u/2/open?id=${drive[0].id}`} color="primary" aria-label="Download Vod" rel="noopener noreferrer" target="_blank">
+                        <CloudDownloadIcon />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </Box>
               </Box>
             </Box>
           </Collapse>
         </Box>
         {isPortrait && <Divider />}
-        {
-          <Chat
-            isPortrait={isPortrait}
-            vodId={vodId}
-            playerRef={playerRef}
-            playing={playing}
-            currentTime={currentTime}
-            delay={delay}
-            userChatDelay={userChatDelay}
-            twitchId={twitchId}
-            channel={channel}
-            VODS_API_BASE={VODS_API_BASE}
-          />
-        }
+        <Chat
+          channel={channel}
+          twitchId={twitchId}
+          isPortrait={isPortrait}
+          vodId={vodId}
+          playerRef={playerRef}
+          playing={playing}
+          currentTime={currentTime}
+          delay={delay}
+          userChatDelay={userChatDelay}
+          setUserChatDelay={setUserChatDelay}
+          VODS_API_BASE={VODS_API_BASE}
+        />
       </Box>
     </Box>
   );

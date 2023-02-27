@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Box, IconButton, Menu, MenuItem, Typography, Tooltip } from "@mui/material";
 import CustomLink from "../utils/CustomLink";
 import humanize from "humanize-duration";
-import { toHMS } from "../utils/hms";
+import { toHMS, toSeconds } from "../utils/helpers";
 
 export default function Chapters(props) {
   const { vod } = props;
@@ -51,12 +51,4 @@ export default function Chapters(props) {
 const getImage = (link) => {
   if (!link) return "https://static-cdn.jtvnw.net/ttv-static/404_boxart.jpg";
   return link.replace("{width}x{height}", "40x53");
-};
-
-//Convert older chapter timestamps to seconds.
-const toSeconds = (hms) => {
-  if (!hms) return;
-  const time = hms.split(":");
-
-  return +time[0] * 60 * 60 + +time[1] * 60 + +time[2];
 };

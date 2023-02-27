@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { Box, Typography, MenuItem, Tooltip, useMediaQuery, FormControl, InputLabel, Select, IconButton, Link, Collapse, Divider, TextField, InputAdornment } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Box, Typography, MenuItem, Tooltip, useMediaQuery, FormControl, InputLabel, Select, IconButton, Link, Collapse, Divider } from "@mui/material";
 import Loading from "../utils/Loading";
 import { useLocation, useParams } from "react-router-dom";
 import YoutubePlayer from "./YoutubePlayer";
@@ -7,13 +7,12 @@ import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import NotFound from "../utils/NotFound";
 import Chat from "./Chat";
-import debounce from "lodash.debounce";
 import Chapters from "./VodChapters";
 import ExpandMore from "../utils/CustomExpandMore";
 import CustomToolTip from "../utils/CustomToolTip";
 import { parse } from "tinyduration";
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { toHMS } from "../utils/hms";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { toHMS } from "../utils/helpers";
 
 export default function Vod(props) {
   const location = useLocation();
@@ -115,16 +114,6 @@ export default function Vod(props) {
     setShowMenu(!showMenu);
   };
 
-  const debouncedDelay = useMemo(() => {
-    const delayChange = (evt) => {
-      if (evt.target.value.length === 0) return;
-      const value = Number(evt.target.value);
-      if (isNaN(value)) return;
-      setUserChatDelay(value);
-    };
-    return debounce(delayChange, 300);
-  }, []);
-
   useEffect(() => {
     if (delay === undefined) return;
     console.info(`Chat Delay: ${userChatDelay + delay} seconds`);
@@ -132,7 +121,7 @@ export default function Vod(props) {
 
   const copyTimestamp = () => {
     navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}?t=${toHMS(currentTime)}`);
-  }
+  };
 
   if (vod === undefined || drive === undefined || chapter === undefined || part === undefined || delay === undefined) return <Loading />;
 
@@ -155,52 +144,40 @@ export default function Vod(props) {
               {chapter && <Chapters chapters={vod.chapters} chapter={chapter} setPart={setPart} youtube={youtube} setChapter={setChapter} />}
               <CustomToolTip title={vod.title}>
                 <Box sx={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", ml: 1 }}>
-                  <Typography>{`${vod.title}`}</Typography>
+                  <Typography fontWeight={550} variant="body1">{`${vod.title}`}</Typography>
                 </Box>
               </CustomToolTip>
-              <Box sx={{ ml: 1 }}>
-                <FormControl variant="standard" sx={{ p: 1, maxWidth: "80px", minWidth: "40px" }}>
-                  <InputLabel id="select-label">Part</InputLabel>
-                  <Select labelId="select-label" value={part.part - 1} onChange={handlePartChange} autoWidth>
-                    {youtube.map((data, i) => {
-                      return (
-                        <MenuItem key={data.id} value={i}>
-                          {data?.part || i + 1}
-                        </MenuItem>
-                      );
-                    })}
-                  </Select>
-                </FormControl>
-              </Box>
-              <Box sx={{ ml: 1 }}>
-                {drive && drive[0] && (
-                  <Tooltip title={`Download Vod`}>
-                    <IconButton component={Link} href={`https://drive.google.com/u/2/open?id=${drive[0].id}`} color="primary" aria-label="Download Vod" rel="noopener noreferrer" target="_blank">
-                      <CloudDownloadIcon />
+              <Box sx={{ marginLeft: "auto", display: "flex", alignItems: "center" }}>
+                <Box sx={{ ml: 0.5 }}>
+                  <FormControl variant="outlined">
+                    <InputLabel id="select-label">Part</InputLabel>
+                    <Select labelId="select-label" label="Part" value={part.part - 1} onChange={handlePartChange} autoWidth>
+                      {youtube.map((data, i) => {
+                        return (
+                          <MenuItem key={data.id} value={i}>
+                            {data?.part || i + 1}
+                          </MenuItem>
+                        );
+                      })}
+                    </Select>
+                  </FormControl>
+                </Box>
+                <Box sx={{ ml: 0.5 }}>
+                  {drive && drive[0] && (
+                    <Tooltip title={`Download Vod`}>
+                      <IconButton component={Link} href={`https://drive.google.com/u/2/open?id=${drive[0].id}`} color="primary" aria-label="Download Vod" rel="noopener noreferrer" target="_blank">
+                        <CloudDownloadIcon />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </Box>
+                <Box sx={{ ml: 0.5 }}>
+                  <Tooltip title={`Copy Current Timestamp`}>
+                    <IconButton onClick={copyTimestamp} color="primary" aria-label="Copy Current Timestamp" rel="noopener noreferrer" target="_blank">
+                      <ContentCopyIcon />
                     </IconButton>
                   </Tooltip>
-                )}
-              </Box>
-              <Box sx={{ ml: 1, mr: 1 }}>
-                <TextField
-                  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-                  InputProps={{
-                    endAdornment: <InputAdornment position="start">secs</InputAdornment>,
-                  }}
-                  sx={{ width: 100 }}
-                  onChange={debouncedDelay}
-                  label="Chat Delay"
-                  variant="filled"
-                  size="small"
-                  defaultValue={userChatDelay}
-                />
-              </Box>
-              <Box sx={{ ml: 1 }}>
-                <Tooltip title={`Copy Current Timestamp`}>
-                  <IconButton onClick={copyTimestamp} color="primary" aria-label="Copy Current Timestamp" rel="noopener noreferrer" target="_blank">
-                    <ContentCopyIcon />
-                  </IconButton>
-                </Tooltip>
+                </Box>
               </Box>
             </Box>
           </Collapse>
@@ -219,6 +196,7 @@ export default function Vod(props) {
           twitchId={twitchId}
           channel={channel}
           VODS_API_BASE={VODS_API_BASE}
+          setUserChatDelay={setUserChatDelay}
         />
       </Box>
     </Box>
