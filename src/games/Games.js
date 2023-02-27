@@ -90,7 +90,7 @@ export default function Games(props) {
             <Box sx={{ display: "flex", p: 1, alignItems: "center" }}>
               <CustomToolTip title={vod.title}>
                 <Box sx={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", ml: 1 }}>
-                  <Typography>{`${vod.title}`}</Typography>
+                  <Typography fontWeight={550} variant="body1">{`${vod.title}`}</Typography>
                 </Box>
               </CustomToolTip>
               <Box sx={{ marginLeft: "auto", display: "flex", alignItems: "center" }}>
