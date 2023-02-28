@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { Box, Typography, MenuItem, Tooltip, useMediaQuery, FormControl, InputLabel, Select, IconButton, Link, Collapse, Divider } from "@mui/material";
 import Loading from "../utils/Loading";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import YoutubePlayer from "./YoutubePlayer";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -16,6 +16,7 @@ import { toHMS } from "../utils/helpers";
 
 export default function Vod(props) {
   const location = useLocation();
+  let [, setSearchParams] = useSearchParams();
   const isPortrait = useMediaQuery("(orientation: portrait)");
   const { vodId } = useParams();
   const { type, VODS_API_BASE, channel, twitchId } = props;
@@ -107,9 +108,13 @@ export default function Vod(props) {
 
   const handlePartChange = (evt) => {
     const tmpPart = evt.target.value + 1;
-    setPart({ part: tmpPart, duration: 0 });
+    changePartWithLocation({ part: tmpPart, duration: 0 })
   };
 
+  const changePartWithLocation = ({part, duration},) => {
+    setPart({ part, duration });
+    setSearchParams(new URLSearchParams({part}))
+  }
   const handleExpandClick = () => {
     setShowMenu(!showMenu);
   };
@@ -131,7 +136,7 @@ export default function Vod(props) {
     <Box sx={{ height: "100%", width: "100%" }}>
       <Box sx={{ display: "flex", flexDirection: isPortrait ? "column" : "row", height: "100%", width: "100%" }}>
         <Box sx={{ display: "flex", height: "100%", width: "100%", flexDirection: "column", alignItems: "flex-start", minWidth: 0, overflow: "hidden", position: "relative" }}>
-          <YoutubePlayer playerRef={playerRef} part={part} youtube={youtube} setCurrentTime={setCurrentTime} setPart={setPart} setPlaying={setPlaying} delay={delay} />
+          <YoutubePlayer playerRef={playerRef} part={part} youtube={youtube} setCurrentTime={setCurrentTime} setPart={changePartWithLocation} setPlaying={setPlaying} delay={delay} />
           <Box sx={{ position: "absolute", bottom: 0, left: "50%", width: "100%" }}>
             <Tooltip title={showMenu ? "Collapse" : "Expand"}>
               <ExpandMore expand={showMenu} onClick={handleExpandClick} aria-expanded={showMenu} aria-label="show menu">
@@ -141,7 +146,7 @@ export default function Vod(props) {
           </Box>
           <Collapse in={showMenu} timeout="auto" unmountOnExit sx={{ minHeight: "auto !important", width: "100%" }}>
             <Box sx={{ display: "flex", p: 1, alignItems: "center" }}>
-              {chapter && <Chapters chapters={vod.chapters} chapter={chapter} setPart={setPart} youtube={youtube} setChapter={setChapter} />}
+              {chapter && <Chapters chapters={vod.chapters} chapter={chapter} setPart={changePartWithLocation} youtube={youtube} setChapter={setChapter} />}
               <CustomToolTip title={vod.title}>
                 <Box sx={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", ml: 1 }}>
                   <Typography fontWeight={550} variant="body1">{`${vod.title}`}</Typography>
@@ -192,7 +197,7 @@ export default function Vod(props) {
           userChatDelay={userChatDelay}
           youtube={youtube}
           part={part}
-          setPart={setPart}
+          setPart={changePartWithLocation}
           twitchId={twitchId}
           channel={channel}
           VODS_API_BASE={VODS_API_BASE}
