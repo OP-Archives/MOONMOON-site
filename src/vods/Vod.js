@@ -43,7 +43,7 @@ export default function Vod(props) {
             </Box>
           </Box>
         </Box>
-        <Box sx={{ mt: 1, mb: 1, display: "flex" }}>
+        <Box sx={{ mt: 1, mb: 1, display: "flex", alignItems: "center" }}>
           {vod.chapters && vod.chapters.length > 0 && <Chapters vod={vod} />}
           <Box sx={{ minWidth: 0, width: "100%" }}>
             <Box sx={{ p: 0.5 }}>
