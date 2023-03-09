@@ -13,8 +13,8 @@ const GLOBAL_TWITCH_BADGES_API = "https://badges.twitch.tv/v1/badges/global/disp
 const BASE_TWITCH_CDN = "https://static-cdn.jtvnw.net";
 const BASE_FFZ_EMOTE_CDN = "https://cdn.frankerfacez.com/emote";
 //Needs CORS for mobile devices.
-const BASE_BTTV_EMOTE_CDN = "https://archive.overpowered.tv/bttv";
-const BASE_7TV_EMOTE_CDN = "https://cdn.7tv.app/emote";
+const BASE_BTTV_EMOTE_CDN = "http://emotes.overpowered.tv/bttv";
+const BASE_7TV_EMOTE_CDN = "https://emotes.overpowered.tv/7tv";
 const BASE_FFZ_EMOTE_API = "https://api.frankerfacez.com/v1";
 const BASE_BTTV_EMOTE_API = "https://api.betterttv.net/3";
 const BASE_7TV_EMOTE_API = "https://api.7tv.app/v2";
