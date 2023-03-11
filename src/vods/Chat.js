@@ -89,8 +89,8 @@ export default function Chat(props) {
         });
     };
 
-    const loadEmotes = () => {
-      fetch(`${VODS_API_BASE}/emotes?vod_id=${vodId}`, {
+    const loadEmotes = async () => {
+      await fetch(`${VODS_API_BASE}/emotes?vod_id=${vodId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -112,6 +112,7 @@ export default function Chat(props) {
           load7TVEmotes();
           loadFFZEmotes();
         });
+      load7TVGlobalEmotes();
     };
 
     const loadBTTVGlobalEmotes = () => {
@@ -165,6 +166,22 @@ export default function Chat(props) {
         .then((data) => {
           if (data.status >= 400) return;
           emotes.current["7tv_emotes"] = data;
+        })
+        .catch((e) => {
+          console.error(e);
+        });
+    };
+
+    const load7TVGlobalEmotes = () => {
+      fetch(`${BASE_7TV_EMOTE_API}/emotes/global`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          emotes.current["7tv_emotes"] = emotes.current["7tv_emotes"].concat(data);
         })
         .catch((e) => {
           console.error(e);

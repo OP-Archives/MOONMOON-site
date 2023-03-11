@@ -6,8 +6,6 @@ import Loading from "../utils/Loading";
 import Vod from "./Vod";
 import Search from "./Search";
 
-const limit = 50;
-
 export default function Vods(props) {
   const { VODS_API_BASE, channel } = props;
   const isMobile = useMediaQuery("(max-width: 600px)");
@@ -15,6 +13,7 @@ export default function Vods(props) {
   const [loading, setLoading] = React.useState(true);
   const [page, setPage] = React.useState(null);
   const [totalVods, setTotalVods] = React.useState(null);
+  const limit = isMobile ? 10 : 20;
 
   useEffect(() => {
     document.title = `VODS - ${channel}`;
@@ -38,7 +37,7 @@ export default function Vods(props) {
     };
     fetchVods();
     return;
-  }, [VODS_API_BASE, channel]);
+  }, [VODS_API_BASE, channel, limit]);
 
   const handlePageChange = (_, value) => {
     if (page === value) return;
