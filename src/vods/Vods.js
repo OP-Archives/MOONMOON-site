@@ -1,13 +1,14 @@
 import React, { useEffect } from "react";
-import { Box, Pagination, Grid, useMediaQuery, Typography, PaginationItem } from "@mui/material";
+import { Box, Pagination, Grid, useMediaQuery, Typography, PaginationItem, TextField, InputAdornment } from "@mui/material";
 import SimpleBar from "simplebar-react";
 import Footer from "../utils/Footer";
 import Loading from "../utils/Loading";
 import Vod from "./Vod";
 import Search from "./Search";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 export default function Vods(props) {
+  const navigate = useNavigate();
   const { VODS_API_BASE, channel } = props;
   const location = useLocation();
   const query = new URLSearchParams(location.search);
@@ -18,7 +19,6 @@ export default function Vods(props) {
   const limit = isMobile ? 10 : 20;
 
   useEffect(() => {
-    console.log(page);
     setVods(null);
     document.title = `VODS - ${channel}`;
     const fetchVods = async () => {
@@ -41,7 +41,12 @@ export default function Vods(props) {
     return;
   }, [VODS_API_BASE, channel, limit, page]);
 
-  if (!vods) return <Loading />;
+  const handleSubmit = (e) => {
+    const value = e.target.value;
+    if (e.which === 13 && !isNaN(value) && value > 0) {
+      navigate(`${location.pathname}?page=${value}`);
+    }
+  };
 
   const totalPages = Math.ceil(totalVods / limit);
 
@@ -49,30 +54,53 @@ export default function Vods(props) {
     <SimpleBar style={{ minHeight: 0, height: "100%" }}>
       <Box sx={{ padding: 2 }}>
         <Box sx={{ display: "flex", justifyContent: "center" }}>
-          <Typography variant="h4" color="primary" sx={{ textTransform: "uppercase", fontWeight: "550" }}>
-            {`${totalVods} Vods Archived`}
-          </Typography>
+          {totalVods && (
+            <Typography variant="h4" color="primary" sx={{ textTransform: "uppercase", fontWeight: "550" }}>
+              {`${totalVods} Vods Archived`}
+            </Typography>
+          )}
         </Box>
         <Box sx={{ display: "flex", mt: 1, justifyContent: "center", alignItems: "center" }}>
           <Box sx={{ width: isMobile ? "100%" : "50%" }}>
             <Search VODS_API_BASE={VODS_API_BASE} />
           </Box>
         </Box>
-        <Grid container spacing={2} sx={{ mt: 1, justifyContent: "center" }}>
-          {vods.map((vod, _) => (
-            <Vod gridSize={2.1} key={vod.id} vod={vod} isMobile={isMobile} />
-          ))}
-        </Grid>
+        {vods ? (
+          <Grid container spacing={2} sx={{ mt: 1, justifyContent: "center" }}>
+            {vods.map((vod, _) => (
+              <Vod gridSize={2.1} key={vod.id} vod={vod} isMobile={isMobile} />
+            ))}
+          </Grid>
+        ) : (
+          <Loading />
+        )}
       </Box>
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 2, mb: 2 }}>
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 2, mb: 2, alignItems: "center", flexDirection: isMobile ? "column" : "row" }}>
         {totalPages !== null && (
-          <Pagination
-            count={totalPages}
-            disabled={totalPages <= 1}
-            color="primary"
-            page={page}
-            renderItem={(item) => <PaginationItem component={Link} to={`${location.pathname}${item.page === 1 ? "" : `?page=${item.page}`}`} {...item} />}
-          />
+          <>
+            <Pagination
+              shape="rounded"
+              variant="outlined"
+              count={totalPages}
+              disabled={totalPages <= 1}
+              color="primary"
+              page={page}
+              renderItem={(item) => <PaginationItem component={Link} to={`${location.pathname}${item.page === 1 ? "" : `?page=${item.page}`}`} {...item} />}
+            />
+            <TextField
+              inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+              InputProps={{
+                startAdornment: <InputAdornment position="start">Page</InputAdornment>,
+              }}
+              sx={{
+                width: "100px",
+                m: 1,
+              }}
+              size="small"
+              type="text"
+              onKeyDown={handleSubmit}
+            />
+          </>
         )}
       </Box>
       <Footer />
