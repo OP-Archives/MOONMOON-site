@@ -1,24 +1,28 @@
 import React, { useEffect } from "react";
-import { Box, Pagination, Grid, useMediaQuery, Typography } from "@mui/material";
+import { Box, Pagination, Grid, useMediaQuery, Typography, PaginationItem } from "@mui/material";
 import SimpleBar from "simplebar-react";
 import Footer from "../utils/Footer";
 import Loading from "../utils/Loading";
 import Vod from "./Vod";
 import Search from "./Search";
+import { Link, useLocation } from "react-router-dom";
 
 export default function Vods(props) {
   const { VODS_API_BASE, channel } = props;
+  const location = useLocation();
+  const query = new URLSearchParams(location.search);
   const isMobile = useMediaQuery("(max-width: 600px)");
   const [vods, setVods] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
-  const [page, setPage] = React.useState(null);
   const [totalVods, setTotalVods] = React.useState(null);
+  const page = parseInt(query.get("page") || "1", 10);
   const limit = isMobile ? 10 : 20;
 
   useEffect(() => {
+    console.log(page);
+    setVods(null);
     document.title = `VODS - ${channel}`;
     const fetchVods = async () => {
-      await fetch(`${VODS_API_BASE}/vods?$limit=${limit}&$sort[createdAt]=-1`, {
+      await fetch(`${VODS_API_BASE}/vods?$limit=${limit}&$skip=${(page - 1) * limit}&$sort[createdAt]=-1`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -26,10 +30,8 @@ export default function Vods(props) {
       })
         .then((response) => response.json())
         .then((response) => {
-          setPage(1);
           setVods(response.data);
           setTotalVods(response.total);
-          setLoading(false);
         })
         .catch((e) => {
           console.error(e);
@@ -37,31 +39,9 @@ export default function Vods(props) {
     };
     fetchVods();
     return;
-  }, [VODS_API_BASE, channel, limit]);
+  }, [VODS_API_BASE, channel, limit, page]);
 
-  const handlePageChange = (_, value) => {
-    if (page === value) return;
-    setLoading(true);
-    setPage(value);
-
-    fetch(`${VODS_API_BASE}/vods?$limit=${limit}&$skip=${(value - 1) * limit}&$sort[createdAt]=-1`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((response) => {
-        if (response.data.length === 0) return;
-        setVods(response.data);
-        setLoading(false);
-      })
-      .catch((e) => {
-        console.error(e);
-      });
-  };
-
-  if (loading) return <Loading />;
+  if (!vods) return <Loading />;
 
   const totalPages = Math.ceil(totalVods / limit);
 
@@ -85,7 +65,15 @@ export default function Vods(props) {
         </Grid>
       </Box>
       <Box sx={{ display: "flex", justifyContent: "center", mt: 2, mb: 2 }}>
-        {totalPages !== null && <Pagination count={totalPages} disabled={totalPages <= 1} color="primary" page={page} onChange={handlePageChange} />}
+        {totalPages !== null && (
+          <Pagination
+            count={totalPages}
+            disabled={totalPages <= 1}
+            color="primary"
+            page={page}
+            renderItem={(item) => <PaginationItem component={Link} to={`${location.pathname}${item.page === 1 ? "" : `?page=${item.page}`}`} {...item} />}
+          />
+        )}
       </Box>
       <Footer />
     </SimpleBar>
