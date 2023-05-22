@@ -159,12 +159,12 @@ export default function Chat(props) {
     };
 
     const load7TVEmotes = () => {
-      fetch(`${BASE_7TV_EMOTE_API}/users/${channel.toLowerCase()}/emotes`, {
+      fetch(`${BASE_7TV_EMOTE_API}/users/${twitchId}/emotes`, {
         method: "GET",
       })
         .then((response) => response.json())
         .then((data) => {
-          if (data.status >= 400) return;
+          if (data.status_code >= 400) return;
           emotes.current["7tv_emotes"] = data;
         })
         .catch((e) => {
