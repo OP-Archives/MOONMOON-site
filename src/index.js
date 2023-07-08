@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import "./css/index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import "simplebar/dist/simplebar.min.css";
+import "simplebar-react/dist/simplebar.min.css";
 
 const container = document.getElementById("root");
 const root = createRoot(container);
