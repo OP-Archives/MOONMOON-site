@@ -16,7 +16,7 @@ const BASE_BTTV_EMOTE_CDN = "https://emotes.overpowered.tv/bttv";
 const BASE_7TV_EMOTE_CDN = "https://emotes.overpowered.tv/7tv";
 const BASE_FFZ_EMOTE_API = "https://api.frankerfacez.com/v1";
 const BASE_BTTV_EMOTE_API = "https://api.betterttv.net/3";
-const BASE_7TV_EMOTE_API = "https://api.7tv.app/v2";
+const BASE_7TV_EMOTE_API = "https://7tv.io/v3";
 
 let messageCount = 0;
 let badgesCount = 0;
@@ -141,13 +141,13 @@ export default function Chat(props) {
     };
 
     const load7TVEmotes = () => {
-      fetch(`${BASE_7TV_EMOTE_API}/users/${twitchId}/emotes`, {
+      fetch(`${BASE_7TV_EMOTE_API}/users/twitch/${twitchId}`, {
         method: "GET",
       })
         .then((response) => response.json())
         .then((data) => {
           if (data.status_code >= 400) return;
-          emotes.current["7tv_emotes"] = data;
+          emotes.current["7tv_emotes"] = data.emote_set.emotes;
         })
         .catch((e) => {
           console.error(e);
@@ -155,7 +155,7 @@ export default function Chat(props) {
     };
 
     const load7TVGlobalEmotes = () => {
-      fetch(`${BASE_7TV_EMOTE_API}/emotes/global`, {
+      fetch(`${BASE_7TV_EMOTE_API}/emote-sets/global`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -163,7 +163,7 @@ export default function Chat(props) {
       })
         .then((response) => response.json())
         .then((data) => {
-          emotes.current["7tv_emotes"] = emotes.current["7tv_emotes"].concat(data);
+          emotes.current["7tv_emotes"] = emotes.current["7tv_emotes"].concat(data.emotes);
         })
         .catch((e) => {
           console.error(e);
