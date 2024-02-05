@@ -1,18 +1,15 @@
 import React from "react";
-import { Box, Typography, Grid, Button } from "@mui/material";
-import Thumbnail from "../assets/sadge.jpg";
+import { Box, Typography, Link, Grid } from "@mui/material";
+import CustomLink from "../utils/CustomLink";
+import sadge from "../assets/sadge.jpg";
 import Chapters from "./ChaptersMenu";
 import WatchMenu from "./WatchMenu";
 import CustomWidthTooltip from "../utils/CustomToolTip";
-import { useState } from "react";
-import dayjs from "dayjs";
-import localizedFormat from "dayjs/plugin/localizedFormat.js";
-dayjs.extend(localizedFormat);
 
 export default function Vod(props) {
-  const { vod, gridSize, isCdnAvailable } = props;
-  const [anchorEl, setAnchorEl] = useState(null);
-  const DEFAULT_THUMBNAIL = vod.thumbnail_url ? vod.thumbnail_url : vod.games.length > 0 ? vod.games[0].thumbnail_url : Thumbnail;
+  const { vod, gridSize } = props;
+  const DEFAULT_VOD = vod.youtube.length > 0 ? `/youtube/${vod.id}` : vod.games.length > 0 ? `/games/${vod.id}` : `/manual/${vod.id}`;
+  const DEFAULT_THUMBNAIL = vod.thumbnail_url ? vod.thumbnail_url : vod.games.length > 0 ? vod.games[0].thumbnail_url : sadge;
 
   return (
     <Grid item xs={gridSize} sx={{ maxWidth: "18rem", flexBasis: "18rem" }}>
@@ -27,11 +24,13 @@ export default function Vod(props) {
           },
         }}
       >
-        <img style={{ cursor: "pointer" }} onClick={(e) => setAnchorEl(e.currentTarget)} className="thumbnail" alt="" src={DEFAULT_THUMBNAIL} />
+        <Link href={DEFAULT_VOD}>
+          <img className="thumbnail" alt="" src={DEFAULT_THUMBNAIL} />
+        </Link>
         <Box sx={{ pointerEvents: "none", position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}>
           <Box sx={{ position: "absolute", bottom: 0, left: 0 }}>
             <Typography variant="caption" sx={{ p: 0.3, backgroundColor: "rgba(0,0,0,.6)" }}>
-              {`${dayjs(vod.createdAt).format("LL")}`}
+              {`${vod.date}`}
             </Typography>
           </Box>
         </Box>
@@ -43,21 +42,23 @@ export default function Vod(props) {
           </Box>
         </Box>
       </Box>
-      <Box sx={{ mt: 1, mb: 1, display: "flex" }}>
-        {vod.chapters && vod.chapters.length > 0 && <Chapters vod={vod} isCdnAvailable={isCdnAvailable} />}
+      <Box sx={{ mt: 1, mb: 1, display: "flex", alignItems: "center" }}>
+        {vod.chapters && vod.chapters.length > 0 && <Chapters vod={vod} />}
         <Box sx={{ minWidth: 0, width: "100%" }}>
           <Box sx={{ p: 0.5 }}>
             <CustomWidthTooltip title={vod.title} placement="top">
               <span>
-                <Button onClick={(e) => setAnchorEl(e.currentTarget)} sx={{ width: "100%" }} size="small">
-                  <Typography fontWeight={550} variant="caption" color="primary" noWrap={true}>
+                <CustomLink href={DEFAULT_VOD} sx={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "block" }}>
+                  <Typography variant="caption" color="primary" sx={{ fontWeight: "550" }}>
                     {vod.title}
                   </Typography>
-                </Button>
+                </CustomLink>
               </span>
             </CustomWidthTooltip>
           </Box>
-          <WatchMenu vod={vod} anchorEl={anchorEl} setAnchorEl={setAnchorEl} isCdnAvailable={isCdnAvailable} />
+          <Box sx={{ display: "flex", justifyContent: "center" }}>
+            <WatchMenu vod={vod} />
+          </Box>
         </Box>
       </Box>
     </Grid>
