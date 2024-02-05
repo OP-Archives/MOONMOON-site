@@ -207,12 +207,12 @@ export default function Vods() {
           )}
           {filter === "Title" && (
             <Box sx={{ ml: 1 }}>
-              <TextField fullWidth label="Search by Title" type="text" onChange={handleTitleChange} />
+              <TextField fullWidth label="Search by Title" type="text" onChange={handleTitleChange} defaultValue={filterTitle} />
             </Box>
           )}
           {filter === "Game" && (
             <Box sx={{ ml: 1 }}>
-              <TextField fullWidth label="Search by Game" type="text" onChange={handleGameChange} />
+              <TextField fullWidth label="Search by Game" type="text" onChange={handleGameChange} defaultValue={filterGame} />
             </Box>
           )}
         </Box>
