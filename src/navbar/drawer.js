@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { Drawer, ListItem, List, ListItemText, IconButton, Divider, Box, Link, ListItemIcon } from "@mui/material";
 import { Menu } from "@mui/icons-material";
-import TwitterIcon from "@mui/icons-material/Twitter";
-import SvgIcon from "@mui/material/SvgIcon";
 import HomeIcon from "@mui/icons-material/Home";
 import OndemandVideoIcon from "@mui/icons-material/OndemandVideo";
 import ReportIcon from "@mui/icons-material/Report";
@@ -15,22 +13,8 @@ const mainLinks = [
   { title: `Game Jam`, path: `https://jam.moon2.tv`, icon: <VideogameAssetIcon color="primary" /> },
 ];
 
-const socials = [
-  {
-    path: `https://twitter.com/moonmoon_ow`,
-    icon: <TwitterIcon color="primary" />,
-  },
-  {
-    path: `https://twitch.tv/moonmoon`,
-    icon: (
-      <SvgIcon color="primary">
-        <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
-      </SvgIcon>
-    ),
-  },
-];
-
-export default function DrawerComponent() {
+export default function DrawerComponent(props) {
+  const { socials } = props;
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (

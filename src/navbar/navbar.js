@@ -33,7 +33,7 @@ export default function Navbar(props) {
       <AppBar position="static">
         <Toolbar>
           <Box sx={{ display: "flex", alignItems: "center", flex: 1 }}>
-            {isMobile && <Drawer />}
+            {isMobile && <Drawer socials={socials} />}
 
             <Box sx={{ mr: 2 }}>
               <a href="/">
