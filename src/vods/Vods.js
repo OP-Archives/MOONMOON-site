@@ -1,45 +1,136 @@
-import React, { useEffect } from "react";
-import { Box, Pagination, Grid, useMediaQuery, Typography, PaginationItem, TextField, InputAdornment } from "@mui/material";
+import React, { useEffect, useState, useMemo } from "react";
+import { Box, Typography, Pagination, Grid, useMediaQuery, PaginationItem, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import SimpleBar from "simplebar-react";
 import Footer from "../utils/Footer";
 import Loading from "../utils/Loading";
 import Vod from "./Vod";
-import Search from "./Search";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
+import debounce from "lodash.debounce";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import vodsClient from "./client";
 
-export default function Vods(props) {
+const FILTERS = ["Default", "Date", "Title", "Game"];
+const START_DATE = process.env.REACT_APP_START_DATE;
+
+export default function Vods() {
   const navigate = useNavigate();
-  const { VODS_API_BASE, channel } = props;
   const location = useLocation();
   const query = new URLSearchParams(location.search);
-  const isMobile = useMediaQuery("(max-width: 600px)");
-  const [vods, setVods] = React.useState([]);
-  const [totalVods, setTotalVods] = React.useState(null);
+  const isMobile = useMediaQuery("(max-width: 900px)");
+  const [vods, setVods] = useState(null);
+  const [totalVods, setTotalVods] = useState(null);
+  const [filter, setFilter] = useState(FILTERS[0]);
+  const [filterStartDate, setFilterStartDate] = useState(dayjs(START_DATE));
+  const [filterEndDate, setFilterEndDate] = useState(dayjs());
+  const [filterTitle, setFilterTitle] = useState("");
+  const [filterGame, setFilterGame] = useState("");
   const page = parseInt(query.get("page") || "1", 10);
   const limit = isMobile ? 10 : 20;
 
   useEffect(() => {
     setVods(null);
-    document.title = `VODS - ${channel}`;
     const fetchVods = async () => {
-      await fetch(`${VODS_API_BASE}/vods?$limit=${limit}&$skip=${(page - 1) * limit}&$sort[createdAt]=-1`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-        .then((response) => response.json())
-        .then((response) => {
-          setVods(response.data);
-          setTotalVods(response.total);
-        })
-        .catch((e) => {
-          console.error(e);
-        });
+      switch (filter) {
+        case "Date":
+          if (filterStartDate > filterEndDate) break;
+          vodsClient
+            .service("vods")
+            .find({
+              query: {
+                createdAt: {
+                  $gte: filterStartDate.format("YYYY/MM/DD"),
+                  $lte: filterEndDate.format("YYYY/MM/DD"),
+                },
+                $limit: limit,
+                $skip: (page - 1) * limit,
+                $sort: {
+                  createdAt: -1,
+                },
+              },
+            })
+            .then((response) => {
+              setVods(response.data);
+              setTotalVods(response.total);
+            })
+            .catch((e) => {
+              console.error(e);
+            });
+          break;
+        case "Title":
+          if (filterTitle.length === 0) break;
+          vodsClient
+            .service("vods")
+            .find({
+              query: {
+                title: {
+                  $iLike: `%${filterTitle}%`,
+                },
+                $limit: limit,
+                $skip: (page - 1) * limit,
+                $sort: {
+                  createdAt: -1,
+                },
+              },
+            })
+            .then((response) => {
+              setVods(response.data);
+              setTotalVods(response.total);
+            })
+            .catch((e) => {
+              console.error(e);
+            });
+          break;
+        case "Game":
+          if (filterGame.length === 0) break;
+          vodsClient
+            .service("vods")
+            .find({
+              query: {
+                chapters: {
+                  name: filterGame,
+                },
+                $limit: limit,
+                $skip: (page - 1) * limit,
+                $sort: {
+                  createdAt: -1,
+                },
+              },
+            })
+            .then((response) => {
+              setVods(response.data);
+              setTotalVods(response.total);
+            })
+            .catch((e) => {
+              console.error(e);
+            });
+          break;
+        default:
+          vodsClient
+            .service("vods")
+            .find({
+              query: {
+                $limit: limit,
+                $skip: (page - 1) * limit,
+                $sort: {
+                  createdAt: -1,
+                },
+              },
+            })
+            .then((response) => {
+              setVods(response.data);
+              setTotalVods(response.total);
+            })
+            .catch((e) => {
+              console.error(e);
+            });
+      }
     };
     fetchVods();
     return;
-  }, [VODS_API_BASE, channel, limit, page]);
+  }, [limit, page, filter, filterStartDate, filterEndDate, filterTitle, filterGame]);
 
   const handleSubmit = (e) => {
     const value = e.target.value;
@@ -48,22 +139,82 @@ export default function Vods(props) {
     }
   };
 
+  const handleTitleChange = useMemo(
+    () =>
+      debounce((evt) => {
+        if (evt.target.value.length === 0) return;
+        setFilterTitle(evt.target.value);
+      }, 1000),
+    [setFilterTitle]
+  );
+
+  const handleGameChange = useMemo(
+    () =>
+      debounce((evt) => {
+        if (evt.target.value.length === 0) return;
+        setFilterGame(evt.target.value);
+      }, 1000),
+    [setFilterGame]
+  );
+
   const totalPages = Math.ceil(totalVods / limit);
 
   return (
     <SimpleBar style={{ minHeight: 0, height: "100%" }}>
       <Box sx={{ padding: 2 }}>
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
-          {totalVods && (
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 2, flexDirection: "column", alignItems: "center" }}>
+          {totalVods !== null && (
             <Typography variant="h4" color="primary" sx={{ textTransform: "uppercase", fontWeight: "550" }}>
-              {`${totalVods} Vods Archived`}
+              {`${totalVods} Vods`}
             </Typography>
           )}
         </Box>
-        <Box sx={{ display: "flex", mt: 1, justifyContent: "center", alignItems: "center" }}>
-          <Box sx={{ width: isMobile ? "100%" : "50%" }}>
-            <Search VODS_API_BASE={VODS_API_BASE} />
-          </Box>
+        <Box sx={{ pl: !isMobile ? 15 : 5, pr: !isMobile ? 15 : 5, pt: 1, display: "flex", flexDirection: "row", alignItems: "center" }}>
+          <FormControl>
+            <InputLabel id="select-label">Filter</InputLabel>
+            <Select labelId="select-label" label={filter} value={filter} onChange={(evt) => setFilter(evt.target.value)} autoWidth>
+              {FILTERS.map((data, i) => {
+                return (
+                  <MenuItem key={i} value={data}>
+                    {data}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
+          {filter === "Date" && (
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <Box sx={{ ml: 1 }}>
+                <DatePicker
+                  minDate={dayjs(START_DATE)}
+                  maxDate={dayjs()}
+                  sx={{ mr: 1 }}
+                  label="Start Date"
+                  defaultValue={filterStartDate}
+                  onAccept={(newDate) => setFilterStartDate(newDate)}
+                  views={["year", "month", "day"]}
+                />
+                <DatePicker
+                  minDate={dayjs(START_DATE)}
+                  maxDate={dayjs()}
+                  label="End Date"
+                  defaultValue={filterEndDate}
+                  onAccept={(newDate) => setFilterEndDate(newDate)}
+                  views={["year", "month", "day"]}
+                />
+              </Box>
+            </LocalizationProvider>
+          )}
+          {filter === "Title" && (
+            <Box sx={{ ml: 1 }}>
+              <TextField fullWidth label="Search by Title" type="text" onChange={handleTitleChange} />
+            </Box>
+          )}
+          {filter === "Game" && (
+            <Box sx={{ ml: 1 }}>
+              <TextField fullWidth label="Search by Game" type="text" onChange={handleGameChange} />
+            </Box>
+          )}
         </Box>
         {vods ? (
           <Grid container spacing={2} sx={{ mt: 1, justifyContent: "center" }}>
