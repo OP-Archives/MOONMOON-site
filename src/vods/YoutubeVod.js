@@ -82,6 +82,7 @@ export default function Vod(props) {
       }
     }
     setPart({ part: tmpPart, timestamp: timestamp });
+    return;
   }, [location.search, youtube]);
 
   useEffect(() => {
@@ -92,6 +93,7 @@ export default function Vod(props) {
         break;
       }
     }
+    return;
   }, [currentTime, vod, playerRef]);
 
   useEffect(() => {
@@ -103,6 +105,7 @@ export default function Vod(props) {
     }
     const tmpDelay = vodDuration - totalYoutubeDuration < 0 ? 0 : vodDuration - totalYoutubeDuration;
     setDelay(tmpDelay);
+    return;
   }, [youtube, vod]);
 
   const handlePartChange = (evt) => {
@@ -123,7 +126,7 @@ export default function Vod(props) {
     navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}?t=${toHMS(currentTime)}`);
   };
 
-  if (vod === undefined || drive === undefined || chapter === undefined || part === undefined || delay === undefined) return <Loading />;
+  if (vod === undefined || drive === undefined || part === undefined || delay === undefined) return <Loading />;
 
   if (youtube.length === 0) return <NotFound channel={channel} />;
 

@@ -65,6 +65,7 @@ export default function Vod(props) {
         break;
       }
     }
+    return;
   }, [currentTime, vod, playerRef]);
 
   const handleExpandClick = () => {
@@ -74,9 +75,10 @@ export default function Vod(props) {
   useEffect(() => {
     if (delay === undefined) return;
     console.info(`Chat Delay: ${userChatDelay + delay} seconds`);
+    return;
   }, [userChatDelay, delay]);
 
-  if (vod === undefined || drive === undefined || chapter === undefined) return <Loading />;
+  if (vod === undefined || drive === undefined) return <Loading />;
 
   return (
     <Box sx={{ height: "100%", width: "100%" }}>
