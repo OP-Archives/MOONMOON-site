@@ -7,7 +7,7 @@ import { toHMS, toSeconds } from "../utils/helpers";
 export default function Chapters(props) {
   const { vod } = props;
   const [anchorEl, setAnchorEl] = useState(null);
-  const DEFAULT_VOD = vod.youtube.length > 0 ? `/youtube/${vod.id}` : `/manual/${vod.id}`;
+  const DEFAULT_VOD = vod.youtube.length > 0 ? `/youtube/${vod.id}` : `#`;
 
   const handleClose = () => {
     setAnchorEl(null);
