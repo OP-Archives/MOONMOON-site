@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { Box, Typography, Pagination, Grid, useMediaQuery, PaginationItem, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import React, { useEffect, useState, useMemo, createContext, useContext, useCallback } from "react";
+import { Box, Typography, Pagination, Grid, useMediaQuery, PaginationItem, TextField, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import SimpleBar from "simplebar-react";
 import Footer from "../utils/Footer";
 import Loading from "../utils/Loading";
@@ -14,6 +14,18 @@ import vodsClient from "./client";
 
 const FILTERS = ["Default", "Date", "Title", "Game"];
 const START_DATE = process.env.REACT_APP_START_DATE;
+export const FILTER_ALTS = Object.freeze({
+  Default: 0,
+  Date: 1,
+  Title: 2,
+  Game: 3
+});
+
+const VodsContext = createContext();
+
+export function useVods() {
+  return useContext(VodsContext);
+}
 
 export default function Vods() {
   const navigate = useNavigate();
@@ -29,6 +41,25 @@ export default function Vods() {
   const [filterGame, setFilterGame] = useState("");
   const page = parseInt(query.get("page") || "1", 10);
   const limit = isMobile ? 10 : 20;
+
+  useEffect(() => {
+    const setFilterByQuery = async (queryFilter) => {
+      setFilter(FILTERS[queryFilter]);
+      switch (FILTERS[queryFilter]) {
+        case "Date":
+          setFilterEndDate(dayjs(query.get("value")));
+          break;
+        case "Title":
+          setFilterTitle(query.get("value"));
+          break;
+        case "Game":
+          setFilterGame(query.get("value"));
+      }
+    }
+
+    const queryFilter = Math.abs(parseInt(query.get("filter"), 10)) || FILTERS.length;
+    queryFilter < FILTERS.length && setFilterByQuery(queryFilter);
+  }, []);
 
   useEffect(() => {
     setVods(null);
@@ -157,104 +188,116 @@ export default function Vods() {
     [setFilterGame]
   );
 
+  const setGameFilter = useCallback(
+    (name) => {
+      setFilter(FILTERS[FILTER_ALTS.Game])
+      setFilterGame(name);
+    }, []
+  );
+
+  const ctx = useMemo(
+    () => ({setGameFilter}),
+    [setGameFilter]
+  );
+
   const totalPages = Math.ceil(totalVods / limit);
 
   return (
-    <SimpleBar style={{ minHeight: 0, height: "100%" }}>
-      <Box sx={{ padding: 2 }}>
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 2, flexDirection: "column", alignItems: "center" }}>
-          {totalVods !== null && (
-            <Typography variant="h4" color="primary" sx={{ textTransform: "uppercase", fontWeight: "550" }}>
-              {`${totalVods} Vods`}
-            </Typography>
-          )}
-        </Box>
-        <Box sx={{ pl: !isMobile ? 15 : 5, pr: !isMobile ? 15 : 5, pt: 1, display: "flex", flexDirection: "row", alignItems: "center" }}>
-          <FormControl>
-            <InputLabel id="select-label">Filter</InputLabel>
-            <Select labelId="select-label" label={filter} value={filter} onChange={(evt) => setFilter(evt.target.value)} autoWidth>
-              {FILTERS.map((data, i) => {
-                return (
-                  <MenuItem key={i} value={data}>
-                    {data}
-                  </MenuItem>
-                );
-              })}
-            </Select>
-          </FormControl>
-          {filter === "Date" && (
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <VodsContext.Provider value={ctx}>
+      <SimpleBar style={{ minHeight: 0, height: "100%" }}>
+        <Box sx={{ padding: 2 }}>
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 2, flexDirection: "column", alignItems: "center" }}>
+            {totalVods !== null && (
+              <Typography variant="h4" color="primary" sx={{ textTransform: "uppercase", fontWeight: "550" }}>
+                {`${totalVods} Vods`}
+              </Typography>
+            )}
+          </Box>
+          <Box sx={{ pl: !isMobile ? 15 : 5, pr: !isMobile ? 15 : 5, pt: 1, display: "flex", flexDirection: "row", alignItems: "center" }}>
+            <FormControl>
+              <InputLabel id="select-label">Filter</InputLabel>
+              <Select labelId="select-label" label={filter} value={filter} onChange={(evt) => setFilter(evt.target.value)} autoWidth>
+                {FILTERS.map((data, i) => {
+                  return (
+                    <MenuItem key={i} value={data}>
+                      {data}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+            {filter === "Date" && (
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <Box sx={{ ml: 1 }}>
+                  <DatePicker
+                    minDate={dayjs(START_DATE)}
+                    maxDate={dayjs()}
+                    sx={{ mr: 1 }}
+                    label="Start Date"
+                    defaultValue={filterStartDate}
+                    onAccept={(newDate) => setFilterStartDate(newDate)}
+                    views={["year", "month", "day"]}
+                  />
+                  <DatePicker
+                    minDate={dayjs(START_DATE)}
+                    maxDate={dayjs()}
+                    label="End Date"
+                    defaultValue={filterEndDate}
+                    onAccept={(newDate) => setFilterEndDate(newDate)}
+                    views={["year", "month", "day"]}
+                  />
+                </Box>
+              </LocalizationProvider>
+            )}
+            {filter === "Title" && (
               <Box sx={{ ml: 1 }}>
-                <DatePicker
-                  minDate={dayjs(START_DATE)}
-                  maxDate={dayjs()}
-                  sx={{ mr: 1 }}
-                  label="Start Date"
-                  defaultValue={filterStartDate}
-                  onAccept={(newDate) => setFilterStartDate(newDate)}
-                  views={["year", "month", "day"]}
-                />
-                <DatePicker
-                  minDate={dayjs(START_DATE)}
-                  maxDate={dayjs()}
-                  label="End Date"
-                  defaultValue={filterEndDate}
-                  onAccept={(newDate) => setFilterEndDate(newDate)}
-                  views={["year", "month", "day"]}
-                />
+                <TextField fullWidth label="Search by Title" type="text" onChange={handleTitleChange} defaultValue={filterTitle} />
               </Box>
-            </LocalizationProvider>
-          )}
-          {filter === "Title" && (
-            <Box sx={{ ml: 1 }}>
-              <TextField fullWidth label="Search by Title" type="text" onChange={handleTitleChange} defaultValue={filterTitle} />
-            </Box>
-          )}
-          {filter === "Game" && (
-            <Box sx={{ ml: 1 }}>
-              <TextField fullWidth label="Search by Game" type="text" onChange={handleGameChange} defaultValue={filterGame} />
-            </Box>
+            )}
+            {filter === "Game" && (
+              <Box sx={{ ml: 1 }}>
+                <TextField fullWidth label="Search by Game" type="text" onChange={handleGameChange} defaultValue={filterGame} />
+              </Box>
+            )}
+          </Box>
+          {vods ? (
+            <Grid container spacing={2} sx={{ mt: 1, justifyContent: "center" }}>
+              {vods.map((vod, _) => (
+                <Vod gridSize={2.1} key={vod.id} vod={vod} isMobile={isMobile} />
+              ))}
+            </Grid>
+          ) : (
+            <Loading />
           )}
         </Box>
-        {vods ? (
-          <Grid container spacing={2} sx={{ mt: 1, justifyContent: "center" }}>
-            {vods.map((vod, _) => (
-              <Vod gridSize={2.1} key={vod.id} vod={vod} isMobile={isMobile} />
-            ))}
-          </Grid>
-        ) : (
-          <Loading />
-        )}
-      </Box>
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 2, mb: 2, alignItems: "center", flexDirection: isMobile ? "column" : "row" }}>
-        {totalPages !== null && (
-          <>
-            <Pagination
-              shape="rounded"
-              variant="outlined"
-              count={totalPages}
-              disabled={totalPages <= 1}
-              color="primary"
-              page={page}
-              renderItem={(item) => <PaginationItem component={Link} to={`${location.pathname}${item.page === 1 ? "" : `?page=${item.page}`}`} {...item} />}
-            />
-            <TextField
-              inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-              InputProps={{
-                startAdornment: <InputAdornment position="start">Page</InputAdornment>,
-              }}
-              sx={{
-                width: "100px",
-                m: 1,
-              }}
-              size="small"
-              type="text"
-              onKeyDown={handleSubmit}
-            />
-          </>
-        )}
-      </Box>
-      <Footer />
-    </SimpleBar>
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 2, mb: 2, alignItems: "center", flexDirection: isMobile ? "column" : "row" }}>
+          {totalPages !== null && (
+            <>
+              <Pagination
+                shape="rounded"
+                variant="outlined"
+                count={totalPages}
+                disabled={totalPages <= 1}
+                color="primary"
+                page={page}
+                renderItem={(item) => <PaginationItem component={Link} to={`${location.pathname}${item.page === 1 ? "" : `?page=${item.page}`}`} {...item} />}
+              />
+              <TextField
+                inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+                label="Page"
+                sx={{
+                  width: "100px",
+                  m: 1,
+                }}
+                size="small"
+                type="text"
+                onKeyDown={handleSubmit}
+              />
+            </>
+          )}
+        </Box>
+        <Footer />
+      </SimpleBar>
+    </VodsContext.Provider>
   );
 }
