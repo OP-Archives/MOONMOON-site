@@ -132,6 +132,12 @@ export default function Vods() {
     return;
   }, [limit, page, filter, filterStartDate, filterEndDate, filterTitle, filterGame]);
 
+  useEffect(() => {
+    if (!filter) return;
+    //reset page to 1 when filter changes
+    navigate(`${location.pathname}?page=1`);
+  }, [filter, location.pathname, navigate]);
+
   const handleSubmit = (e) => {
     const value = e.target.value;
     if (e.which === 13 && !isNaN(value) && value > 0) {
