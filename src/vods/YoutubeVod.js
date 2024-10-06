@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { Box, Typography, MenuItem, Tooltip, useMediaQuery, FormControl, InputLabel, Select, IconButton, Link, Collapse, Divider } from "@mui/material";
+import HomeIcon from "@mui/icons-material/Home";
 import Loading from "../utils/Loading";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams} from "react-router-dom";
 import YoutubePlayer from "./YoutubePlayer";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -180,6 +181,13 @@ export default function Vod(props) {
                   <Tooltip title={`Copy Current Timestamp`}>
                     <IconButton onClick={copyTimestamp} color="primary" aria-label="Copy Current Timestamp" rel="noopener noreferrer" target="_blank">
                       <ContentCopyIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+                <Box sx={{ ml: 0.5 }}>
+                  <Tooltip title={`Go To VODs`}>
+                    <IconButton component={Link} href="/" color="primary" aria-label="Go To Vods" rel="noopener noreferrer" target="_blank">
+                      <HomeIcon />
                     </IconButton>
                   </Tooltip>
                 </Box>
