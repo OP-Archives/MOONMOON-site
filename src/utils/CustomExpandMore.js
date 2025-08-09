@@ -7,10 +7,10 @@ const ExpandMore = styled(({ expand, ...props }, ref) => <IconButton {...props} 
   ${(props) =>
     props.expand
       ? `
-        transform: rotate(180deg);
+        transform: rotate(0deg);
       `
       : `
-        transform: rotate(0deg);
+        transform: rotate(180deg);
       `}
 `;
 
