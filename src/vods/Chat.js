@@ -183,10 +183,10 @@ export default function Chat(props) {
         if (i + 1 >= part.part) break;
         time += video.duration;
       }
-      time += playerRef.current.getCurrentTime();
+      time += playerRef.current.getCurrentTime() ?? 0;
     } else if (games) {
       time += parseFloat(games[part.part - 1].start_time);
-      time += playerRef.current.getCurrentTime();
+      time += playerRef.current.getCurrentTime() ?? 0;
     } else {
       time += playerRef.current.currentTime();
     }
