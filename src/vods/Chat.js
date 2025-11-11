@@ -467,7 +467,7 @@ export default function Chat(props) {
                         style={{ verticalAlign: "middle", border: "none", maxWidth: "100%" }}
                         src={`${BASE_BTTV_EMOTE_CDN}/${emote.id}/1x`}
                         srcSet={`${BASE_BTTV_EMOTE_CDN}/${emote.id}/1x 1x, ${BASE_BTTV_EMOTE_CDN}/${emote.id}/2x 2x, ${BASE_BTTV_EMOTE_CDN}/${emote.id}/3x 3x`}
-                        alt=""
+                        alt={text}
                       />{" "}
                     </Box>
                   </MessageTooltip>
