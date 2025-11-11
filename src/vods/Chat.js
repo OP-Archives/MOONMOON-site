@@ -329,7 +329,7 @@ export default function Chat(props) {
                   style={{ verticalAlign: "middle", border: "none", maxWidth: "100%" }}
                   src={`${BASE_TWITCH_CDN}/emoticons/v2/${fragment.emote.emoteID}/default/dark/1.0`}
                   srcSet={`${BASE_TWITCH_CDN}/emoticons/v2/${fragment.emote.emoteID}/default/dark/1.0 1x, ${BASE_TWITCH_CDN}/emoticons/v2/${fragment.emote.emoteID}/default/dark/2.0 2x, ${BASE_TWITCH_CDN}/emoticons/v2/${fragment.emote.emoteID}/default/dark/3.0 4x`}
-                  alt=""
+                  alt={fragment.text}
                 />{" "}
               </Box>
             </MessageTooltip>
@@ -362,7 +362,7 @@ export default function Chat(props) {
                   style={{ verticalAlign: "middle", border: "none", maxWidth: "100%" }}
                   src={`${BASE_TWITCH_CDN}/emoticons/v2/${fragment.emoticon.emoticon_id}/default/dark/1.0`}
                   srcSet={`${BASE_TWITCH_CDN}/emoticons/v2/${fragment.emoticon.emoticon_id}/default/dark/1.0 1x, ${BASE_TWITCH_CDN}/emoticons/v2/${fragment.emoticon.emoticon_id}/default/dark/2.0 2x, ${BASE_TWITCH_CDN}/emoticons/v2/${fragment.emoticon.emoticon_id}/default/dark/3.0 4x`}
-                  alt=""
+                  alt={fragment.text}
                 />{" "}
               </Box>
             </MessageTooltip>
@@ -390,7 +390,7 @@ export default function Chat(props) {
                           crossOrigin="anonymous"
                           style={{ marginBottom: "0.3rem", border: "none", maxWidth: "100%", verticalAlign: "top" }}
                           src={`${BASE_7TV_EMOTE_CDN}/${emote.id}/4x.webp`}
-                          alt=""
+                          alt={text}
                         />
                         <Typography display="block" variant="caption">{`Emote: ${emote.name || emote.code}`}</Typography>
                         <Typography display="block" variant="caption">
@@ -405,7 +405,7 @@ export default function Chat(props) {
                         style={{ verticalAlign: "middle", border: "none", maxWidth: "100%" }}
                         src={`${BASE_7TV_EMOTE_CDN}/${emote.id}/1x.webp`}
                         srcSet={`${BASE_7TV_EMOTE_CDN}/${emote.id}/1x.webp 1x, ${BASE_7TV_EMOTE_CDN}/${emote.id}/2x.webp 2x, ${BASE_7TV_EMOTE_CDN}/${emote.id}/3x.webp 3x, ${BASE_7TV_EMOTE_CDN}/${emote.id}/4x.webp 4x`}
-                        alt=""
+                        alt={text}
                       />{" "}
                     </Box>
                   </MessageTooltip>
@@ -436,7 +436,7 @@ export default function Chat(props) {
                         style={{ verticalAlign: "middle", border: "none", maxWidth: "100%" }}
                         src={`${BASE_FFZ_EMOTE_CDN}/${emote.id}/1`}
                         srcSet={`${BASE_FFZ_EMOTE_CDN}/${emote.id}/1 1x, ${BASE_FFZ_EMOTE_CDN}/${emote.id}/2 2x, ${BASE_FFZ_EMOTE_CDN}/${emote.id}/4 4x`}
-                        alt=""
+                        alt={text}
                       />{" "}
                     </Box>
                   </MessageTooltip>
