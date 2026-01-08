@@ -12,7 +12,7 @@ dayjs.extend(localizedFormat);
 export default function Vod(props) {
   const { vod, gridSize } = props;
   const DEFAULT_VOD = vod.youtube.length > 0 ? `/youtube/${vod.id}` : vod.games.length > 0 ? `/games/${vod.id}` : `/manual/${vod.id}`;
-  const DEFAULT_THUMBNAIL = vod.thumbnail_url ? vod.thumbnail_url : vod.games.length > 0 ? vod.games[0].thumbnail_url : sadge;
+  const DEFAULT_THUMBNAIL = vod.youtube.length > 0 ? vod.youtube.thumbnail_url[0] : vod.games.length > 0 ? vod.games[0].thumbnail_url : vod.thumbnail_url ? vod.thumbnail_url : sadge;
 
   return (
     <Grid item xs={gridSize} sx={{ maxWidth: "18rem", flexBasis: "18rem" }}>
