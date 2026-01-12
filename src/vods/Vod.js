@@ -1,8 +1,8 @@
-import React from "react";
 import { Box, Typography, Link, Grid } from "@mui/material";
 import CustomLink from "../utils/CustomLink";
 import sadge from "../assets/sadge.jpg";
 import Chapters from "./ChaptersMenu";
+import WatchMenu from "./WatchMenu";
 import CustomWidthTooltip from "../utils/CustomToolTip";
 import dayjs from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat.js";
@@ -44,7 +44,7 @@ export default function Vod(props) {
           </Box>
         </Box>
       </Box>
-      <Box sx={{ mt: 1, mb: 1, display: "flex" }}>
+      <Box sx={{ mt: 1, mb: 1, display: "flex", alignItems: "center" }}>
         {vod.chapters && vod.chapters.length > 0 && <Chapters vod={vod} />}
         <Box sx={{ minWidth: 0, width: "100%" }}>
           <Box sx={{ p: 0.5 }}>
@@ -57,6 +57,9 @@ export default function Vod(props) {
                 </CustomLink>
               </span>
             </CustomWidthTooltip>
+          </Box>
+          <Box sx={{ display: "flex", justifyContent: "center" }}>
+            <WatchMenu vod={vod} />
           </Box>
         </Box>
       </Box>
