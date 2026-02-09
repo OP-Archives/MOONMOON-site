@@ -9,7 +9,8 @@ import Chat from "./Chat";
 import Chapters from "./VodChapters";
 import ExpandMore from "../utils/CustomExpandMore";
 import CustomWidthTooltip from "../utils/CustomToolTip";
-import { parse } from "tinyduration";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { toHMS, convertTimestamp } from "../utils/helpers";
 
 export default function Vod(props) {
   const location = useLocation();
@@ -78,6 +79,20 @@ export default function Vod(props) {
     return;
   }, [userChatDelay, delay]);
 
+  useEffect(() => {
+    if (!playerRef.current) return;
+    if (timestamp >= 0) {
+      //need to pause/play to reset chat position.
+      playerRef.current.pause();
+      playerRef.current.currentTime(timestamp);
+      playerRef.current.play();
+    }
+  }, [timestamp, playerRef]);
+
+  const copyTimestamp = () => {
+    navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}?t=${toHMS(currentTime)}`);
+  };
+
   if (vod === undefined || drive === undefined) return <Loading />;
 
   return (
@@ -108,6 +123,13 @@ export default function Vod(props) {
                     </Tooltip>
                   )}
                 </Box>
+                <Box sx={{ ml: 0.5 }}>
+                  <Tooltip title={`Copy Current Timestamp`}>
+                    <IconButton onClick={copyTimestamp} color="primary" aria-label="Copy Current Timestamp" rel="noopener noreferrer" target="_blank">
+                      <ContentCopyIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
               </Box>
             </Box>
           </Collapse>
@@ -130,17 +152,3 @@ export default function Vod(props) {
     </Box>
   );
 }
-
-/**
- * Parse Timestamp (1h2m3s) to seconds.
- */
-const convertTimestamp = (timestamp) => {
-  try {
-    timestamp = parse(`PT${timestamp.toUpperCase()}`);
-    timestamp = (timestamp?.hours || 0) * 60 * 60 + (timestamp?.minutes || 0) * 60 + (timestamp?.seconds || 0);
-  } catch {
-    timestamp = 0;
-  }
-
-  return timestamp;
-};

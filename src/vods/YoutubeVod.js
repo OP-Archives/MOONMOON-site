@@ -10,9 +10,8 @@ import Chat from "./Chat";
 import Chapters from "./VodChapters";
 import ExpandMore from "../utils/CustomExpandMore";
 import CustomToolTip from "../utils/CustomToolTip";
-import { parse } from "tinyduration";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import { toHMS, toSeconds } from "../utils/helpers";
+import { toHMS, toSeconds, convertTimestamp } from "../utils/helpers";
 
 export default function Vod(props) {
   const location = useLocation();
@@ -207,17 +206,3 @@ export default function Vod(props) {
     </Box>
   );
 }
-
-/**
- * Parse Timestamp (1h2m3s) to seconds.
- */
-const convertTimestamp = (timestamp) => {
-  try {
-    timestamp = parse(`PT${timestamp.toUpperCase()}`);
-    timestamp = (timestamp?.hours || 0) * 60 * 60 + (timestamp?.minutes || 0) * 60 + (timestamp?.seconds || 0);
-  } catch {
-    timestamp = 0;
-  }
-
-  return timestamp;
-};
