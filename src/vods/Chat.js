@@ -194,7 +194,7 @@ export default function Chat(props) {
       time += playerRef.current.currentTime();
     }
     time += delay;
-    time += userChatDelay;
+    time += userChatDelay || 0;
     return time;
   }, [playerRef, youtube, delay, part, userChatDelay, games]);
 
@@ -573,11 +573,20 @@ export default function Chat(props) {
     const currentChatRef = chatRef.current;
     return () => {
       stopLoop();
+      if (playRef.current) {
+        clearTimeout(playRef.current);
+        playRef.current = null;
+      }
       // Clean up scroll event listener with proper ref handling
       if (currentChatRef) {
         const scrollElement = currentChatRef.simplebar ? currentChatRef.simplebar.getScrollElement() : currentChatRef;
         scrollElement.removeEventListener("scroll", handleScroll);
       }
+      // Clean up all refs to prevent memory leaks
+      comments.current = [];
+      cursor.current = null;
+      stoppedAtIndex.current = 0;
+      newMessages.current = [];
     };
   }, [playing, vodId, getCurrentTime, loop, VODS_API_BASE, handleScroll]);
 
