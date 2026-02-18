@@ -587,7 +587,6 @@ export default function Chat(props) {
       stopLoop();
       if (playRef.current) {
         clearTimeout(playRef.current);
-        playRef.current = null;
       }
       // Clean up scroll event listener with proper ref handling
       if (currentChatRef) {
