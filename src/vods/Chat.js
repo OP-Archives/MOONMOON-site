@@ -38,21 +38,7 @@ export default function Chat(props) {
   const [scrolling, setScrolling] = useState(false);
   const [showTimestamp, setShowTimestamp] = useState(false);
   const [showModal, setShowModal] = useState(false);
-
-  useEffect(() => {
-    if (chatRef && chatRef.current) {
-      const ref = chatRef.current;
-      const handleScroll = (e) => {
-        e.stopPropagation();
-        const atBottom = ref.scrollHeight - ref.clientHeight - ref.scrollTop <= 128;
-        setScrolling(!atBottom);
-      };
-
-      ref.addEventListener("scroll", handleScroll);
-
-      return () => ref.removeEventListener("scroll", handleScroll);
-    }
-  }, [chatRef]);
+  const isAtBottomRef = useRef(true);
 
   useEffect(() => {
     const loadBadges = () => {
@@ -108,7 +94,7 @@ export default function Chat(props) {
         .then((response) => response.json())
         .then((data) => {
           if (data.status >= 400) return;
-          setEmotes((emotes) => ({ ...emotes, bttv_emotes: emotes.bttv_emotes.concat(data)  }));
+          setEmotes((emotes) => ({ ...emotes, bttv_emotes: emotes.bttv_emotes.concat(data) }));
         })
         .catch((e) => {
           console.error(e);
@@ -448,12 +434,12 @@ export default function Chat(props) {
       return <Box sx={{ display: "inline" }}>{badgeWrapper}</Box>;
     };
 
+    newMessages.current = [];
     // Create only new messages, not all messages
-    const newMessages = [];
     for (let i = stoppedAtIndex.current.valueOf(); i < lastIndex; i++) {
       const comment = comments.current[i];
       if (!comment.message) continue;
-      newMessages.push(
+      newMessages.current.push(
         <Box key={comment.id} sx={{ width: "100%" }}>
           <Box
             sx={{
@@ -491,9 +477,9 @@ export default function Chat(props) {
     }
 
     // Only update state if there are new messages
-    if (newMessages.length > 0) {
+    if (newMessages.current.length > 0) {
       setShownMessages((shownMessages) => {
-        const concatMessages = shownMessages.concat(newMessages);
+        const concatMessages = shownMessages.concat(newMessages.current);
         // Keep only the last 200 messages to prevent memory issues
         if (concatMessages.length > 200) {
           concatMessages.splice(0, concatMessages.length - 200);
@@ -502,6 +488,13 @@ export default function Chat(props) {
       });
       stoppedAtIndex.current = lastIndex;
       if (comments.current.length - 1 === lastIndex) fetchNextComments();
+
+      // Auto-scroll to bottom if user is at the bottom
+      if (isAtBottomRef.current) {
+        setTimeout(() => {
+          scrollToBottom();
+        }, 0);
+      }
     }
   }, [getCurrentTime, playerRef, vodId, VODS_API_BASE, youtube, games, showTimestamp, transformMessage]);
 
@@ -510,6 +503,28 @@ export default function Chat(props) {
     buildComments();
     loopRef.current = setInterval(buildComments, 500);
   }, [buildComments]);
+
+  // Handle scroll events to detect when user scrolls up
+  const handleScroll = useCallback(() => {
+    if (!chatRef.current) return;
+
+    const scrollElement = chatRef.current.simplebar ? chatRef.current.simplebar.getScrollElement() : chatRef.current;
+    const { scrollTop, scrollHeight, clientHeight } = scrollElement;
+
+    // Check if user is at the bottom (within 350px tolerance)
+    const isAtBottom = Math.abs(scrollTop + clientHeight - scrollHeight) < 350;
+
+    // Update ref to track scroll position
+    isAtBottomRef.current = isAtBottom;
+
+    // If user scrolls up, pause auto-scrolling
+    if (!isAtBottom) {
+      setScrolling(true);
+    } else {
+      // If user scrolls all the way down, resume auto-scrolling
+      setScrolling(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (!playing.playing || stoppedAtIndex.current === undefined) return;
@@ -555,31 +570,43 @@ export default function Chat(props) {
       fetchComments(time);
       loop();
     }, 300);
+    const currentChatRef = chatRef.current;
     return () => {
       stopLoop();
+      // Clean up scroll event listener with proper ref handling
+      if (currentChatRef) {
+        const scrollElement = currentChatRef.simplebar ? currentChatRef.simplebar.getScrollElement() : currentChatRef;
+        scrollElement.removeEventListener("scroll", handleScroll);
+      }
     };
-  }, [playing, vodId, getCurrentTime, loop, VODS_API_BASE]);
+  }, [playing, vodId, getCurrentTime, loop, VODS_API_BASE, handleScroll]);
 
   const stopLoop = () => {
     if (loopRef.current !== null) clearInterval(loopRef.current);
   };
 
-  useEffect(() => {
-    if (!chatRef.current || shownMessages.length === 0) return;
-
-    let messageHeight = 0;
-    for (let message of newMessages.current) {
-      if (!message.props.ref.current) continue;
-      messageHeight += message.props.ref.current.scrollHeight;
-    }
-    const height = chatRef.current.scrollHeight - chatRef.current.clientHeight - chatRef.current.scrollTop - messageHeight;
-    const atBottom = height < 128;
-    if (atBottom) chatRef.current.scrollTop = chatRef.current.scrollHeight;
-  }, [shownMessages]);
-
   const scrollToBottom = () => {
     setScrolling(false);
-    chatRef.current.scrollTop = chatRef.current.scrollHeight;
+    // Force scroll to bottom using SimpleBar's API if available
+    if (chatRef.current.simplebar) {
+      const scrollElement = chatRef.current.simplebar.getScrollElement();
+      // Use requestAnimationFrame to ensure DOM is updated before scrolling
+      requestAnimationFrame(() => {
+        // Add a small delay to ensure all content is rendered
+        setTimeout(() => {
+          scrollElement.scrollTop = scrollElement.scrollHeight;
+        }, 0);
+      });
+    } else {
+      // Fallback to regular scroll
+      // Use requestAnimationFrame to ensure DOM is updated before scrolling
+      requestAnimationFrame(() => {
+        // Add a small delay to ensure all content is rendered
+        setTimeout(() => {
+          chatRef.current.scrollTop = chatRef.current.scrollHeight;
+        }, 0);
+      });
+    }
   };
 
   const handleExpandClick = () => {
@@ -635,7 +662,7 @@ export default function Chat(props) {
               <Loading />
             ) : (
               <>
-                <SimpleBar scrollableNodeProps={{ ref: chatRef }} style={{ height: "100%", overflowX: "hidden" }}>
+                <SimpleBar scrollableNodeProps={{ ref: chatRef, onScroll: handleScroll }} style={{ height: "100%", overflowX: "hidden" }}>
                   <Box
                     sx={{
                       display: "flex",
