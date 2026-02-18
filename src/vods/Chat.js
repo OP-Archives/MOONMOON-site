@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from "react";
-import { Box, Typography, Tooltip, Divider, Collapse, styled, IconButton, Button, tooltipClasses } from "@mui/material";
+import { Box, Typography, Tooltip, Divider, Collapse, styled, IconButton, Button, CircularProgress, tooltipClasses } from "@mui/material";
 import SimpleBar from "simplebar-react";
-import Loading from "../utils/Loading";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { collapseClasses } from "@mui/material/Collapse";
 import Twemoji from "react-twemoji";
@@ -9,24 +8,31 @@ import Settings from "./Settings";
 import { toHHMMSS } from "../utils/helpers";
 import SettingsIcon from "@mui/icons-material/Settings";
 
+// CDN URLs for emotes and badges
 const BASE_TWITCH_CDN = "https://static-cdn.jtvnw.net";
 const BASE_FFZ_EMOTE_CDN = "https://cdn.frankerfacez.com/emote";
-//Needs CORS for mobile devices.
 const BASE_BTTV_EMOTE_CDN = "https://emotes.overpowered.tv/bttv";
 const BASE_7TV_EMOTE_CDN = "https://cdn.7tv.app/emote";
 const BASE_FFZ_EMOTE_API = "https://api.frankerfacez.com/v1";
 const BASE_BTTV_EMOTE_API = "https://api.betterttv.net/3";
 const BASE_7TV_EMOTE_API = "https://7tv.io/v3";
 
+// Cache for badges
 let cachedBadges = new Map();
 
 export default function Chat(props) {
   const { isPortrait, vodId, playerRef, playing, VODS_API_BASE, twitchId, channel, userChatDelay, delay, youtube, part, games } = props;
+
+  // State management
   const [showChat, setShowChat] = useState(true);
   const [shownMessages, setShownMessages] = useState([]);
   const [emotes, setEmotes] = useState({ ffz_emotes: [], bttv_emotes: [], "7tv_emotes": [] });
-  const messageCountRef = useRef(0);
-  const badgesCountRef = useRef(0);
+  const [scrolling, setScrolling] = useState(false);
+  const [showTimestamp, setShowTimestamp] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const isAtBottomRef = useRef(true);
+
+  // Refs for various data and timers
   const comments = useRef([]);
   const badges = useRef();
   const cursor = useRef();
@@ -34,12 +40,9 @@ export default function Chat(props) {
   const playRef = useRef();
   const chatRef = useRef();
   const stoppedAtIndex = useRef(0);
-  const newMessages = useRef([]);
-  const [scrolling, setScrolling] = useState(false);
-  const [showTimestamp, setShowTimestamp] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  const isAtBottomRef = useRef(true);
+  const newMessages = useRef();
 
+  // === EFFECT HOOKS ===
   useEffect(() => {
     const loadBadges = () => {
       fetch(`${VODS_API_BASE}/v2/badges`, {
@@ -163,7 +166,7 @@ export default function Chat(props) {
     loadBadges();
   }, [vodId, VODS_API_BASE, twitchId, channel]);
 
-  // Pre-process emote/badge mappings during component initialization
+  // === MEMOIZED VALUES ===
   const emoteLookup = useMemo(() => {
     if (!emotes) return;
     const lookup = new Map();
@@ -177,6 +180,7 @@ export default function Chat(props) {
     return lookup;
   }, [emotes]);
 
+  // === CALLBACK FUNCTIONS ===
   const getCurrentTime = useCallback(() => {
     if (!playerRef.current) return 0;
     let time = 0;
@@ -198,20 +202,20 @@ export default function Chat(props) {
     return time;
   }, [playerRef, youtube, delay, part, userChatDelay, games]);
 
-  const getEmoteImageUrl = (emote, type, size = 1) => {
+  const getEmoteImageUrl = useCallback((emote, type, size = 1) => {
     switch (type) {
       case "FFZ":
         return `${BASE_FFZ_EMOTE_CDN}/${emote.id}/${size}`;
       case "BTTV":
-        return `${BASE_BTTV_EMOTE_CDN}/${emote.id}/${size === 4 ? 3 : size}x`;
+        return `${BASE_BTTV_EMOTE_CDN}/${emote.id}/${size === 4 ? 2 : size}x`;
       case "7TV":
         return `${BASE_7TV_EMOTE_CDN}/${emote.id}/${size}x.webp`;
       default:
         return `${BASE_TWITCH_CDN}/emoticons/v2/${emote.id}/default/dark/${size}.0`;
     }
-  };
+  }, []);
 
-  const getEmoteImageSrcSet = (emote, type) => {
+  const getEmoteImageSrcSet = useCallback((emote, type) => {
     switch (type) {
       case "FFZ":
         return `${BASE_FFZ_EMOTE_CDN}/${emote.id}/1 1x, ${BASE_FFZ_EMOTE_CDN}/${emote.id}/2 2x, ${BASE_FFZ_EMOTE_CDN}/${emote.id}/4 4x`;
@@ -222,51 +226,54 @@ export default function Chat(props) {
       default:
         return `${BASE_TWITCH_CDN}/emoticons/v2/${emote.id}/default/dark/1.0 1x, ${BASE_TWITCH_CDN}/emoticons/v2/${emote.id}/default/dark/2.0 2x, ${BASE_TWITCH_CDN}/emoticons/v2/${emote.id}/default/dark/3.0 4x`;
     }
-  };
+  }, []);
 
-  const renderEmoteTooltip = useCallback((emote, word) => {
-    const emoteType = emote.provider;
+  const renderEmoteTooltip = useCallback(
+    (emote, word, key) => {
+      const emoteType = emote.provider;
 
-    return (
-      <MessageTooltip
-        key={messageCountRef.current++}
-        title={
-          <Box sx={{ maxWidth: "30rem", textAlign: "center" }}>
+      return (
+        <MessageTooltip
+          key={key}
+          title={
+            <Box sx={{ maxWidth: "30rem", textAlign: "center" }}>
+              <img
+                crossOrigin="anonymous"
+                style={{
+                  marginBottom: "0.3rem",
+                  border: "none",
+                  maxWidth: "100%",
+                  verticalAlign: "top",
+                }}
+                src={getEmoteImageUrl(emote, emoteType, 2)}
+                alt={word}
+              />
+              <Typography display="block" variant="caption">{`Emote: ${emote.name || emote.code}`}</Typography>
+              <Typography display="block" variant="caption">{`${emoteType} Emotes`}</Typography>
+            </Box>
+          }
+        >
+          <Box sx={{ display: "inline" }}>
             <img
               crossOrigin="anonymous"
               style={{
-                marginBottom: "0.3rem",
+                verticalAlign: "middle",
                 border: "none",
                 maxWidth: "100%",
-                verticalAlign: "top",
               }}
-              src={getEmoteImageUrl(emote, emoteType, 4)}
+              src={getEmoteImageUrl(emote, emoteType)}
+              srcSet={getEmoteImageSrcSet(emote, emoteType)}
               alt={word}
-            />
-            <Typography display="block" variant="caption">{`Emote: ${emote.name || emote.code}`}</Typography>
-            <Typography display="block" variant="caption">{`${emoteType} Emotes`}</Typography>
+            />{" "}
           </Box>
-        }
-      >
-        <Box sx={{ display: "inline" }}>
-          <img
-            crossOrigin="anonymous"
-            style={{
-              verticalAlign: "middle",
-              border: "none",
-              maxWidth: "100%",
-            }}
-            src={getEmoteImageUrl(emote, emoteType)}
-            srcSet={getEmoteImageSrcSet(emote, emoteType)}
-            alt={word}
-          />{" "}
-        </Box>
-      </MessageTooltip>
-    );
-  }, []);
+        </MessageTooltip>
+      );
+    },
+    [getEmoteImageUrl, getEmoteImageSrcSet],
+  );
 
   const transformMessage = useCallback(
-    (fragments) => {
+    (fragments, keyPrefix) => {
       if (!fragments) return;
 
       const textFragments = [];
@@ -274,16 +281,17 @@ export default function Chat(props) {
         // Handle emote/emoticon fragments directly
         if (fragment.emote || fragment.emoticon) {
           const emoteID = fragment.emote ? fragment.emote.emoteID : fragment.emoticon.emoticon_id;
-          textFragments.push(renderEmoteTooltip({ id: emoteID, code: fragment.text, provider: "Twitch" }, fragment.text));
+          textFragments.push(renderEmoteTooltip({ id: emoteID, code: fragment.text, provider: "Twitch" }, fragment.text, `${keyPrefix}-emote-${fragment.text}`));
         } else {
           const words = fragment.text.split(" ");
-          for (let word of words) {
+          for (let i = 0; i < words.length; i++) {
+            const word = words[i];
             const emote = emoteLookup.get(word);
             if (emote) {
-              textFragments.push(renderEmoteTooltip(emote, word));
+              textFragments.push(renderEmoteTooltip(emote, word, `${keyPrefix}-emote-${word}-${i}`));
             } else {
               textFragments.push(
-                <Twemoji key={messageCountRef.current++} noWrapper options={{ className: "twemoji" }}>
+                <Twemoji key={`${keyPrefix}-twemoji-${word}-${i}`} noWrapper options={{ className: "twemoji" }}>
                   <Typography variant="body1" display="inline">{`${word} `}</Typography>
                 </Twemoji>,
               );
@@ -331,13 +339,14 @@ export default function Chat(props) {
         });
     };
 
-    const transformBadges = (textBadges) => {
+    const transformBadges = (textBadges, keyPrefix) => {
       if (!badges.current) return;
 
       const badgeWrapper = [];
       const { channel: channelBadges, global: globalBadges } = badges.current;
 
-      for (const textBadge of textBadges) {
+      for (let i = 0; i < textBadges.length; i++) {
+        const textBadge = textBadges[i];
         const badgeId = textBadge._id ?? textBadge.setID;
         const version = textBadge.version;
 
@@ -348,7 +357,7 @@ export default function Chat(props) {
 
           badgeWrapper.push(
             <MessageTooltip
-              key={badgesCountRef.current++}
+              key={`${keyPrefix}-badge-${badgeId}-${version}`}
               title={
                 <Box sx={{ maxWidth: "30rem", textAlign: "center" }}>
                   <img
@@ -395,7 +404,7 @@ export default function Chat(props) {
 
         badgeWrapper.push(
           <MessageTooltip
-            key={badgesCountRef.current++}
+            key={`${keyPrefix}-badge-${badgeId}-${version}`}
             title={
               <Box sx={{ maxWidth: "30rem", textAlign: "center" }}>
                 <img
@@ -461,13 +470,13 @@ export default function Chat(props) {
                 </Box>
               )}
               <Box sx={{ flexGrow: 1 }}>
-                {comment.user_badges && transformBadges(comment.user_badges)}
+                {comment.user_badges && transformBadges(comment.user_badges, `comment-${comment.id}`)}
                 <Box sx={{ textDecoration: "none", display: "inline" }}>
                   <span style={{ color: comment.user_color, fontWeight: 600 }}>{comment.display_name}</span>
                 </Box>
                 <Box sx={{ display: "inline" }}>
                   <span>: </span>
-                  {transformMessage(comment.message)}
+                  {transformMessage(comment.message, `comment-${comment.id}`)}
                 </Box>
               </Box>
             </Box>
@@ -501,7 +510,7 @@ export default function Chat(props) {
   const loop = useCallback(() => {
     if (loopRef.current !== null) clearInterval(loopRef.current);
     buildComments();
-    loopRef.current = setInterval(buildComments, 500);
+    loopRef.current = setInterval(buildComments, 1000);
   }, [buildComments]);
 
   // Handle scroll events to detect when user scrolls up
@@ -526,8 +535,10 @@ export default function Chat(props) {
     }
   }, []);
 
+  // === MAIN EFFECT HOOK ===
   useEffect(() => {
     if (!playing.playing || stoppedAtIndex.current === undefined) return;
+
     const fetchComments = (offset = 0) => {
       fetch(`${VODS_API_BASE}/v1/vods/${vodId}/comments?content_offset_seconds=${offset}`, {
         method: "GET",
@@ -570,6 +581,7 @@ export default function Chat(props) {
       fetchComments(time);
       loop();
     }, 300);
+
     const currentChatRef = chatRef.current;
     return () => {
       stopLoop();
@@ -622,6 +634,7 @@ export default function Chat(props) {
     setShowChat(!showChat);
   };
 
+  // === RENDERING ===
   return (
     <Box
       sx={{
@@ -667,8 +680,12 @@ export default function Chat(props) {
           </Box>
           <Divider />
           <CustomCollapse in={showChat} timeout="auto" unmountOnExit sx={{ minWidth: "340px" }}>
-            {comments.length === 0 ? (
-              <Loading />
+            {comments.current.length === 0 ? (
+              <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%", width: "100%", flexDirection: "column" }}>
+                <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+                  <CircularProgress sx={{ mt: 2 }} size="2rem" />
+                </Box>
+              </Box>
             ) : (
               <>
                 <SimpleBar scrollableNodeProps={{ ref: chatRef, onScroll: handleScroll }} style={{ height: "100%", overflowX: "hidden" }}>
@@ -742,6 +759,7 @@ export default function Chat(props) {
   );
 }
 
+// === STYLED COMPONENTS ===
 const CustomCollapse = styled(({ _, ...props }) => <Collapse {...props} />)({
   [`& .${collapseClasses.wrapper}`]: {
     height: "100%",
