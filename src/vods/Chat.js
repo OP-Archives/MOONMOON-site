@@ -281,17 +281,19 @@ export default function Chat(props) {
         // Handle emote/emoticon fragments directly
         if (fragment.emote || fragment.emoticon) {
           const emoteID = fragment.emote ? fragment.emote.emoteID : fragment.emoticon.emoticon_id;
-          textFragments.push(renderEmoteTooltip({ id: emoteID, code: fragment.text, provider: "Twitch" }, fragment.text, `${keyPrefix}-emote-${fragment.text}`));
+          textFragments.push(
+            renderEmoteTooltip({ id: emoteID, code: fragment.text, provider: "Twitch" }, fragment.text, `${keyPrefix}-emote-${fragment.text}-${Math.random().toString(36).substr(2, 9)}`),
+          );
         } else {
           const words = fragment.text.split(" ");
           for (let i = 0; i < words.length; i++) {
             const word = words[i];
             const emote = emoteLookup.get(word);
             if (emote) {
-              textFragments.push(renderEmoteTooltip(emote, word, `${keyPrefix}-emote-${word}-${i}`));
+              textFragments.push(renderEmoteTooltip(emote, word, `${keyPrefix}-emote-${word}-${i}-${Math.random().toString(36).substr(2, 9)}`));
             } else {
               textFragments.push(
-                <Twemoji key={`${keyPrefix}-twemoji-${word}-${i}`} noWrapper options={{ className: "twemoji" }}>
+                <Twemoji key={`${keyPrefix}-twemoji-${word}-${i}-${Math.random().toString(36).substr(2, 9)}`} noWrapper options={{ className: "twemoji" }}>
                   <Typography variant="body1" display="inline">{`${word} `}</Typography>
                 </Twemoji>,
               );
