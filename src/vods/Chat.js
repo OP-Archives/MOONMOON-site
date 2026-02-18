@@ -173,9 +173,9 @@ export default function Chat(props) {
     const { ffz_emotes, bttv_emotes, "7tv_emotes": sevenTVEmotes } = emotes;
 
     // Build lookup for all emotes (O(1) lookups)
-    ffz_emotes.forEach((emote) => lookup.set(emote.code, { id: emote.id, code: emote.code, provider: "FFZ" }));
-    bttv_emotes.forEach((emote) => lookup.set(emote.code, { id: emote.id, code: emote.code, provider: "BTTV" }));
-    sevenTVEmotes.forEach((emote) => lookup.set(emote.code, { id: emote.id, code: emote.code, provider: "7TV" }));
+    ffz_emotes.forEach((emote) => lookup.set(emote.code || emote.name, { ...emote, provider: "FFZ" }));
+    bttv_emotes.forEach((emote) => lookup.set(emote.code || emote.name, { ...emote, provider: "BTTV" }));
+    sevenTVEmotes.forEach((emote) => lookup.set(emote.code || emote.name, { ...emote, provider: "7TV" }));
 
     return lookup;
   }, [emotes]);
@@ -228,6 +228,12 @@ export default function Chat(props) {
     }
   }, []);
 
+  // Checks if 7tv emote is zero width
+  const SEVENTV_isZeroWidth = useCallback((emote) => {
+    const ZERO_WIDTH = 1 << 8;
+    return (emote.flags && ZERO_WIDTH) !== 0;
+  }, []);
+
   const renderEmoteTooltip = useCallback(
     (emote, word, key) => {
       const emoteType = emote.provider;
@@ -272,6 +278,34 @@ export default function Chat(props) {
     [getEmoteImageUrl, getEmoteImageSrcSet],
   );
 
+  const renderZeroWidthEmote = useCallback(
+    (emote, word, key) => {
+      const emoteType = emote.provider;
+
+      return (
+        <span>
+          <img
+            key={key}
+            crossOrigin="anonymous"
+            style={{
+              position: "absolute",
+              verticalAlign: "middle",
+              maxWidth: "100%",
+              border: "none",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
+            src={getEmoteImageUrl(emote, emoteType)}
+            srcSet={getEmoteImageSrcSet(emote, emoteType)}
+            alt={word}
+          />
+        </span>
+      );
+    },
+    [getEmoteImageUrl, getEmoteImageSrcSet],
+  );
+
   const transformMessage = useCallback(
     (fragments, keyPrefix) => {
       if (!fragments) return;
@@ -286,12 +320,48 @@ export default function Chat(props) {
           );
         } else {
           const words = fragment.text.split(" ");
+          let lastNormalEmote = null;
+          let lastNormalEmoteIndex = -1;
           for (let i = 0; i < words.length; i++) {
             const word = words[i];
             const emote = emoteLookup.get(word);
             if (emote) {
-              textFragments.push(renderEmoteTooltip(emote, word, `${keyPrefix}-emote-${word}-${i}-${Math.random().toString(36).substr(2, 9)}`));
+              if (emote.provider === "7TV") {
+                const isZeroWidth = SEVENTV_isZeroWidth(emote);
+
+                // If Zero Width Emote
+                if (isZeroWidth && lastNormalEmote) {
+                  // Create a container that holds both the normal emote and zero-width emote
+                  const zeroWidthEmote = renderZeroWidthEmote(emote, word, `${keyPrefix}-emote-${word}-${i}-${Math.random().toString(36).substr(2, 9)}`);
+
+                  // Create a wrapper that contains both emotes - zero-width emote first, then normal emote
+                  // This ensures the zero-width emote is positioned correctly relative to the normal emote
+                  const emoteContainer = (
+                    <Box key={`${keyPrefix}-emote-container-${word}-${i}`} sx={{ display: "inline", position: "relative", verticalAlign: "middle" }}>
+                      {zeroWidthEmote}
+                      {lastNormalEmote}
+                    </Box>
+                  );
+
+                  // Replace the previous normal emote with the container
+                  textFragments[lastNormalEmoteIndex] = emoteContainer;
+                  lastNormalEmote = null;
+                  lastNormalEmoteIndex = -1;
+                } else {
+                  const normalEmote = renderEmoteTooltip(emote, word, `${keyPrefix}-emote-${word}-${i}-${Math.random().toString(36).substr(2, 9)}`);
+                  lastNormalEmote = normalEmote;
+                  lastNormalEmoteIndex = textFragments.length;
+                  textFragments.push(normalEmote);
+                }
+              } else {
+                const normalEmote = renderEmoteTooltip(emote, word, `${keyPrefix}-emote-${word}-${i}-${Math.random().toString(36).substr(2, 9)}`);
+                lastNormalEmote = normalEmote;
+                lastNormalEmoteIndex = textFragments.length;
+                textFragments.push(normalEmote);
+              }
             } else {
+              lastNormalEmote = null;
+              lastNormalEmoteIndex = -1;
               textFragments.push(
                 <Twemoji key={`${keyPrefix}-twemoji-${word}-${i}-${Math.random().toString(36).substr(2, 9)}`} noWrapper options={{ className: "twemoji" }}>
                   <Typography variant="body1" display="inline">{`${word} `}</Typography>
@@ -304,7 +374,7 @@ export default function Chat(props) {
 
       return <Box sx={{ display: "inline" }}>{textFragments}</Box>;
     },
-    [emoteLookup, renderEmoteTooltip],
+    [emoteLookup, renderEmoteTooltip, SEVENTV_isZeroWidth, renderZeroWidthEmote],
   );
 
   const buildComments = useCallback(() => {
