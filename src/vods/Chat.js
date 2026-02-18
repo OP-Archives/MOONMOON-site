@@ -316,7 +316,7 @@ export default function Chat(props) {
         if (fragment.emote || fragment.emoticon) {
           const emoteID = fragment.emote ? fragment.emote.emoteID : fragment.emoticon.emoticon_id;
           textFragments.push(
-            renderEmoteTooltip({ id: emoteID, code: fragment.text, provider: "Twitch" }, fragment.text, `${keyPrefix}-emote-${fragment.text}-${Math.random().toString(36).substr(2, 9)}`),
+            renderEmoteTooltip({ id: emoteID, code: fragment.text, provider: "Twitch" }, fragment.text, `${keyPrefix}-emote-${fragment.text}-${Math.random().toString(36).slice(2, 11)}`),
           );
         } else {
           const words = fragment.text.split(" ");
@@ -332,12 +332,12 @@ export default function Chat(props) {
                 // If Zero Width Emote
                 if (isZeroWidth && lastNormalEmote) {
                   // Create a container that holds both the normal emote and zero-width emote
-                  const zeroWidthEmote = renderZeroWidthEmote(emote, word, `${keyPrefix}-emote-${word}-${i}-${Math.random().toString(36).substr(2, 9)}`);
+                  const zeroWidthEmote = renderZeroWidthEmote(emote, word, `${keyPrefix}-emote-${word}-${i}-${Math.random().toString(36).slice(2, 11)}`);
 
                   // Create a wrapper that contains both emotes - zero-width emote first, then normal emote
                   // This ensures the zero-width emote is positioned correctly relative to the normal emote
                   const emoteContainer = (
-                    <Box key={`${keyPrefix}-emote-container-${word}-${i}`} sx={{ display: "inline", position: "relative", verticalAlign: "middle" }}>
+                    <Box key={`${keyPrefix}-emote-container-${word}-${i}-${Math.random().toString(36).slice(2, 11)}`} sx={{ display: "inline", position: "relative", verticalAlign: "middle" }}>
                       {zeroWidthEmote}
                       {lastNormalEmote}
                     </Box>
@@ -348,13 +348,13 @@ export default function Chat(props) {
                   lastNormalEmote = null;
                   lastNormalEmoteIndex = -1;
                 } else {
-                  const normalEmote = renderEmoteTooltip(emote, word, `${keyPrefix}-emote-${word}-${i}-${Math.random().toString(36).substr(2, 9)}`);
+                  const normalEmote = renderEmoteTooltip(emote, word, `${keyPrefix}-emote-${word}-${i}-${Math.random().toString(36).slice(2, 11)}`);
                   lastNormalEmote = normalEmote;
                   lastNormalEmoteIndex = textFragments.length;
                   textFragments.push(normalEmote);
                 }
               } else {
-                const normalEmote = renderEmoteTooltip(emote, word, `${keyPrefix}-emote-${word}-${i}-${Math.random().toString(36).substr(2, 9)}`);
+                const normalEmote = renderEmoteTooltip(emote, word, `${keyPrefix}-emote-${word}-${i}-${Math.random().toString(36).slice(2, 11)}`);
                 lastNormalEmote = normalEmote;
                 lastNormalEmoteIndex = textFragments.length;
                 textFragments.push(normalEmote);
@@ -363,7 +363,7 @@ export default function Chat(props) {
               lastNormalEmote = null;
               lastNormalEmoteIndex = -1;
               textFragments.push(
-                <Twemoji key={`${keyPrefix}-twemoji-${word}-${i}-${Math.random().toString(36).substr(2, 9)}`} noWrapper options={{ className: "twemoji" }}>
+                <Twemoji key={`${keyPrefix}-twemoji-${word}-${i}-${Math.random().toString(36).slice(2, 11)}`} noWrapper options={{ className: "twemoji" }}>
                   <Typography variant="body1" display="inline">{`${word} `}</Typography>
                 </Twemoji>,
               );
