@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, createRef, useCallback, useMemo } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { Box, Typography, Tooltip, Divider, Collapse, styled, IconButton, Button, tooltipClasses } from "@mui/material";
 import SimpleBar from "simplebar-react";
 import Loading from "../utils/Loading";
@@ -34,7 +34,7 @@ export default function Chat(props) {
   const playRef = useRef();
   const chatRef = useRef();
   const stoppedAtIndex = useRef(0);
-  const newMessages = useRef();
+  const newMessages = useRef([]);
   const [scrolling, setScrolling] = useState(false);
   const [showTimestamp, setShowTimestamp] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -98,7 +98,7 @@ export default function Chat(props) {
     };
 
     const fallbackLoadEmotes = async () => {
-      await Promise.all([loadBTTVGlobalEmotes(), load7TVEmotes(), loadFFZEmotes()]);
+      await Promise.all([loadBTTVChannelEmotes(), loadBTTVGlobalEmotes(), load7TVEmotes(), loadFFZEmotes()]);
     };
 
     const loadBTTVGlobalEmotes = async () => {
@@ -108,8 +108,7 @@ export default function Chat(props) {
         .then((response) => response.json())
         .then((data) => {
           if (data.status >= 400) return;
-          setEmotes((emotes) => ({ ...emotes, bttv_emotes: data }));
-          loadBTTVChannelEmotes();
+          setEmotes((emotes) => ({ ...emotes, bttv_emotes: emotes.bttv_emotes.concat(data)  }));
         })
         .catch((e) => {
           console.error(e);
@@ -325,6 +324,7 @@ export default function Chat(props) {
       }
     }
 
+    // Early exit if no new messages
     if (stoppedAtIndex.current === lastIndex && stoppedAtIndex.current !== 0) return;
 
     const fetchNextComments = () => {
@@ -448,12 +448,13 @@ export default function Chat(props) {
       return <Box sx={{ display: "inline" }}>{badgeWrapper}</Box>;
     };
 
-    const messages = [];
+    // Create only new messages, not all messages
+    const newMessages = [];
     for (let i = stoppedAtIndex.current.valueOf(); i < lastIndex; i++) {
       const comment = comments.current[i];
       if (!comment.message) continue;
-      messages.push(
-        <Box key={comment.id} ref={createRef()} sx={{ width: "100%" }}>
+      newMessages.push(
+        <Box key={comment.id} sx={{ width: "100%" }}>
           <Box
             sx={{
               alignItems: "flex-start",
@@ -489,16 +490,19 @@ export default function Chat(props) {
       );
     }
 
-    newMessages.current = messages;
-
-    setShownMessages((shownMessages) => {
-      const concatMessages = shownMessages.concat(messages);
-      if (concatMessages.length > 200) concatMessages.splice(0, messages.length);
-
-      return concatMessages;
-    });
-    stoppedAtIndex.current = lastIndex;
-    if (comments.current.length - 1 === lastIndex) fetchNextComments();
+    // Only update state if there are new messages
+    if (newMessages.length > 0) {
+      setShownMessages((shownMessages) => {
+        const concatMessages = shownMessages.concat(newMessages);
+        // Keep only the last 200 messages to prevent memory issues
+        if (concatMessages.length > 200) {
+          concatMessages.splice(0, concatMessages.length - 200);
+        }
+        return concatMessages;
+      });
+      stoppedAtIndex.current = lastIndex;
+      if (comments.current.length - 1 === lastIndex) fetchNextComments();
+    }
   }, [getCurrentTime, playerRef, vodId, VODS_API_BASE, youtube, games, showTimestamp, transformMessage]);
 
   const loop = useCallback(() => {
