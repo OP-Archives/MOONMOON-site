@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Box, Typography, Pagination, Grid, useMediaQuery, PaginationItem, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import SimpleBar from "simplebar-react";
 import Footer from "../utils/Footer";
@@ -10,7 +10,7 @@ import dayjs from "dayjs";
 import debounce from "lodash.debounce";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import vodsClient from "./client";
+import archiveClient from "./client";
 
 const FILTERS = ["Default", "Date", "Title", "Game"];
 const START_DATE = process.env.REACT_APP_START_DATE;
@@ -36,7 +36,7 @@ export default function Vods() {
       switch (filter) {
         case "Date":
           if (filterStartDate > filterEndDate) break;
-          vodsClient
+          archiveClient
             .service("vods")
             .find({
               query: {
@@ -61,7 +61,7 @@ export default function Vods() {
           break;
         case "Title":
           if (filterTitle.length === 0) break;
-          vodsClient
+          archiveClient
             .service("vods")
             .find({
               query: {
@@ -85,7 +85,7 @@ export default function Vods() {
           break;
         case "Game":
           if (filterGame.length === 0) break;
-          vodsClient
+          archiveClient
             .service("vods")
             .find({
               query: {
@@ -108,7 +108,7 @@ export default function Vods() {
             });
           break;
         default:
-          vodsClient
+          archiveClient
             .service("vods")
             .find({
               query: {

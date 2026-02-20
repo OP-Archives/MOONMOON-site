@@ -54,3 +54,10 @@ export const toHHMMSS = (secs) => {
     .filter((v, i) => v !== "00" || i > 0)
     .join(":");
 };
+
+/**
+ * Sleep function
+ */
+export const sleep = (ms) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};

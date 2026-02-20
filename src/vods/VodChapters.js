@@ -4,7 +4,7 @@ import humanize from "humanize-duration";
 import { toSeconds } from "../utils/helpers";
 
 export default function Chapters(props) {
-  const { chapters, chapter, setPart, youtube, setChapter, setTimestamp } = props;
+  const { chapters, chapter, setPart, youtube, setChapter, setTimestamp, isYoutubeVod } = props;
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handleClose = () => {
@@ -16,7 +16,7 @@ export default function Chapters(props) {
   };
 
   const handleChapterClick = (data) => {
-    if (youtube) {
+    if (isYoutubeVod && youtube) {
       let part = 1,
         timestamp = data?.start || toSeconds(data.duration);
       if (timestamp > 1) {

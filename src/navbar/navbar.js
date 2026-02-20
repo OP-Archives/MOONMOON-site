@@ -1,4 +1,3 @@
-import React from "react";
 import { AppBar, Toolbar, Typography, useMediaQuery, Box, Divider } from "@mui/material";
 import Logo from "../assets/logo.jpg";
 import CustomLink from "../utils/CustomLink";

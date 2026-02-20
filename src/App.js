@@ -13,8 +13,7 @@ const CustomVod = lazy(() => import("./vods/CustomVod"));
 const NotFound = lazy(() => import("./utils/NotFound"));
 
 const channel = process.env.REACT_APP_CHANNEL,
-  twitchId = process.env.REACT_APP_TWITCH_ID,
-  VODS_API_BASE = process.env.REACT_APP_VODS_API_BASE;
+  twitchId = process.env.REACT_APP_TWITCH_ID;
 
 export default function App() {
   let darkTheme = createTheme({
@@ -58,7 +57,7 @@ export default function App() {
                 element={
                   <>
                     <Navbar channel={channel} />
-                    <Vods channel={channel} twitchId={twitchId} VODS_API_BASE={VODS_API_BASE} />
+                    <Vods channel={channel} twitchId={twitchId} />
                   </>
                 }
               />
@@ -68,15 +67,15 @@ export default function App() {
                 element={
                   <>
                     <Navbar channel={channel} />
-                    <Vods channel={channel} twitchId={twitchId} VODS_API_BASE={VODS_API_BASE} />
+                    <Vods channel={channel} twitchId={twitchId} />
                   </>
                 }
               />
-              <Route exact path="/vods/:vodId" element={<YoutubeVod channel={channel} twitchId={twitchId} type="vod" VODS_API_BASE={VODS_API_BASE} />} />
-              <Route exact path="/live/:vodId" element={<YoutubeVod channel={channel} twitchId={twitchId} type="live" VODS_API_BASE={VODS_API_BASE} />} />
-              <Route exact path="/youtube/:vodId" element={<YoutubeVod channel={channel} twitchId={twitchId} VODS_API_BASE={VODS_API_BASE} />} />
-              <Route exact path="/games/:vodId" element={<Games channel={channel} twitchId={twitchId} VODS_API_BASE={VODS_API_BASE} />} />
-              <Route exact path="/manual/:vodId" element={<CustomVod channel={channel} twitchId={twitchId} type="manual" VODS_API_BASE={VODS_API_BASE} />} />
+              <Route exact path="/vods/:vodId" element={<YoutubeVod type="vod" />} />
+              <Route exact path="/live/:vodId" element={<YoutubeVod type="live" />} />
+              <Route exact path="/youtube/:vodId" element={<YoutubeVod />} />
+              <Route exact path="/games/:vodId" element={<Games />} />
+              <Route exact path="/manual/:vodId" element={<CustomVod type="manual" />} />
             </Routes>
           </Suspense>
         </Parent>

@@ -8,6 +8,10 @@ import Settings from "./Settings";
 import { toHHMMSS } from "../utils/helpers";
 import SettingsIcon from "@mui/icons-material/Settings";
 
+//ENV
+const twitchId = process.env.REACT_APP_TWITCH_ID,
+  ARCHIVE_API_BASE = process.env.REACT_APP_ARCHIVE_API_BASE;
+
 // CDN URLs for emotes and badges
 const BASE_TWITCH_CDN = "https://static-cdn.jtvnw.net";
 const BASE_FFZ_EMOTE_CDN = "https://cdn.frankerfacez.com/emote";
@@ -21,7 +25,7 @@ const BASE_7TV_EMOTE_API = "https://7tv.io/v3";
 let cachedBadges = new Map();
 
 export default function Chat(props) {
-  const { isPortrait, vodId, playerRef, playing, VODS_API_BASE, twitchId, channel, userChatDelay, delay, youtube, part, games } = props;
+  const { isPortrait, vodId, playerRef, userChatDelay, delay, youtube, part, games, isYoutubeVod, playerState } = props;
 
   // State management
   const [showChat, setShowChat] = useState(true);
@@ -45,7 +49,7 @@ export default function Chat(props) {
   // === EFFECT HOOKS ===
   useEffect(() => {
     const loadBadges = () => {
-      fetch(`${VODS_API_BASE}/v2/badges`, {
+      fetch(`${ARCHIVE_API_BASE}/v2/badges`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -66,7 +70,7 @@ export default function Chat(props) {
     };
 
     const loadArchiveEmotes = async () => {
-      await fetch(`${VODS_API_BASE}/emotes?vod_id=${vodId}`, {
+      await fetch(`${ARCHIVE_API_BASE}/emotes?vod_id=${vodId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -164,7 +168,7 @@ export default function Chat(props) {
 
     loadEmotes();
     loadBadges();
-  }, [vodId, VODS_API_BASE, twitchId, channel]);
+  }, [vodId]);
 
   // === MEMOIZED VALUES ===
   const emoteLookup = useMemo(() => {
@@ -184,23 +188,28 @@ export default function Chat(props) {
   const getCurrentTime = useCallback(() => {
     if (!playerRef.current) return 0;
     let time = 0;
-    if (youtube) {
+    if (youtube && isYoutubeVod) {
       for (let i = 0; i < youtube.length; i++) {
         let video = youtube[i];
         if (i + 1 >= part.part) break;
         time += video.duration;
       }
       time += playerRef.current.getCurrentTime() ?? 0;
-    } else if (games) {
+    } else if (games && isYoutubeVod) {
       time += parseFloat(games[part.part - 1].start_time);
       time += playerRef.current.getCurrentTime() ?? 0;
     } else {
       time += playerRef.current.currentTime();
     }
-    time += delay;
-    time += userChatDelay || 0;
+    time += delay ?? 0;
+    time += userChatDelay ?? 0;
     return time;
-  }, [playerRef, youtube, delay, part, userChatDelay, games]);
+  }, [playerRef, youtube, delay, part, userChatDelay, games, isYoutubeVod]);
+
+  const isPlaying = useCallback(() => {
+    if (!playerRef.current) return false;
+    return isYoutubeVod ? playerRef.current.getPlayerState() === 1 : playerRef.current.paused() === false;
+  }, [isYoutubeVod, playerRef]);
 
   const getEmoteImageUrl = useCallback((emote, type, size = 1) => {
     switch (type) {
@@ -379,7 +388,7 @@ export default function Chat(props) {
 
   const buildComments = useCallback(() => {
     if (!playerRef.current || !comments.current || comments.current.length === 0 || !cursor.current || stoppedAtIndex.current === null) return;
-    if (youtube || games ? playerRef.current.getPlayerState() !== 1 : playerRef.current.paused()) return;
+    if (!isPlaying()) return;
 
     const time = getCurrentTime();
     let lastIndex = comments.current.length - 1;
@@ -394,7 +403,7 @@ export default function Chat(props) {
     if (stoppedAtIndex.current === lastIndex && stoppedAtIndex.current !== 0) return;
 
     const fetchNextComments = () => {
-      fetch(`${VODS_API_BASE}/v1/vods/${vodId}/comments?cursor=${cursor.current}`, {
+      fetch(`${ARCHIVE_API_BASE}/v1/vods/${vodId}/comments?cursor=${cursor.current}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -577,7 +586,7 @@ export default function Chat(props) {
         }, 0);
       }
     }
-  }, [getCurrentTime, playerRef, vodId, VODS_API_BASE, youtube, games, showTimestamp, transformMessage]);
+  }, [getCurrentTime, playerRef, vodId, showTimestamp, transformMessage, isPlaying]);
 
   const loop = useCallback(() => {
     if (loopRef.current !== null) clearInterval(loopRef.current);
@@ -609,10 +618,38 @@ export default function Chat(props) {
 
   // === MAIN EFFECT HOOK ===
   useEffect(() => {
-    if (!playing.playing || stoppedAtIndex.current === undefined) return;
+    if (playRef.current) clearTimeout(playRef.current);
+    //Player not initalized yet
+    if (playerState === -1 || !playerRef.current) return;
+
+    // Handle player play/pause state changes
+    const handlePlayerStateChange = () => {
+      // If player is playing, fetch comments and start building
+      if (playerState === 1) {
+        const time = getCurrentTime();
+        // Only fetch comments if we don't have any or if we're seeking out of range
+        if (!comments.current || comments.current.length === 0 || time < comments.current[0].content_offset_seconds || time > comments.current[comments.current.length - 1].content_offset_seconds) {
+          playRef.current = setTimeout(() => {
+            stopLoop();
+            stoppedAtIndex.current = 0;
+            comments.current = [];
+            cursor.current = null;
+            setShownMessages([]);
+            fetchComments(time);
+            loop();
+          }, 300);
+        } else {
+          // Player is playing and we have comments in range
+          loop();
+        }
+      } else {
+        // Player is paused, stop the loop
+        stopLoop();
+      }
+    };
 
     const fetchComments = (offset = 0) => {
-      fetch(`${VODS_API_BASE}/v1/vods/${vodId}/comments?content_offset_seconds=${offset}`, {
+      fetch(`${ARCHIVE_API_BASE}/v1/vods/${vodId}/comments?content_offset_seconds=${Math.floor(offset)}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -628,33 +665,10 @@ export default function Chat(props) {
         });
     };
 
-    const time = getCurrentTime();
-
-    if (comments.current && comments.current.length > 0) {
-      const lastComment = comments.current[comments.current.length - 1];
-      const firstComment = comments.current[0];
-
-      if (time - lastComment.content_offset_seconds <= 30 && time > firstComment.content_offset_seconds) {
-        if (comments.current[stoppedAtIndex.current].content_offset_seconds - time >= 4) {
-          stoppedAtIndex.current = 0;
-          setShownMessages([]);
-        }
-        loop();
-        return;
-      }
-    }
-    if (playRef.current) clearTimeout(playRef.current);
-    playRef.current = setTimeout(() => {
-      stopLoop();
-      stoppedAtIndex.current = 0;
-      comments.current = [];
-      cursor.current = null;
-      setShownMessages([]);
-      fetchComments(time);
-      loop();
-    }, 300);
+    handlePlayerStateChange();
 
     const currentChatRef = chatRef.current;
+
     return () => {
       stopLoop();
       // Clean up scroll event listener with proper ref handling
@@ -663,13 +677,14 @@ export default function Chat(props) {
         scrollElement.removeEventListener("scroll", handleScroll);
       }
     };
-  }, [playing, vodId, getCurrentTime, loop, VODS_API_BASE, handleScroll]);
+  }, [vodId, playerRef, playerState, getCurrentTime, handleScroll, loop, isPlaying]);
 
   const stopLoop = () => {
     if (loopRef.current !== null) clearInterval(loopRef.current);
   };
 
   const scrollToBottom = () => {
+    if (!chatRef.current) return;
     setScrolling(false);
     // Force scroll to bottom using SimpleBar's API if available
     if (chatRef.current.simplebar) {

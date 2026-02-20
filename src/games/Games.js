@@ -1,43 +1,37 @@
 import { useEffect, useState, useRef } from "react";
-import { Box, Typography, MenuItem, Tooltip, useMediaQuery, FormControl, InputLabel, Select, IconButton, Link, Collapse, Divider } from "@mui/material";
+import { Box, Typography, MenuItem, Tooltip, useMediaQuery, FormControl, InputLabel, Select, Collapse, Divider } from "@mui/material";
 import Loading from "../utils/Loading";
 import { useLocation, useParams } from "react-router-dom";
 import YoutubePlayer from "./Youtube";
-import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import NotFound from "../utils/NotFound";
 import Chat from "../vods/Chat";
 import ExpandMore from "../utils/CustomExpandMore";
 import CustomToolTip from "../utils/CustomToolTip";
+import archiveClient from "../vods/client";
 
-const delay = 0;
+const channel = process.env.REACT_APP_CHANNEL;
 
 export default function Games(props) {
-  const { VODS_API_BASE, channel, twitchId } = props;
   const location = useLocation();
   const isPortrait = useMediaQuery("(orientation: portrait)");
   const { vodId } = useParams();
   const [vod, setVod] = useState(undefined);
   const [games, setGames] = useState(undefined);
-  const [drive, setDrive] = useState(undefined);
   const [part, setPart] = useState(undefined);
   const [showMenu, setShowMenu] = useState(true);
-  const [playing, setPlaying] = useState({ playing: false });
   const [userChatDelay, setUserChatDelay] = useState(0);
+  const [playerState, setPlayerState] = useState(-1);
   const playerRef = useRef(null);
 
   useEffect(() => {
+    document.title = `${vodId} - ${channel}`;
     const fetchVod = async () => {
-      await fetch(`${VODS_API_BASE}/vods/${vodId}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-        .then((response) => response.json())
+      await archiveClient
+        .service("vods")
+        .get(vodId)
         .then((response) => {
           setVod(response);
-          document.title = `${response.id} - ${channel}`;
         })
         .catch((e) => {
           console.error(e);
@@ -45,11 +39,10 @@ export default function Games(props) {
     };
     fetchVod();
     return;
-  }, [vodId, VODS_API_BASE, channel]);
+  }, [vodId]);
 
   useEffect(() => {
     if (!vod) return;
-    setDrive(vod.drive.filter((data) => data.type === "vod"));
     setGames(vod.games);
     const search = new URLSearchParams(location.search);
     let tmpPart = search.get("part") !== null ? parseInt(search.get("part")) : 1;
@@ -67,11 +60,11 @@ export default function Games(props) {
   };
 
   useEffect(() => {
-    console.info(`Chat Delay: ${userChatDelay + delay} seconds`);
+    console.info(`Chat Delay: ${userChatDelay} seconds`);
     return;
   }, [userChatDelay]);
 
-  if (vod === undefined || drive === undefined || part === undefined || delay === undefined) return <Loading />;
+  if (vod === undefined || part === undefined) return <Loading />;
 
   if (games.length === 0) return <NotFound />;
 
@@ -79,7 +72,7 @@ export default function Games(props) {
     <Box sx={{ height: "100%", width: "100%" }}>
       <Box sx={{ display: "flex", flexDirection: isPortrait ? "column" : "row", height: "100%", width: "100%" }}>
         <Box sx={{ display: "flex", height: "100%", width: "100%", flexDirection: "column", alignItems: "flex-start", minWidth: 0, overflow: "hidden", position: "relative" }}>
-          <YoutubePlayer playerRef={playerRef} part={part} games={games} setPart={setPart} setPlaying={setPlaying} delay={delay} />
+          <YoutubePlayer playerRef={playerRef} part={part} games={games} setPart={setPart} setPlayerState={setPlayerState} />
           <Box sx={{ position: "absolute", bottom: 0, left: "50%" }}>
             <Tooltip title={showMenu ? "Collapse" : "Expand"}>
               <ExpandMore expand={showMenu} onClick={handleExpandClick} aria-expanded={showMenu} aria-label="show menu">
@@ -107,15 +100,6 @@ export default function Games(props) {
                     </Select>
                   </FormControl>
                 </Box>
-                <Box sx={{ ml: 0.5 }}>
-                  {drive && drive[0] && (
-                    <Tooltip title={`Download Vod`}>
-                      <IconButton component={Link} href={`https://drive.google.com/u/2/open?id=${drive[0].id}`} color="secondary" aria-label="Download Vod" rel="noopener noreferrer" target="_blank">
-                        <CloudDownloadIcon />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                </Box>
               </Box>
             </Box>
           </Collapse>
@@ -125,16 +109,12 @@ export default function Games(props) {
           isPortrait={isPortrait}
           vodId={vodId}
           playerRef={playerRef}
-          playing={playing}
-          delay={delay}
           userChatDelay={userChatDelay}
           part={part}
           setPart={setPart}
           games={games}
           setUserChatDelay={setUserChatDelay}
-          channel={channel}
-          twitchId={twitchId}
-          VODS_API_BASE={VODS_API_BASE}
+          playerState={playerState}
         />
       </Box>
     </Box>

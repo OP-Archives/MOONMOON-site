@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import canAutoPlay from "can-autoplay";
 import Youtube from "react-youtube";
 
 export default function YoutubeGames(props) {
-  const { games, playerRef, part, setPart, setPlaying } = props;
+  const { games, playerRef, part, setPart, setPlayerState } = props;
 
   useEffect(() => {
     if (!playerRef.current) return;
@@ -21,14 +21,6 @@ export default function YoutubeGames(props) {
     playerRef.current.loadVideoById(games[part.part - 1].video_id, part.timestamp);
   };
 
-  const onPlay = () => {
-    setPlaying({ playing: true });
-  };
-
-  const onPause = () => {
-    setPlaying({ playing: false });
-  };
-
   const onEnd = () => {
     const nextPart = part.part + 1;
     if (nextPart > games.length) return;
@@ -38,6 +30,13 @@ export default function YoutubeGames(props) {
   const onError = (evt) => {
     if (evt.data !== 150) console.error(evt.data);
     //dmca error
+  };
+
+  const handleStateChange = (evt) => {
+    // event.data: -1=unstarted, 0=ended, 1=playing, 2=paused, 3=buffering, 5=cued
+    if (evt.data !== undefined) {
+      setPlayerState(evt.data);
+    }
   };
 
   return (
@@ -51,7 +50,7 @@ export default function YoutubeGames(props) {
           playsinline: 1,
           rel: 0,
           modestbranding: 1,
-          origin: process.env.REACT_APP_DOMAIN
+          origin: process.env.REACT_APP_DOMAIN,
         },
       }}
       onReady={onReady}
@@ -59,6 +58,7 @@ export default function YoutubeGames(props) {
       onPause={onPause}
       onEnd={onEnd}
       onError={onError}
+      onStateChange={handleStateChange}
     />
   );
 }

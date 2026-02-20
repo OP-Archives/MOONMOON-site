@@ -3,10 +3,10 @@ import canAutoPlay from "can-autoplay";
 import { Button, Box, Alert, Paper } from "@mui/material";
 import VideoJS from "./VideoJS";
 import "videojs-hotkeys";
-import { toSeconds } from "../utils/helpers";
+import { toSeconds, sleep } from "../utils/helpers";
 
 export default function Player(props) {
-  const { playerRef, setCurrentTime, setPlaying, type, vod, timestamp, delay, setDelay } = props;
+  const { playerRef, setCurrentTime, type, vod, timestamp, delay, setDelay, setPlayerState } = props;
   const timeUpdateRef = useRef(null);
   const [source, setSource] = useState(undefined);
   const [fileError, setFileError] = useState(undefined);
@@ -35,19 +35,27 @@ export default function Player(props) {
     });
 
     player.on("play", () => {
+      setPlayerState(1);
       timeUpdate();
       loopTimeUpdate();
-      setPlaying({ playing: true });
     });
 
     player.on("pause", () => {
+      setPlayerState(2);
       clearTimeUpdate();
-      setPlaying({ playing: false });
     });
 
     player.on("end", () => {
+      setPlayerState(0);
       clearTimeUpdate();
-      setPlaying({ playing: false });
+    });
+
+    player.on("waiting", () => {
+      setPlayerState(3);
+    });
+
+    player.on("playing", () => {
+      setPlayerState(1);
     });
   };
 
@@ -55,8 +63,8 @@ export default function Player(props) {
     if (!playerRef.current) return;
     if (playerRef.current.paused()) return;
     let currentTime = 0;
-    currentTime += playerRef.current.currentTime();
-    currentTime += delay;
+    currentTime += playerRef.current.currentTime() ?? 0;
+    currentTime += delay ?? 0;
     setCurrentTime(currentTime);
   };
 
@@ -120,7 +128,3 @@ export default function Player(props) {
     </Box>
   );
 }
-
-const sleep = (ms) => {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-};

@@ -1,9 +1,9 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import canAutoPlay from "can-autoplay";
 import Youtube from "react-youtube";
 
 export default function YoutubePlayer(props) {
-  const { youtube, playerRef, part, setPart, setCurrentTime, delay, setPlaying } = props;
+  const { youtube, playerRef, part, setPart, setCurrentTime, delay, setPlayerState } = props;
   const timeUpdateRef = useRef(null);
 
   useEffect(() => {
@@ -21,8 +21,8 @@ export default function YoutubePlayer(props) {
       if (video.part >= part.part) break;
       currentTime += video.duration;
     }
-    currentTime += playerRef.current.getCurrentTime();
-    currentTime += delay;
+    currentTime += playerRef.current.getCurrentTime() ?? 0;
+    currentTime += delay ?? 0;
     setCurrentTime(currentTime);
   };
 
@@ -35,25 +35,24 @@ export default function YoutubePlayer(props) {
   };
 
   const onReady = (evt) => {
-    playerRef.current = evt.target;
+    const player = evt.target;
+    playerRef.current = player;
 
     canAutoPlay.video().then(({ result }) => {
-      if (!result) playerRef.current.mute();
+      if (!result) player.mute();
     });
 
     const index = youtube.findIndex((data) => data.part === part.part);
-    playerRef.current.loadVideoById(youtube[index !== -1 ? index : 0].id, part.timestamp);
+    player.loadVideoById(youtube[index !== -1 ? index : 0].id, part.timestamp);
   };
 
   const onPlay = () => {
     timeUpdate();
     loopTimeUpdate();
-    setPlaying({ playing: true });
   };
 
   const onPause = () => {
     clearTimeUpdate();
-    setPlaying({ playing: false });
   };
 
   const onEnd = () => {
@@ -71,6 +70,13 @@ export default function YoutubePlayer(props) {
     if (timeUpdateRef.current !== null) clearTimeout(timeUpdateRef.current);
   };
 
+  const handleStateChange = (evt) => {
+    // event.data: -1=unstarted, 0=ended, 1=playing, 2=paused, 3=buffering, 5=cued
+    if (evt.data !== undefined) {
+      setPlayerState(evt.data);
+    }
+  };
+
   return (
     <Youtube
       className="youtube-player"
@@ -82,7 +88,7 @@ export default function YoutubePlayer(props) {
           playsinline: 1,
           rel: 0,
           modestbranding: 1,
-          origin: process.env.REACT_APP_DOMAIN
+          origin: process.env.REACT_APP_DOMAIN,
         },
       }}
       onReady={onReady}
@@ -90,6 +96,7 @@ export default function YoutubePlayer(props) {
       onPause={onPause}
       onEnd={onEnd}
       onError={onError}
+      onStateChange={handleStateChange}
     />
   );
 }
