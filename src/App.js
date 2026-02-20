@@ -12,8 +12,7 @@ const Games = lazy(() => import("./games/Games"));
 const CustomVod = lazy(() => import("./vods/CustomVod"));
 const NotFound = lazy(() => import("./utils/NotFound"));
 
-const channel = process.env.REACT_APP_CHANNEL,
-  twitchId = process.env.REACT_APP_TWITCH_ID;
+const channel = process.env.REACT_APP_CHANNEL;
 
 export default function App() {
   let darkTheme = createTheme({
@@ -57,7 +56,7 @@ export default function App() {
                 element={
                   <>
                     <Navbar channel={channel} />
-                    <Vods channel={channel} twitchId={twitchId} />
+                    <Vods />
                   </>
                 }
               />
@@ -67,7 +66,7 @@ export default function App() {
                 element={
                   <>
                     <Navbar channel={channel} />
-                    <Vods channel={channel} twitchId={twitchId} />
+                    <Vods />
                   </>
                 }
               />
