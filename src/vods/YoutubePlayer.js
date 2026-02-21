@@ -3,15 +3,19 @@ import canAutoPlay from "can-autoplay";
 import Youtube from "react-youtube";
 
 export default function YoutubePlayer(props) {
-  const { youtube, playerRef, part, setPart, setCurrentTime, delay, setPlayerState } = props;
+  const { youtube, playerRef, part, setPart, setCurrentTime, delay, setPlayerState, games } = props;
   const timeUpdateRef = useRef(null);
 
   useEffect(() => {
     if (!playerRef.current) return;
 
-    const index = youtube.findIndex((data) => data.part === part.part);
-    playerRef.current.loadVideoById(youtube[index !== -1 ? index : part.part - 1].id, part.timestamp);
-  }, [part, playerRef, youtube]);
+    if (games) {
+      playerRef.current.loadVideoById(games[part.part - 1].video_id, part.timestamp);
+    } else {
+      const index = youtube.findIndex((data) => data.part === part.part);
+      playerRef.current.loadVideoById(youtube[index !== -1 ? index : part.part - 1].id, part.timestamp);
+    }
+  }, [part, playerRef, youtube, games]);
 
   const timeUpdate = () => {
     if (!playerRef.current) return;
@@ -42,23 +46,35 @@ export default function YoutubePlayer(props) {
       if (!result) player.mute();
     });
 
-    const index = youtube.findIndex((data) => data.part === part.part);
-    player.loadVideoById(youtube[index !== -1 ? index : 0].id, part.timestamp);
+    if (games) {
+      playerRef.current.loadVideoById(games[part.part - 1].video_id, part.timestamp);
+    } else {
+      const index = youtube.findIndex((data) => data.part === part.part);
+      player.loadVideoById(youtube[index !== -1 ? index : 0].id, part.timestamp);
+    }
   };
 
   const onPlay = () => {
+    if (games) return;
     timeUpdate();
     loopTimeUpdate();
   };
 
   const onPause = () => {
+    if (games) return;
     clearTimeUpdate();
   };
 
   const onEnd = () => {
     const nextPart = part.part + 1;
-    if (nextPart > youtube.length) return;
-    setPart({ part: nextPart, duration: 0 });
+
+    if (games) {
+      if (nextPart > games.length) return;
+      setPart({ part: nextPart, duration: 0 });
+    } else {
+      if (nextPart > youtube.length) return;
+      setPart({ part: nextPart, duration: 0 });
+    }
   };
 
   const onError = (evt) => {

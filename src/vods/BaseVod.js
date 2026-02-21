@@ -11,7 +11,7 @@ import YoutubePlayer from "./YoutubePlayer";
 import CustomPlayer from "./CustomPlayer";
 
 export default function BaseVod(props) {
-  const { isYoutubeVod, youtube, handlePartChange, playerRef, part, setPart, vod, type, delay, setDelay, timestamp, setTimestamp, setPlayerState } = props;
+  const { isYoutubeVod, youtube, handlePartChange, playerRef, part, setPart, vod, type, delay, setDelay, timestamp, setTimestamp, setPlayerState, games } = props;
   const [chapter, setChapter] = useState(undefined);
   const [showMenu, setShowMenu] = useState(true);
   const [currentTime, setCurrentTime] = useState(undefined);
@@ -46,6 +46,8 @@ export default function BaseVod(props) {
     <Box sx={{ display: "flex", height: "100%", width: "100%", flexDirection: "column", alignItems: "flex-start", minWidth: 0, overflow: "hidden", position: "relative" }}>
       {isYoutubeVod ? (
         <YoutubePlayer playerRef={playerRef} part={part} youtube={youtube} setCurrentTime={setCurrentTime} setPart={setPart} delay={delay} setPlayerState={setPlayerState} />
+      ) : games ? (
+        <YoutubePlayer playerRef={playerRef} part={part} games={games} setPart={setPart} setPlayerState={setPlayerState} />
       ) : (
         <CustomPlayer playerRef={playerRef} setCurrentTime={setCurrentTime} delay={delay} setDelay={setDelay} type={type} vod={vod} timestamp={timestamp} setPlayerState={setPlayerState} />
       )}
@@ -77,6 +79,24 @@ export default function BaseVod(props) {
                     })}
                   </Select>
                 </FormControl>
+              </Box>
+            )}
+            {games && (
+              <Box sx={{ marginLeft: "auto", display: "flex", alignItems: "center" }}>
+                <Box sx={{ ml: 0.5 }}>
+                  <FormControl variant="outlined">
+                    <InputLabel id="select-label">Game</InputLabel>
+                    <Select labelId="select-label" label="Game" value={part.part - 1} onChange={handlePartChange} autoWidth>
+                      {games.map((data, i) => {
+                        return (
+                          <MenuItem key={data.id} value={i}>
+                            {data.game_name}
+                          </MenuItem>
+                        );
+                      })}
+                    </Select>
+                  </FormControl>
+                </Box>
               </Box>
             )}
             <Box sx={{ ml: 0.5 }}>

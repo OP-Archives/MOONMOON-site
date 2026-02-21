@@ -8,7 +8,7 @@ import Loading from "./utils/Loading";
 const Vods = lazy(() => import("./vods/Vods"));
 const Navbar = lazy(() => import("./navbar/navbar"));
 const YoutubeVod = lazy(() => import("./vods/YoutubeVod"));
-const Games = lazy(() => import("./games/Games"));
+const Games = lazy(() => import("./vods/Games"));
 const CustomVod = lazy(() => import("./vods/CustomVod"));
 const NotFound = lazy(() => import("./utils/NotFound"));
 
