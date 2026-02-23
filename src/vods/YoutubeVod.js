@@ -97,19 +97,21 @@ export default function YoutubeVod(props) {
 
   return (
     <Box sx={{ height: "100%", width: "100%" }}>
-      <Box sx={{ display: "flex", flexDirection: isPortrait ? "column" : "row", height: isPortrait ? "auto" : "100%", width: "100%" }}>
-        <BaseVod
-          {...props}
-          handlePartChange={handlePartChange}
-          youtube={youtube}
-          isYoutubeVod={true}
-          playerRef={playerRef}
-          part={part}
-          setPart={setPart}
-          vod={vod}
-          delay={delay}
-          setPlayerState={setPlayerState}
-        />
+      <Box sx={{ display: "flex", flexDirection: isPortrait ? "column" : "row", height: "100%", width: "100%" }}>
+        <Box sx={{ display: "flex", height: isPortrait ? "auto" : "100%", width: "100%" }}>
+          <BaseVod
+            {...props}
+            handlePartChange={handlePartChange}
+            youtube={youtube}
+            isYoutubeVod={true}
+            playerRef={playerRef}
+            part={part}
+            setPart={setPart}
+            vod={vod}
+            delay={delay}
+            setPlayerState={setPlayerState}
+          />
+        </Box>
         {isPortrait && <Divider />}
         <Chat
           isPortrait={isPortrait}

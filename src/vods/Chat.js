@@ -578,15 +578,14 @@ export default function Chat(props) {
       });
       stoppedAtIndex.current = lastIndex;
       if (comments.current.length - 1 === lastIndex) fetchNextComments();
-
-      // Auto-scroll to bottom if user is at the bottom
-      if (isAtBottomRef.current) {
-        setTimeout(() => {
-          scrollToBottom();
-        }, 0);
-      }
     }
   }, [getCurrentTime, playerRef, vodId, showTimestamp, transformMessage, isPlaying]);
+
+  useEffect(() => {
+    if (!isAtBottomRef.current || shownMessages.length === 0) return;
+    // Auto-scroll to bottom if user is at the bottom
+    scrollToBottom();
+  }, [shownMessages]);
 
   const loop = useCallback(() => {
     if (loopRef.current !== null) clearInterval(loopRef.current);
@@ -598,8 +597,7 @@ export default function Chat(props) {
   const handleScroll = useCallback(() => {
     if (!chatRef.current) return;
 
-    const scrollElement = chatRef.current.simplebar ? chatRef.current.simplebar.getScrollElement() : chatRef.current;
-    const { scrollTop, scrollHeight, clientHeight } = scrollElement;
+    const { scrollTop, scrollHeight, clientHeight } = chatRef.current;
 
     // Check if user is at the bottom (within 350px tolerance)
     const isAtBottom = Math.abs(scrollTop + clientHeight - scrollHeight) < 350;
@@ -673,8 +671,7 @@ export default function Chat(props) {
       stopLoop();
       // Clean up scroll event listener with proper ref handling
       if (currentChatRef) {
-        const scrollElement = currentChatRef.simplebar ? currentChatRef.simplebar.getScrollElement() : currentChatRef;
-        scrollElement.removeEventListener("scroll", handleScroll);
+        currentChatRef.removeEventListener("scroll", handleScroll);
       }
     };
   }, [vodId, playerRef, playerState, getCurrentTime, handleScroll, loop, isPlaying]);
@@ -686,20 +683,14 @@ export default function Chat(props) {
   const scrollToBottom = () => {
     if (!chatRef.current) return;
     setScrolling(false);
-    // Force scroll to bottom using SimpleBar's API if available
-    if (chatRef.current.simplebar) {
-      const scrollElement = chatRef.current.simplebar.getScrollElement();
-      // Use requestAnimationFrame to ensure DOM is updated before scrolling
-      requestAnimationFrame(() => {
-        scrollElement.scrollTop = scrollElement.scrollHeight;
-      });
-    } else {
-      // Fallback to regular scroll
-      // Use requestAnimationFrame to ensure DOM is updated before scrolling
-      requestAnimationFrame(() => {
-        chatRef.current.scrollTop = chatRef.current.scrollHeight;
-      });
-    }
+    chatRef.current.scrollTop = chatRef.current.scrollHeight;
+    // Add a small delay to ensure all content is rendered
+    setTimeout(() => {
+      chatRef.current.scrollTop = chatRef.current.scrollHeight;
+    }, 100);
+    setTimeout(() => {
+      chatRef.current.scrollTop = chatRef.current.scrollHeight;
+    }, 300);
   };
 
   const handleExpandClick = () => {
