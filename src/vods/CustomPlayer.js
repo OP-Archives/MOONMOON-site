@@ -122,7 +122,7 @@ export default function Player(props) {
           </Box>
         </Paper>
       )}
-      <Box style={{ visibility: !source ? "hidden" : "visible", height: "100%", width: "100%", outline: "none" }}>
+      <Box sx={{ visibility: !source ? "hidden" : "visible", height: "100%", width: "100%", outline: "none" }}>
         <VideoJS options={videoJsOptions} onReady={onReady} />
       </Box>
     </Box>

@@ -11,7 +11,7 @@ import YoutubePlayer from "./YoutubePlayer";
 import CustomPlayer from "./CustomPlayer";
 
 export default function BaseVod(props) {
-  const { isYoutubeVod, youtube, handlePartChange, playerRef, part, setPart, vod, type, delay, setDelay, timestamp, setTimestamp, setPlayerState, games } = props;
+  const { isYoutubeVod, youtube, handlePartChange, playerRef, part, setPart, vod, type, delay, setDelay, timestamp, setTimestamp, setPlayerState, games, isPortrait } = props;
   const [chapter, setChapter] = useState(undefined);
   const [showMenu, setShowMenu] = useState(true);
   const [currentTime, setCurrentTime] = useState(undefined);
@@ -43,14 +43,16 @@ export default function BaseVod(props) {
   if (vod === undefined) return <Loading />;
 
   return (
-    <Box sx={{ display: "flex", height: "100%", width: "100%", flexDirection: "column", alignItems: "flex-start", minWidth: 0, overflow: "hidden", position: "relative" }}>
-      {isYoutubeVod ? (
-        <YoutubePlayer playerRef={playerRef} part={part} youtube={youtube} setCurrentTime={setCurrentTime} setPart={setPart} delay={delay} setPlayerState={setPlayerState} />
-      ) : games ? (
-        <YoutubePlayer playerRef={playerRef} part={part} games={games} setPart={setPart} setPlayerState={setPlayerState} />
-      ) : (
-        <CustomPlayer playerRef={playerRef} setCurrentTime={setCurrentTime} delay={delay} setDelay={setDelay} type={type} vod={vod} timestamp={timestamp} setPlayerState={setPlayerState} />
-      )}
+    <Box sx={{ display: "flex", height: "100%", width: "100%", flexDirection: "column", alignItems: "flex-start", minWidth: 0, overflow: "hidden", position: "relative", minHeight: 0 }}>
+      <Box sx={{ position: "relative", width: "100%", aspectRatio: "16 / 9", flex: isPortrait ? "1 1 auto" : "1 1 auto", minHeight: 0 }}>
+        {isYoutubeVod ? (
+          <YoutubePlayer playerRef={playerRef} part={part} youtube={youtube} setCurrentTime={setCurrentTime} setPart={setPart} delay={delay} setPlayerState={setPlayerState} />
+        ) : games ? (
+          <YoutubePlayer playerRef={playerRef} part={part} games={games} setPart={setPart} setPlayerState={setPlayerState} />
+        ) : (
+          <CustomPlayer playerRef={playerRef} setCurrentTime={setCurrentTime} delay={delay} setDelay={setDelay} type={type} vod={vod} timestamp={timestamp} setPlayerState={setPlayerState} />
+        )}
+      </Box>
       <Box sx={{ position: "absolute", bottom: 0, left: "50%" }}>
         <Tooltip title={showMenu ? "Collapse" : "Expand"}>
           <ExpandMore expand={showMenu} onClick={handleExpandClick} aria-expanded={showMenu} aria-label="show menu">

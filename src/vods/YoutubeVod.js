@@ -97,7 +97,7 @@ export default function YoutubeVod(props) {
 
   return (
     <Box sx={{ height: "100%", width: "100%" }}>
-      <Box sx={{ display: "flex", flexDirection: isPortrait ? "column" : "row", height: "100%", width: "100%" }}>
+      <Box sx={{ display: "flex", flexDirection: isPortrait ? "column" : "row", height: isPortrait ? "auto" : "100%", width: "100%" }}>
         <BaseVod
           {...props}
           handlePartChange={handlePartChange}

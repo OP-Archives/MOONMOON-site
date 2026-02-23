@@ -30,9 +30,11 @@ a:active {
   height: 100%;
 }
 
-.youtube-player {
+.player {
   height: 100%;
   width: 100%;
+  inset: 0;
+  position: absolute;
 }
 
 *:focus {

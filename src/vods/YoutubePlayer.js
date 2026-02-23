@@ -95,7 +95,7 @@ export default function YoutubePlayer(props) {
 
   return (
     <Youtube
-      className="youtube-player"
+      className="player"
       opts={{
         height: "100%",
         width: "100%",
