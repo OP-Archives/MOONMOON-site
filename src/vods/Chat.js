@@ -603,6 +603,7 @@ export default function Chat(props) {
 
     // Check if user is at the bottom (within 350px tolerance)
     const isAtBottom = Math.abs(scrollTop + clientHeight - scrollHeight) < 350;
+    console.log(isAtBottom);
 
     // Update ref to track scroll position
     isAtBottomRef.current = isAtBottom;
@@ -691,19 +692,13 @@ export default function Chat(props) {
       const scrollElement = chatRef.current.simplebar.getScrollElement();
       // Use requestAnimationFrame to ensure DOM is updated before scrolling
       requestAnimationFrame(() => {
-        // Add a small delay to ensure all content is rendered
-        setTimeout(() => {
-          scrollElement.scrollTop = scrollElement.scrollHeight;
-        }, 0);
+        scrollElement.scrollTop = scrollElement.scrollHeight;
       });
     } else {
       // Fallback to regular scroll
       // Use requestAnimationFrame to ensure DOM is updated before scrolling
       requestAnimationFrame(() => {
-        // Add a small delay to ensure all content is rendered
-        setTimeout(() => {
-          chatRef.current.scrollTop = chatRef.current.scrollHeight;
-        }, 0);
+        chatRef.current.scrollTop = chatRef.current.scrollHeight;
       });
     }
   };
