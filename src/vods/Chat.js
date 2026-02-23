@@ -603,7 +603,6 @@ export default function Chat(props) {
 
     // Check if user is at the bottom (within 350px tolerance)
     const isAtBottom = Math.abs(scrollTop + clientHeight - scrollHeight) < 350;
-    console.log(isAtBottom);
 
     // Update ref to track scroll position
     isAtBottomRef.current = isAtBottom;
