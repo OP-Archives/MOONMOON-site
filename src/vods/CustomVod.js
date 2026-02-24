@@ -45,11 +45,8 @@ export default function CustomVod(props) {
 
   useEffect(() => {
     if (!playerRef.current) return;
-    if (timestamp >= 0) {
-      //need to pause/play to reset chat position.
-      playerRef.current.pause();
+    if (timestamp > 0) {
       playerRef.current.currentTime(timestamp);
-      playerRef.current.play();
     }
   }, [timestamp, playerRef]);
 
