@@ -34,6 +34,36 @@ export default function Chat(props) {
   const [scrolling, setScrolling] = useState(false);
   const [showTimestamp, setShowTimestamp] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [chatWidth, setChatWidth] = useState(undefined);
+
+  // Set responsive default width based on screen size, but only if not already set by user
+  useEffect(() => {
+    const updateChatWidth = () => {
+      if (typeof window !== "undefined") {
+        const savedSettings = localStorage.getItem("chatSettings");
+
+        if (savedSettings) {
+          // Set User defined width
+          try {
+            const settings = JSON.parse(savedSettings);
+            if (settings.chatWidth !== undefined) {
+              setChatWidth(settings.chatWidth);
+              return;
+            }
+          } catch (e) {
+            console.error("Failed to parse chat settings from localStorage", e);
+          }
+        }
+
+        // Only set default width if it hasn't been set by user already
+        const screenWidth = window.innerWidth;
+        setChatWidth(screenWidth <= 600 ? 250 : screenWidth <= 900 ? 300 : 340);
+      }
+    };
+
+    // Set initial width
+    updateChatWidth();
+  }, []);
   const isAtBottomRef = useRef(true);
 
   // Refs for various data and timers
@@ -777,7 +807,7 @@ export default function Chat(props) {
             </Box>
           </Box>
           <Divider />
-          <CustomCollapse in={showChat} timeout="auto" unmountOnExit sx={{ minWidth: { xs: "unset", sm: "250px", md: "300px", lg: "340px" } }}>
+          <CustomCollapse in={showChat} timeout="auto" unmountOnExit sx={{ width: isPortrait ? "unset" : `${chatWidth}px` }}>
             {comments.current && comments.current.length === 0 ? (
               <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%", width: "100%", flexDirection: "column" }}>
                 <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
@@ -852,6 +882,8 @@ export default function Chat(props) {
         setShowModal={setShowModal}
         showTimestamp={showTimestamp}
         setShowTimestamp={setShowTimestamp}
+        chatWidth={chatWidth}
+        setChatWidth={setChatWidth}
       />
     </Box>
   );

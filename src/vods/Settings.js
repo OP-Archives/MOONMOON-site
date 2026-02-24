@@ -1,9 +1,9 @@
 import { useMemo, useEffect, useState } from "react";
 import debounce from "lodash.debounce";
-import { Box, Modal, Typography, TextField, InputAdornment, FormGroup, FormControlLabel, Checkbox, Button } from "@mui/material";
+import { Box, Modal, Typography, TextField, InputAdornment, FormGroup, FormControlLabel, Checkbox, Button, Slider } from "@mui/material";
 
 export default function Settings(props) {
-  const { userChatDelay, setUserChatDelay, showModal, setShowModal, showTimestamp, setShowTimestamp } = props;
+  const { userChatDelay, setUserChatDelay, showModal, setShowModal, showTimestamp, setShowTimestamp, chatWidth, setChatWidth } = props;
   const [filterWords, setFilterWords] = useState([]);
 
   const delayChange = useMemo(
@@ -15,6 +15,25 @@ export default function Settings(props) {
         setUserChatDelay(value);
       }, 300),
     [setUserChatDelay],
+  );
+
+  // Save chat settings to local storage
+  const debouncedSaveSetting = useMemo(
+    () =>
+      debounce((key, value) => {
+        const savedSettings = localStorage.getItem("chatSettings");
+        let settings = {};
+        if (savedSettings) {
+          try {
+            settings = JSON.parse(savedSettings);
+          } catch (e) {
+            console.error("Failed to parse chat settings from localStorage", e);
+          }
+        }
+        settings[key] = value;
+        localStorage.setItem("chatSettings", JSON.stringify(settings));
+      }, 500),
+    [],
   );
 
   // Load all settings from localStorage on component mount
@@ -29,32 +48,31 @@ export default function Settings(props) {
         if (settings.showTimestamp !== undefined) {
           setShowTimestamp(settings.showTimestamp);
         }
+        if (settings.chatWidth !== undefined) {
+          setChatWidth(settings.chatWidth);
+        }
       } catch (e) {
         console.error("Failed to parse settings from localStorage", e);
       }
     }
-  }, [setShowTimestamp]);
-
-  // Save all settings to localStorage whenever they change
-  useEffect(() => {
-    const settings = {
-      filterWords,
-      showTimestamp,
-    };
-    localStorage.setItem("chatSettings", JSON.stringify(settings));
-  }, [filterWords, showTimestamp]);
+  }, [setShowTimestamp, setChatWidth]);
 
   const handleAddWord = () => {
     const input = document.getElementById("filter-word-input");
     const word = input.value.trim();
     if (word && !filterWords.includes(word)) {
       setFilterWords([...filterWords, word]);
+      debouncedSaveSetting("filterWords", [...filterWords, word]);
       input.value = "";
     }
   };
 
   const handleRemoveWord = (wordToRemove) => {
     setFilterWords(filterWords.filter((word) => word !== wordToRemove));
+    debouncedSaveSetting(
+      "filterWords",
+      filterWords.filter((word) => word !== wordToRemove),
+    );
   };
 
   return (
@@ -66,18 +84,40 @@ export default function Settings(props) {
           </Box>
           <Box sx={{ mt: 2 }}>
             <TextField
-              inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-              InputProps={{
-                endAdornment: <InputAdornment position="start">secs</InputAdornment>,
+              slotProps={{
+                input: {
+                  endAdornment: <InputAdornment position="start">secs</InputAdornment>,
+                },
               }}
               fullWidth
               label="Chat Delay"
               size="small"
-              type="number"
               onChange={delayChange}
               defaultValue={userChatDelay}
               onFocus={(evt) => evt.target.select()}
             />
+          </Box>
+
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="subtitle1" sx={{ mb: 1 }}>
+              Chat Width
+            </Typography>
+            <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+              <Slider
+                disabled={window.innerWidth - 400 <= 150}
+                value={chatWidth}
+                onChange={(e, newValue) => {
+                  setChatWidth(newValue);
+                  debouncedSaveSetting("chatWidth", newValue);
+                }}
+                min={150}
+                max={Math.min(window.innerWidth - 400, 800)}
+                step={10}
+                valueLabelDisplay="auto"
+                valueLabelFormat={(value) => `${value}px`}
+                sx={{ width: "100%" }}
+              />
+            </Box>
           </Box>
 
           <Box sx={{ mt: 2 }}>
@@ -110,7 +150,18 @@ export default function Settings(props) {
         </Box>
 
         <FormGroup sx={{ mt: 2 }}>
-          <FormControlLabel control={<Checkbox checked={showTimestamp} onChange={() => setShowTimestamp(!showTimestamp)} />} label="Show Timestamps" />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={showTimestamp}
+                onChange={() => {
+                  setShowTimestamp(!showTimestamp);
+                  debouncedSaveSetting("showTimestamp", !showTimestamp);
+                }}
+              />
+            }
+            label="Show Timestamps"
+          />
         </FormGroup>
       </Box>
     </Modal>
