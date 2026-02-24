@@ -93,7 +93,6 @@ export default function Player(props) {
   useEffect(() => {
     if (!source || !playerRef.current) return;
     playerRef.current.src(source);
-    if (timestamp) playerRef.current.currentTime(timestamp);
 
     const set = async () => {
       let playerDuration = playerRef.current.duration();
@@ -107,7 +106,12 @@ export default function Player(props) {
     };
 
     set();
-  }, [source, playerRef, timestamp, vod, setDelay]);
+  }, [source, playerRef, vod, setDelay]);
+
+  useEffect(() => {
+    if (!playerRef.current || timestamp <= 0 || !source) return;
+    playerRef.current.currentTime(timestamp);
+  }, [timestamp, playerRef, source]);
 
   return (
     <Box sx={{ height: "100%", width: "100%" }}>

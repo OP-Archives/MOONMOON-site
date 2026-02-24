@@ -9,6 +9,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { toHMS } from "../utils/helpers";
 import YoutubePlayer from "./YoutubePlayer";
 import CustomPlayer from "./CustomPlayer";
+import { saveResumePosition } from "../utils/positionStorage";
 
 export default function BaseVod(props) {
   const { isYoutubeVod, youtube, handlePartChange, playerRef, part, setPart, vod, type, delay, setDelay, timestamp, setTimestamp, setPlayerState, games, isPortrait } = props;
@@ -29,6 +30,8 @@ export default function BaseVod(props) {
         break;
       }
     }
+    //Save current position when current time updates
+    saveResumePosition(vod.id, currentTime);
     return;
   }, [currentTime, vod, playerRef]);
 

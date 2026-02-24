@@ -6,6 +6,7 @@ import Chat from "./Chat";
 import { convertTimestamp } from "../utils/helpers";
 import archiveClient from "./client";
 import BaseVod from "./BaseVod";
+import { getResumePosition, saveResumePosition, clearResumePosition } from "../utils/positionStorage";
 
 const channel = process.env.REACT_APP_CHANNEL;
 
@@ -44,11 +45,35 @@ export default function CustomVod(props) {
   }, [userChatDelay, delay]);
 
   useEffect(() => {
-    if (!playerRef.current) return;
-    if (timestamp > 0) {
-      playerRef.current.currentTime(timestamp);
+    if (!vodId) return;
+
+    const savedPosition = getResumePosition(vodId);
+    if (savedPosition !== null && savedPosition > 0) {
+      console.info(`Resuming Playback from ${savedPosition}`);
+      setTimestamp(savedPosition);
     }
-  }, [timestamp, playerRef]);
+  }, [vodId]);
+
+  // Handle Resume Positions depending on player state.
+  useEffect(() => {
+    if (playerState === -1 || !vodId || !playerRef.current) return;
+
+    switch (playerState) {
+      // Player States: -1=unstarted, 0=ended, 1=playing, 2=paused, 3=buffering, 5=cued
+      case 0:
+        // Clear Resume Position when video has ended.
+        clearResumePosition(vodId);
+        break;
+      case 2:
+        // Save Resume Position when video has paused.
+        const currentTime = playerRef.current.currentTime();
+        if (currentTime !== null && currentTime > 0) saveResumePosition(vodId, currentTime);
+        break;
+      default:
+        break;
+    }
+    return;
+  }, [playerState, vodId, playerRef]);
 
   if (vod === undefined) return <Loading />;
 

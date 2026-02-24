@@ -7,6 +7,7 @@ import Chat from "./Chat";
 import { toSeconds, convertTimestamp } from "../utils/helpers";
 import BaseVod from "./BaseVod";
 import archiveClient from "./client";
+import { getResumePosition, saveResumePosition, clearResumePosition } from "../utils/positionStorage";
 
 const channel = process.env.REACT_APP_CHANNEL;
 
@@ -47,7 +48,7 @@ export default function YoutubeVod(props) {
   }, [vodId, type]);
 
   useEffect(() => {
-    if (!youtube) return;
+    if (!youtube || !vodId) return;
 
     const search = new URLSearchParams(location.search);
     let timestamp = search.get("t") !== null ? convertTimestamp(search.get("t")) : 0;
@@ -60,10 +61,17 @@ export default function YoutubeVod(props) {
         }
         timestamp -= data.duration;
       }
+    } else {
+      // Load saved position when component mounts if no timestamp provided.
+      const savedPosition = getResumePosition(vodId);
+      if (savedPosition !== null && savedPosition > 0) {
+        console.info(`Resuming Playback from ${savedPosition}`);
+        timestamp = savedPosition;
+      }
     }
     setPart({ part: tmpPart, timestamp: timestamp });
     return;
-  }, [location.search, youtube]);
+  }, [location.search, vodId, youtube]);
 
   useEffect(() => {
     if (!youtube || !vod) return;
@@ -80,6 +88,27 @@ export default function YoutubeVod(props) {
     setDelay(tmpDelay);
     return;
   }, [youtube, vod]);
+
+  // Handle Resume Positions depending on player state.
+  useEffect(() => {
+    if (playerState === -1 || !vodId || !playerRef.current) return;
+
+    switch (playerState) {
+      // Player States: -1=unstarted, 0=ended, 1=playing, 2=paused, 3=buffering, 5=cued
+      case 0:
+        // Clear Resume Position when video has ended.
+        clearResumePosition(vodId);
+        break;
+      case 2:
+        // Save Resume Position when video has paused.
+        const currentTime = playerRef.current.getCurrentTime();
+        if (currentTime !== null && currentTime > 0) saveResumePosition(vodId, currentTime);
+        break;
+      default:
+        break;
+    }
+    return;
+  }, [playerState, vodId, playerRef]);
 
   const handlePartChange = (evt) => {
     const tmpPart = evt.target.value + 1;
