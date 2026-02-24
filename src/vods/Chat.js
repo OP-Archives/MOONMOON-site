@@ -702,7 +702,6 @@ export default function Chat(props) {
     <Box
       sx={{
         height: "100%",
-        background: "#131314",
         display: "flex",
         flexDirection: "column",
         minHeight: 0,
@@ -742,7 +741,7 @@ export default function Chat(props) {
             </Box>
           </Box>
           <Divider />
-          <CustomCollapse in={showChat} timeout="auto" unmountOnExit sx={{ minWidth: "340px" }}>
+          <CustomCollapse in={showChat} timeout="auto" unmountOnExit sx={{ minWidth: { xs: "unset", sm: "250px", md: "300px", lg: "340px" } }}>
             {comments.current && comments.current.length === 0 ? (
               <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%", width: "100%", flexDirection: "column" }}>
                 <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
