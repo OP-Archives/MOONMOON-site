@@ -317,11 +317,12 @@ export default function Chat(props) {
 
   // Function to check if a message should be filtered out
   const shouldFilterMessage = useCallback((message) => {
-    const savedFilterWords = localStorage.getItem("chatFilterWords");
-    if (!savedFilterWords) return false;
+    const savedSettings = localStorage.getItem("chatSettings");
+    if (!savedSettings) return false;
 
     try {
-      const filterWords = JSON.parse(savedFilterWords);
+      const settings = JSON.parse(savedSettings);
+      const filterWords = settings.filterWords || [];
       if (!filterWords || filterWords.length === 0) return false;
 
       // Create a regex pattern that matches entire words only (case sensitive)

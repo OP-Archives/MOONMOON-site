@@ -81,7 +81,7 @@ export default function CustomVod(props) {
     <Box sx={{ height: "100%", width: "100%" }}>
       <Box sx={{ display: "flex", flexDirection: isPortrait ? "column" : "row", height: "100%", width: "100%" }}>
         <Box sx={{ display: "flex", height: isPortrait ? "auto" : "100%", width: "100%" }}>
-          <BaseVod {...props} playerRef={playerRef} vod={vod} delay={delay} timestamp={timestamp} setTimestamp={setTimestamp} setDelay={setDelay} setPlayerState={setPlayerState} />
+          <BaseVod {...props} playerRef={playerRef} vod={vod} timestamp={timestamp} setTimestamp={setTimestamp} setDelay={setDelay} setPlayerState={setPlayerState} />
         </Box>
         {isPortrait && <Divider />}
         <Chat

@@ -17,22 +17,32 @@ export default function Settings(props) {
     [setUserChatDelay]
   );
 
-  // Load filter words from localStorage on component mount
+  // Load all settings from localStorage on component mount
   useEffect(() => {
-    const savedFilterWords = localStorage.getItem("chatFilterWords");
-    if (savedFilterWords) {
+    const savedSettings = localStorage.getItem("chatSettings");
+    if (savedSettings) {
       try {
-        setFilterWords(JSON.parse(savedFilterWords));
+        const settings = JSON.parse(savedSettings);
+        if (settings.filterWords) {
+          setFilterWords(settings.filterWords);
+        }
+        if (settings.showTimestamp !== undefined) {
+          setShowTimestamp(settings.showTimestamp);
+        }
       } catch (e) {
-        console.error("Failed to parse filter words from localStorage", e);
+        console.error("Failed to parse settings from localStorage", e);
       }
     }
-  }, []);
+  }, [setShowTimestamp]);
 
-  // Save filter words to localStorage whenever they change
+  // Save all settings to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem("chatFilterWords", JSON.stringify(filterWords));
-  }, [filterWords]);
+    const settings = {
+      filterWords,
+      showTimestamp
+    };
+    localStorage.setItem("chatSettings", JSON.stringify(settings));
+  }, [filterWords, showTimestamp]);
 
   const handleAddWord = () => {
     const input = document.getElementById("filter-word-input");

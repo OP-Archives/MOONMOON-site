@@ -6,7 +6,7 @@ import "videojs-hotkeys";
 import { toSeconds, sleep } from "../utils/helpers";
 
 export default function Player(props) {
-  const { playerRef, setCurrentTime, type, vod, timestamp, delay, setDelay, setPlayerState } = props;
+  const { playerRef, setCurrentTime, type, vod, timestamp, setDelay, setPlayerState } = props;
   const timeUpdateRef = useRef(null);
   const [source, setSource] = useState(undefined);
   const [fileError, setFileError] = useState(undefined);
@@ -64,7 +64,6 @@ export default function Player(props) {
     if (playerRef.current.paused()) return;
     let currentTime = 0;
     currentTime += playerRef.current.currentTime() ?? 0;
-    currentTime += delay ?? 0;
     setCurrentTime(currentTime);
   };
 

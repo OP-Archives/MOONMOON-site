@@ -137,7 +137,6 @@ export default function YoutubeVod(props) {
             part={part}
             setPart={setPart}
             vod={vod}
-            delay={delay}
             setPlayerState={setPlayerState}
           />
         </Box>

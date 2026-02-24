@@ -3,7 +3,7 @@ import canAutoPlay from "can-autoplay";
 import Youtube from "react-youtube";
 
 export default function YoutubePlayer(props) {
-  const { youtube, playerRef, part, setPart, setCurrentTime, delay, setPlayerState, games } = props;
+  const { youtube, playerRef, part, setPart, setCurrentTime, setPlayerState, games } = props;
   const timeUpdateRef = useRef(null);
 
   useEffect(() => {
@@ -26,7 +26,6 @@ export default function YoutubePlayer(props) {
       currentTime += video.duration;
     }
     currentTime += playerRef.current.getCurrentTime() ?? 0;
-    currentTime += delay ?? 0;
     setCurrentTime(currentTime);
   };
 

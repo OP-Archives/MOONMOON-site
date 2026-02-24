@@ -12,7 +12,7 @@ import CustomPlayer from "./CustomPlayer";
 import { saveResumePosition } from "../utils/positionStorage";
 
 export default function BaseVod(props) {
-  const { isYoutubeVod, youtube, handlePartChange, playerRef, part, setPart, vod, type, delay, setDelay, timestamp, setTimestamp, setPlayerState, games, isPortrait } = props;
+  const { isYoutubeVod, youtube, handlePartChange, playerRef, part, setPart, vod, type, setDelay, timestamp, setTimestamp, setPlayerState, games, isPortrait } = props;
   const [chapter, setChapter] = useState(undefined);
   const [showMenu, setShowMenu] = useState(true);
   const [currentTime, setCurrentTime] = useState(undefined);
@@ -30,7 +30,6 @@ export default function BaseVod(props) {
         break;
       }
     }
-    //Save current position when current time updates
     saveResumePosition(vod.id, currentTime);
     return;
   }, [currentTime, vod, playerRef]);
@@ -49,11 +48,11 @@ export default function BaseVod(props) {
     <Box sx={{ display: "flex", height: "100%", width: "100%", flexDirection: "column", alignItems: "flex-start", minWidth: 0, overflow: "hidden", position: "relative", minHeight: 0 }}>
       <Box sx={{ position: "relative", width: "100%", aspectRatio: "16 / 9", flex: isPortrait ? "1 1 auto" : "1 1 auto", minHeight: 0 }}>
         {isYoutubeVod ? (
-          <YoutubePlayer playerRef={playerRef} part={part} youtube={youtube} setCurrentTime={setCurrentTime} setPart={setPart} delay={delay} setPlayerState={setPlayerState} />
+          <YoutubePlayer playerRef={playerRef} part={part} youtube={youtube} setCurrentTime={setCurrentTime} setPart={setPart} setPlayerState={setPlayerState} />
         ) : games ? (
           <YoutubePlayer playerRef={playerRef} part={part} games={games} setPart={setPart} setPlayerState={setPlayerState} />
         ) : (
-          <CustomPlayer playerRef={playerRef} setCurrentTime={setCurrentTime} delay={delay} setDelay={setDelay} type={type} vod={vod} timestamp={timestamp} setPlayerState={setPlayerState} />
+          <CustomPlayer playerRef={playerRef} setCurrentTime={setCurrentTime} setDelay={setDelay} type={type} vod={vod} timestamp={timestamp} setPlayerState={setPlayerState} />
         )}
       </Box>
       <Box sx={{ position: "absolute", bottom: 0, left: "50%" }}>
