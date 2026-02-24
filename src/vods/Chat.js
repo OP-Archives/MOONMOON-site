@@ -315,6 +315,32 @@ export default function Chat(props) {
     [getEmoteImageUrl, getEmoteImageSrcSet],
   );
 
+  // Function to check if a message should be filtered out
+  const shouldFilterMessage = useCallback((message) => {
+    const savedFilterWords = localStorage.getItem("chatFilterWords");
+    if (!savedFilterWords) return false;
+
+    try {
+      const filterWords = JSON.parse(savedFilterWords);
+      if (!filterWords || filterWords.length === 0) return false;
+
+      // Create a regex pattern that matches entire words only (case sensitive)
+      const wordsToMatch = filterWords.map((word) => {
+        // Escape special regex characters
+        const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        return `\\b${escapedWord}\\b`;
+      });
+
+      const pattern = new RegExp(wordsToMatch.join("|"), "g");
+
+      // Check if any filtered word appears in the message
+      return pattern.test(message);
+    } catch (e) {
+      console.error("Failed to parse filter words", e);
+      return false;
+    }
+  }, []);
+
   const transformMessage = useCallback(
     (fragments, keyPrefix) => {
       if (!fragments) return;
@@ -529,6 +555,15 @@ export default function Chat(props) {
     for (let i = stoppedAtIndex.current.valueOf(); i < lastIndex; i++) {
       const comment = comments.current[i];
       if (!comment.message) continue;
+
+      // Check if message should be filtered out
+      const messageText = comment.message.map((fragment) => fragment.text).join(" ");
+
+      if (shouldFilterMessage(messageText)) {
+        // Skip this message if it contains filtered words
+        continue;
+      }
+
       newMessages.current.push(
         <Box key={comment.id} sx={{ width: "100%" }}>
           <Box
@@ -579,7 +614,7 @@ export default function Chat(props) {
       stoppedAtIndex.current = lastIndex;
       if (comments.current.length - 1 === lastIndex) fetchNextComments();
     }
-  }, [getCurrentTime, playerRef, vodId, showTimestamp, transformMessage, isPlaying]);
+  }, [getCurrentTime, playerRef, vodId, showTimestamp, transformMessage, isPlaying, shouldFilterMessage]);
 
   useEffect(() => {
     if (!isAtBottomRef.current || shownMessages.length === 0) return;

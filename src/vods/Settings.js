@@ -1,9 +1,10 @@
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 import debounce from "lodash.debounce";
-import { Box, Modal, Typography, TextField, InputAdornment, FormGroup, FormControlLabel, Checkbox } from "@mui/material";
+import { Box, Modal, Typography, TextField, InputAdornment, FormGroup, FormControlLabel, Checkbox, Button } from "@mui/material";
 
 export default function Settings(props) {
   const { userChatDelay, setUserChatDelay, showModal, setShowModal, showTimestamp, setShowTimestamp } = props;
+  const [filterWords, setFilterWords] = useState([]);
 
   const delayChange = useMemo(
     () =>
@@ -15,6 +16,36 @@ export default function Settings(props) {
       }, 300),
     [setUserChatDelay]
   );
+
+  // Load filter words from localStorage on component mount
+  useEffect(() => {
+    const savedFilterWords = localStorage.getItem("chatFilterWords");
+    if (savedFilterWords) {
+      try {
+        setFilterWords(JSON.parse(savedFilterWords));
+      } catch (e) {
+        console.error("Failed to parse filter words from localStorage", e);
+      }
+    }
+  }, []);
+
+  // Save filter words to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem("chatFilterWords", JSON.stringify(filterWords));
+  }, [filterWords]);
+
+  const handleAddWord = () => {
+    const input = document.getElementById("filter-word-input");
+    const word = input.value.trim();
+    if (word && !filterWords.includes(word)) {
+      setFilterWords([...filterWords, word]);
+      input.value = "";
+    }
+  };
+
+  const handleRemoveWord = (wordToRemove) => {
+    setFilterWords(filterWords.filter(word => word !== wordToRemove));
+  };
 
   return (
     <Modal open={showModal} onClose={() => setShowModal(false)}>
@@ -37,6 +68,38 @@ export default function Settings(props) {
               defaultValue={userChatDelay}
               onFocus={(evt) => evt.target.select()}
             />
+          </Box>
+
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="subtitle1" sx={{ mb: 1 }}>Filter Words</Typography>
+            <Box sx={{ display: "flex", mb: 1 }}>
+              <TextField
+                id="filter-word-input"
+                fullWidth
+                label="Add word to filter"
+                size="small"
+                onKeyDown={(e) => e.key === 'Enter' && handleAddWord()}
+              />
+              <Button variant="outlined" sx={{ ml: 1 }} onClick={handleAddWord}>Add</Button>
+            </Box>
+            <Box sx={{ maxHeight: "150px", overflowY: "auto", border: "1px solid #ccc", p: 1, borderRadius: 1 }}>
+              {filterWords.length > 0 ? (
+                filterWords.map((word, index) => (
+                  <Box key={index} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 0.5 }}>
+                    <Typography variant="body2">{word}</Typography>
+                    <Button
+                      size="small"
+                      color="error"
+                      onClick={() => handleRemoveWord(word)}
+                    >
+                      Remove
+                    </Button>
+                  </Box>
+                ))
+              ) : (
+                <Typography variant="body2" color="textSecondary">No filter words added</Typography>
+              )}
+            </Box>
           </Box>
         </Box>
 
