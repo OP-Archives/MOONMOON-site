@@ -37,7 +37,8 @@
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
     "lint": "eslint src/",
-    "lint:fix": "eslint src/ --fix"
+    "lint:fix": "eslint src/ --fix",
+    "mui:imports": "npx @mui/codemod@latest v5.0.0/path-imports src/"
   },
   "eslintConfig": {
     "extends": [
