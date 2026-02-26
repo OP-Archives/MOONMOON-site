@@ -1,4 +1,4 @@
-import { styled, Link } from "@mui/material";
+import { styled, Link } from '@mui/material';
 
 const CustomLink = styled((props) => <Link {...props} />)`
   &:hover {

@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { Drawer, ListItem, List, ListItemText, IconButton, Divider, Box, Link, ListItemIcon } from "@mui/material";
-import { Menu } from "@mui/icons-material";
-import HomeIcon from "@mui/icons-material/Home";
-import OndemandVideoIcon from "@mui/icons-material/OndemandVideo";
-import ReportIcon from "@mui/icons-material/Report";
-import VideogameAssetIcon from "@mui/icons-material/VideogameAsset";
+import { useState } from 'react';
+import { Drawer, ListItem, List, ListItemText, IconButton, Divider, Box, Link, ListItemIcon } from '@mui/material';
+import { Menu } from '@mui/icons-material';
+import HomeIcon from '@mui/icons-material/Home';
+import OndemandVideoIcon from '@mui/icons-material/OndemandVideo';
+import ReportIcon from '@mui/icons-material/Report';
+import VideogameAssetIcon from '@mui/icons-material/VideogameAsset';
 
 const mainLinks = [
   { title: `Home`, path: `/`, icon: <HomeIcon color="primary" /> },
@@ -35,7 +35,7 @@ export default function DrawerComponent(props) {
             </Box>
           ))}
           <Divider />
-          <Box sx={{ display: "flex", p: 2 }}>
+          <Box sx={{ display: 'flex', p: 2 }}>
             {socials.map(({ path, icon }) => (
               <Box key={path} sx={{ mr: 2 }}>
                 <Link href={path} rel="noopener noreferrer" target="_blank">

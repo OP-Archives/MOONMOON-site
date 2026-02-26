@@ -1,17 +1,17 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography } from '@mui/material';
 
 export default function EnvironmentError({ missingVars }) {
   return (
     <Box
       sx={{
-        height: "100vh",
-        width: "100vw",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "#0e0e10",
-        color: "#fff",
+        height: '100vh',
+        width: '100vw',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#0e0e10',
+        color: '#fff',
         padding: 4,
       }}
     >
@@ -21,9 +21,9 @@ export default function EnvironmentError({ missingVars }) {
       <Typography variant="body1" color="textSecondary" paragraph>
         The application cannot start because required environment variables are missing.
       </Typography>
-      <Box sx={{ backgroundColor: "rgba(0,0,0,0.3)", p: 2, borderRadius: 1, my: 2 }}>
+      <Box sx={{ backgroundColor: 'rgba(0,0,0,0.3)', p: 2, borderRadius: 1, my: 2 }}>
         <Typography variant="body2" fontFamily="monospace" color="#ff5252">
-          {missingVars.join("\n")}
+          {missingVars.join('\n')}
         </Typography>
       </Box>
       <Typography variant="body2" color="textSecondary">

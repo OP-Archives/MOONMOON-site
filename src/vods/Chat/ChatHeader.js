@@ -1,7 +1,7 @@
-import { Box, Tooltip, IconButton, Typography } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import SettingsIcon from "@mui/icons-material/Settings";
-import ExpandMore from "./ExpandMore";
+import { Box, Tooltip, IconButton, Typography } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import SettingsIcon from '@mui/icons-material/Settings';
+import ExpandMore from './ExpandMore';
 
 export default function ChatHeader(props) {
   const { isPortrait, showChat, setShowChat, setShowModal } = props;
@@ -11,11 +11,11 @@ export default function ChatHeader(props) {
   };
 
   return (
-    <Box sx={{ display: "grid", alignItems: "center", p: 1 }}>
+    <Box sx={{ display: 'grid', alignItems: 'center', p: 1 }}>
       {!isPortrait && (
         <Box
           sx={{
-            justifySelf: "left",
+            justifySelf: 'left',
             gridColumnStart: 1,
             gridRowStart: 1,
           }}
@@ -29,14 +29,14 @@ export default function ChatHeader(props) {
       )}
       <Box
         sx={{
-          justifySelf: "center",
+          justifySelf: 'center',
           gridColumnStart: 1,
           gridRowStart: 1,
         }}
       >
         <Typography variant="body1">Chat Replay</Typography>
       </Box>
-      <Box sx={{ justifySelf: "end", gridColumnStart: 1, gridRowStart: 1 }}>
+      <Box sx={{ justifySelf: 'end', gridColumnStart: 1, gridRowStart: 1 }}>
         <IconButton title="Settings" onClick={() => setShowModal(true)} color="primary">
           <SettingsIcon />
         </IconButton>

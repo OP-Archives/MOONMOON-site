@@ -1,5 +1,5 @@
-import { feathers } from "@feathersjs/feathers";
-import rest from "@feathersjs/rest-client";
+import { feathers } from '@feathersjs/feathers';
+import rest from '@feathersjs/rest-client';
 
 const vodsClient = feathers();
 

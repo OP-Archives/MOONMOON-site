@@ -1,6 +1,6 @@
-import { styled, IconButton } from "@mui/material";
+import { styled, IconButton } from '@mui/material';
 
-const ExpandMore = styled(({ expand, ...props }, ref) => <IconButton {...props} />)`
+const ExpandMore = styled(({ ...props }) => <IconButton {...props} />)`
   margin-left: auto;
   transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 

@@ -1,15 +1,15 @@
-import { useEffect, useState } from "react";
-import { Box, Typography, Tooltip, IconButton, Collapse, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
-import Loading from "../utils/Loading";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import Chapters from "./VodChapters";
-import ExpandMore from "../utils/CustomExpandMore";
-import CustomWidthTooltip from "../utils/CustomToolTip";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import { toHMS } from "../utils/helpers";
-import YoutubePlayer from "./YoutubePlayer";
-import CustomPlayer from "./CustomPlayer";
-import { saveResumePosition } from "../utils/positionStorage";
+import { useEffect, useState } from 'react';
+import { Box, Typography, Tooltip, IconButton, Collapse, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import Loading from '../utils/Loading';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Chapters from './VodChapters';
+import ExpandMore from '../utils/CustomExpandMore';
+import CustomWidthTooltip from '../utils/CustomToolTip';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { toHMS } from '../utils/helpers';
+import YoutubePlayer from './YoutubePlayer';
+import CustomPlayer from './CustomPlayer';
+import { saveResumePosition } from '../utils/positionStorage';
 
 export default function BaseVod(props) {
   const { isYoutubeVod, youtube, handlePartChange, playerRef, part, setPart, vod, type, setDelay, timestamp, setTimestamp, setPlayerState, games, isPortrait } = props;
@@ -45,8 +45,8 @@ export default function BaseVod(props) {
   if (vod === undefined) return <Loading />;
 
   return (
-    <Box sx={{ display: "flex", height: "100%", width: "100%", flexDirection: "column", alignItems: "flex-start", minWidth: 0, overflow: "hidden", position: "relative", minHeight: 0 }}>
-      <Box sx={{ position: "relative", width: "100%", aspectRatio: "16 / 9", flex: isPortrait ? "1 1 auto" : "1 1 auto", minHeight: 0 }}>
+    <Box sx={{ display: 'flex', height: '100%', width: '100%', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0, overflow: 'hidden', position: 'relative', minHeight: 0 }}>
+      <Box sx={{ position: 'relative', width: '100%', aspectRatio: '16 / 9', flex: isPortrait ? '1 1 auto' : '1 1 auto', minHeight: 0 }}>
         {isYoutubeVod ? (
           <YoutubePlayer playerRef={playerRef} part={part} youtube={youtube} setCurrentTime={setCurrentTime} setPart={setPart} setPlayerState={setPlayerState} />
         ) : games ? (
@@ -55,20 +55,20 @@ export default function BaseVod(props) {
           <CustomPlayer playerRef={playerRef} setCurrentTime={setCurrentTime} setDelay={setDelay} type={type} vod={vod} timestamp={timestamp} setPlayerState={setPlayerState} />
         )}
       </Box>
-      <Box sx={{ position: "absolute", bottom: 0, left: "50%" }}>
-        <Tooltip title={showMenu ? "Collapse" : "Expand"}>
+      <Box sx={{ position: 'absolute', bottom: 0, left: '50%' }}>
+        <Tooltip title={showMenu ? 'Collapse' : 'Expand'}>
           <ExpandMore expand={showMenu} onClick={handleExpandClick} aria-expanded={showMenu} aria-label="show menu">
             <ExpandMoreIcon />
           </ExpandMore>
         </Tooltip>
       </Box>
-      <Collapse in={showMenu} timeout="auto" unmountOnExit sx={{ minHeight: "auto !important", width: "100%" }}>
-        <Box sx={{ display: "flex", p: 1, alignItems: "center" }}>
+      <Collapse in={showMenu} timeout="auto" unmountOnExit sx={{ minHeight: 'auto !important', width: '100%' }}>
+        <Box sx={{ display: 'flex', p: 1, alignItems: 'center' }}>
           {chapter && <Chapters chapters={vod.chapters} chapter={chapter} setChapter={setChapter} setTimestamp={setTimestamp} setPart={setPart} youtube={youtube} isYoutubeVod={isYoutubeVod} />}
           <CustomWidthTooltip title={vod.title}>
             <Typography fontWeight={550} variant="body1" noWrap={true}>{`${vod.title}`}</Typography>
           </CustomWidthTooltip>
-          <Box sx={{ marginLeft: "auto", display: "flex", alignItems: "center" }}>
+          <Box sx={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
             {isYoutubeVod && (
               <Box sx={{ ml: 0.5 }}>
                 <FormControl variant="outlined">
@@ -86,7 +86,7 @@ export default function BaseVod(props) {
               </Box>
             )}
             {games && (
-              <Box sx={{ marginLeft: "auto", display: "flex", alignItems: "center" }}>
+              <Box sx={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
                 <Box sx={{ ml: 0.5 }}>
                   <FormControl variant="outlined">
                     <InputLabel id="select-label">Game</InputLabel>

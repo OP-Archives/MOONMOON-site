@@ -1,6 +1,6 @@
-import { useEffect, useRef } from "react";
-import canAutoPlay from "can-autoplay";
-import Youtube from "react-youtube";
+import { useEffect, useRef } from 'react';
+import canAutoPlay from 'can-autoplay';
+import Youtube from 'react-youtube';
 
 export default function YoutubePlayer(props) {
   const { youtube, playerRef, part, setPart, setCurrentTime, setPlayerState, games } = props;
@@ -96,8 +96,8 @@ export default function YoutubePlayer(props) {
     <Youtube
       className="player"
       opts={{
-        height: "100%",
-        width: "100%",
+        height: '100%',
+        width: '100%',
         playerVars: {
           autoplay: 1,
           playsinline: 1,

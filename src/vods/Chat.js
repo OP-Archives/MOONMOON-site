@@ -1,26 +1,26 @@
-import { useEffect, useState, useRef, useCallback, useMemo } from "react";
-import { Box, Typography, Tooltip, Divider } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import Twemoji from "react-twemoji";
-import { toHHMMSS } from "../utils/helpers";
-import ChatHeader from "./Chat/ChatHeader";
-import ChatMessages from "./Chat/ChatMessages";
-import ChatSettingsModal from "./Chat/ChatSettingsModal";
-import ExpandMore from "./Chat/ExpandMore";
-import MessageTooltip from "./Chat/MessageTooltip";
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import { Box, Typography, Tooltip, Divider } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Twemoji from 'react-twemoji';
+import { toHHMMSS } from '../utils/helpers';
+import ChatHeader from './Chat/ChatHeader';
+import ChatMessages from './Chat/ChatMessages';
+import ChatSettingsModal from './Chat/ChatSettingsModal';
+import ExpandMore from './Chat/ExpandMore';
+import MessageTooltip from './Chat/MessageTooltip';
 
 //ENV
 const twitchId = process.env.REACT_APP_TWITCH_ID,
   ARCHIVE_API_BASE = process.env.REACT_APP_ARCHIVE_API_BASE;
 
 // CDN URLs for emotes and badges
-const BASE_TWITCH_CDN = "https://static-cdn.jtvnw.net";
-const BASE_FFZ_EMOTE_CDN = "https://cdn.frankerfacez.com/emote";
-const BASE_BTTV_EMOTE_CDN = "https://emotes.overpowered.tv/bttv";
-const BASE_7TV_EMOTE_CDN = "https://cdn.7tv.app/emote";
-const BASE_FFZ_EMOTE_API = "https://api.frankerfacez.com/v1";
-const BASE_BTTV_EMOTE_API = "https://api.betterttv.net/3";
-const BASE_7TV_EMOTE_API = "https://7tv.io/v3";
+const BASE_TWITCH_CDN = 'https://static-cdn.jtvnw.net';
+const BASE_FFZ_EMOTE_CDN = 'https://cdn.frankerfacez.com/emote';
+const BASE_BTTV_EMOTE_CDN = 'https://emotes.overpowered.tv/bttv';
+const BASE_7TV_EMOTE_CDN = 'https://cdn.7tv.app/emote';
+const BASE_FFZ_EMOTE_API = 'https://api.frankerfacez.com/v1';
+const BASE_BTTV_EMOTE_API = 'https://api.betterttv.net/3';
+const BASE_7TV_EMOTE_API = 'https://7tv.io/v3';
 
 // Cache for badges
 let cachedBadges = new Map();
@@ -31,7 +31,7 @@ export default function Chat(props) {
   // State management
   const [showChat, setShowChat] = useState(true);
   const [shownMessages, setShownMessages] = useState([]);
-  const [emotes, setEmotes] = useState({ ffz_emotes: [], bttv_emotes: [], "7tv_emotes": [] });
+  const [emotes, setEmotes] = useState({ ffz_emotes: [], bttv_emotes: [], '7tv_emotes': [] });
   const [scrolling, setScrolling] = useState(false);
   const [showTimestamp, setShowTimestamp] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -40,8 +40,8 @@ export default function Chat(props) {
   // Set responsive default width based on screen size, but only if not already set by user
   useEffect(() => {
     const updateChatWidth = () => {
-      if (typeof window !== "undefined") {
-        const savedSettings = localStorage.getItem("chatSettings");
+      if (typeof window !== 'undefined') {
+        const savedSettings = localStorage.getItem('chatSettings');
 
         if (savedSettings) {
           // Set User defined width
@@ -52,7 +52,7 @@ export default function Chat(props) {
               return;
             }
           } catch (e) {
-            console.error("Failed to parse chat settings from localStorage", e);
+            console.error('Failed to parse chat settings from localStorage', e);
           }
         }
 
@@ -81,9 +81,9 @@ export default function Chat(props) {
   useEffect(() => {
     const loadBadges = () => {
       fetch(`${ARCHIVE_API_BASE}/v2/badges`, {
-        method: "GET",
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       })
         .then((response) => response.json())
@@ -102,9 +102,9 @@ export default function Chat(props) {
 
     const loadArchiveEmotes = async () => {
       await fetch(`${ARCHIVE_API_BASE}/emotes?vod_id=${vodId}`, {
-        method: "GET",
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       })
         .then((response) => response.json())
@@ -127,7 +127,7 @@ export default function Chat(props) {
 
     const loadBTTVGlobalEmotes = async () => {
       await fetch(`${BASE_BTTV_EMOTE_API}/cached/emotes/global`, {
-        method: "GET",
+        method: 'GET',
       })
         .then((response) => response.json())
         .then((data) => {
@@ -141,7 +141,7 @@ export default function Chat(props) {
 
     const loadBTTVChannelEmotes = async () => {
       await fetch(`${BASE_BTTV_EMOTE_API}/cached/users/twitch/${twitchId}`, {
-        method: "GET",
+        method: 'GET',
       })
         .then((response) => response.json())
         .then((data) => {
@@ -155,7 +155,7 @@ export default function Chat(props) {
 
     const loadFFZEmotes = async () => {
       await fetch(`${BASE_FFZ_EMOTE_API}/room/id/${twitchId}`, {
-        method: "GET",
+        method: 'GET',
       })
         .then((response) => response.json())
         .then((data) => {
@@ -169,12 +169,12 @@ export default function Chat(props) {
 
     const load7TVEmotes = async () => {
       await fetch(`${BASE_7TV_EMOTE_API}/users/twitch/${twitchId}`, {
-        method: "GET",
+        method: 'GET',
       })
         .then((response) => response.json())
         .then((data) => {
           if (data.status_code >= 400) return;
-          setEmotes((emotes) => ({ ...emotes, "7tv_emotes": data.emote_set.emotes }));
+          setEmotes((emotes) => ({ ...emotes, '7tv_emotes': data.emote_set.emotes }));
         })
         .catch((e) => {
           console.error(e);
@@ -183,14 +183,14 @@ export default function Chat(props) {
 
     const load7TVGlobalEmotes = async () => {
       await fetch(`${BASE_7TV_EMOTE_API}/emote-sets/global`, {
-        method: "GET",
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       })
         .then((response) => response.json())
         .then((data) => {
-          setEmotes((emotes) => ({ ...emotes, "7tv_emotes": emotes["7tv_emotes"].concat(data.emotes) }));
+          setEmotes((emotes) => ({ ...emotes, '7tv_emotes': emotes['7tv_emotes'].concat(data.emotes) }));
         })
         .catch((e) => {
           console.error(e);
@@ -205,12 +205,12 @@ export default function Chat(props) {
   const emoteLookup = useMemo(() => {
     if (!emotes) return;
     const lookup = new Map();
-    const { ffz_emotes, bttv_emotes, "7tv_emotes": sevenTVEmotes } = emotes;
+    const { ffz_emotes, bttv_emotes, '7tv_emotes': sevenTVEmotes } = emotes;
 
     // Build lookup for all emotes (O(1) lookups)
-    ffz_emotes.forEach((emote) => lookup.set(emote.code || emote.name, { ...emote, provider: "FFZ" }));
-    bttv_emotes.forEach((emote) => lookup.set(emote.code || emote.name, { ...emote, provider: "BTTV" }));
-    sevenTVEmotes.forEach((emote) => lookup.set(emote.code || emote.name, { ...emote, provider: "7TV" }));
+    ffz_emotes.forEach((emote) => lookup.set(emote.code || emote.name, { ...emote, provider: 'FFZ' }));
+    bttv_emotes.forEach((emote) => lookup.set(emote.code || emote.name, { ...emote, provider: 'BTTV' }));
+    sevenTVEmotes.forEach((emote) => lookup.set(emote.code || emote.name, { ...emote, provider: '7TV' }));
 
     return lookup;
   }, [emotes]);
@@ -244,11 +244,11 @@ export default function Chat(props) {
 
   const getEmoteImageUrl = useCallback((emote, type, size = 1) => {
     switch (type) {
-      case "FFZ":
+      case 'FFZ':
         return `${BASE_FFZ_EMOTE_CDN}/${emote.id}/${size}`;
-      case "BTTV":
+      case 'BTTV':
         return `${BASE_BTTV_EMOTE_CDN}/${emote.id}/${size === 4 ? 2 : size}x`;
-      case "7TV":
+      case '7TV':
         return `${BASE_7TV_EMOTE_CDN}/${emote.id}/${size}x.webp`;
       default:
         return `${BASE_TWITCH_CDN}/emoticons/v2/${emote.id}/default/dark/${size}.0`;
@@ -257,11 +257,11 @@ export default function Chat(props) {
 
   const getEmoteImageSrcSet = useCallback((emote, type) => {
     switch (type) {
-      case "FFZ":
+      case 'FFZ':
         return `${BASE_FFZ_EMOTE_CDN}/${emote.id}/1 1x, ${BASE_FFZ_EMOTE_CDN}/${emote.id}/2 2x, ${BASE_FFZ_EMOTE_CDN}/${emote.id}/4 4x`;
-      case "BTTV":
+      case 'BTTV':
         return `${BASE_BTTV_EMOTE_CDN}/${emote.id}/1x 1x, ${BASE_BTTV_EMOTE_CDN}/${emote.id}/2x 2x, ${BASE_BTTV_EMOTE_CDN}/${emote.id}/3x 3x`;
-      case "7TV":
+      case '7TV':
         return `${BASE_7TV_EMOTE_CDN}/${emote.id}/1x.webp 1x, ${BASE_7TV_EMOTE_CDN}/${emote.id}/2x.webp 2x, ${BASE_7TV_EMOTE_CDN}/${emote.id}/3x.webp 3x, ${BASE_7TV_EMOTE_CDN}/${emote.id}/4x.webp 4x`;
       default:
         return `${BASE_TWITCH_CDN}/emoticons/v2/${emote.id}/default/dark/1.0 1x, ${BASE_TWITCH_CDN}/emoticons/v2/${emote.id}/default/dark/2.0 2x, ${BASE_TWITCH_CDN}/emoticons/v2/${emote.id}/default/dark/3.0 4x`;
@@ -282,14 +282,14 @@ export default function Chat(props) {
         <MessageTooltip
           key={key}
           title={
-            <Box sx={{ maxWidth: "30rem", textAlign: "center" }}>
+            <Box sx={{ maxWidth: '30rem', textAlign: 'center' }}>
               <img
                 crossOrigin="anonymous"
                 style={{
-                  marginBottom: "0.3rem",
-                  border: "none",
-                  maxWidth: "100%",
-                  verticalAlign: "top",
+                  marginBottom: '0.3rem',
+                  border: 'none',
+                  maxWidth: '100%',
+                  verticalAlign: 'top',
                 }}
                 src={getEmoteImageUrl(emote, emoteType, 2)}
                 alt={word}
@@ -299,23 +299,23 @@ export default function Chat(props) {
             </Box>
           }
         >
-          <Box sx={{ display: "inline" }}>
+          <Box sx={{ display: 'inline' }}>
             <img
               crossOrigin="anonymous"
               style={{
-                verticalAlign: "middle",
-                border: "none",
-                maxWidth: "100%",
+                verticalAlign: 'middle',
+                border: 'none',
+                maxWidth: '100%',
               }}
               src={getEmoteImageUrl(emote, emoteType)}
               srcSet={getEmoteImageSrcSet(emote, emoteType)}
               alt={word}
-            />{" "}
+            />{' '}
           </Box>
         </MessageTooltip>
       );
     },
-    [getEmoteImageUrl, getEmoteImageSrcSet],
+    [getEmoteImageUrl, getEmoteImageSrcSet]
   );
 
   const renderZeroWidthEmote = useCallback(
@@ -328,13 +328,13 @@ export default function Chat(props) {
             key={key}
             crossOrigin="anonymous"
             style={{
-              position: "absolute",
-              verticalAlign: "middle",
-              maxWidth: "100%",
-              border: "none",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
+              position: 'absolute',
+              verticalAlign: 'middle',
+              maxWidth: '100%',
+              border: 'none',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
             }}
             src={getEmoteImageUrl(emote, emoteType)}
             srcSet={getEmoteImageSrcSet(emote, emoteType)}
@@ -343,12 +343,12 @@ export default function Chat(props) {
         </span>
       );
     },
-    [getEmoteImageUrl, getEmoteImageSrcSet],
+    [getEmoteImageUrl, getEmoteImageSrcSet]
   );
 
   // Function to check if a message should be filtered out
   const shouldFilterMessage = useCallback((message) => {
-    const savedSettings = localStorage.getItem("chatSettings");
+    const savedSettings = localStorage.getItem('chatSettings');
     if (!savedSettings) return false;
 
     try {
@@ -359,16 +359,16 @@ export default function Chat(props) {
       // Create a regex pattern that matches entire words only (case sensitive)
       const wordsToMatch = filterWords.map((word) => {
         // Escape special regex characters
-        const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         return `\\b${escapedWord}\\b`;
       });
 
-      const pattern = new RegExp(wordsToMatch.join("|"), "g");
+      const pattern = new RegExp(wordsToMatch.join('|'), 'g');
 
       // Check if any filtered word appears in the message
       return pattern.test(message);
     } catch (e) {
-      console.error("Failed to parse filter words", e);
+      console.error('Failed to parse filter words', e);
       return false;
     }
   }, []);
@@ -383,17 +383,17 @@ export default function Chat(props) {
         if (fragment.emote || fragment.emoticon) {
           const emoteID = fragment.emote ? fragment.emote.emoteID : fragment.emoticon.emoticon_id;
           textFragments.push(
-            renderEmoteTooltip({ id: emoteID, code: fragment.text, provider: "Twitch" }, fragment.text, `${keyPrefix}-emote-${fragment.text}-${Math.random().toString(36).slice(2, 11)}`),
+            renderEmoteTooltip({ id: emoteID, code: fragment.text, provider: 'Twitch' }, fragment.text, `${keyPrefix}-emote-${fragment.text}-${Math.random().toString(36).slice(2, 11)}`)
           );
         } else {
-          const words = fragment.text.split(" ");
+          const words = fragment.text.split(' ');
           let lastNormalEmote = null;
           let lastNormalEmoteIndex = -1;
           for (let i = 0; i < words.length; i++) {
             const word = words[i];
             const emote = emoteLookup.get(word);
             if (emote) {
-              if (emote.provider === "7TV") {
+              if (emote.provider === '7TV') {
                 const isZeroWidth = SEVENTV_isZeroWidth(emote);
 
                 // If Zero Width Emote
@@ -404,7 +404,7 @@ export default function Chat(props) {
                   // Create a wrapper that contains both emotes - zero-width emote first, then normal emote
                   // This ensures the zero-width emote is positioned correctly relative to the normal emote
                   const emoteContainer = (
-                    <Box key={`${keyPrefix}-emote-container-${word}-${i}-${Math.random().toString(36).slice(2, 11)}`} sx={{ display: "inline", position: "relative", verticalAlign: "middle" }}>
+                    <Box key={`${keyPrefix}-emote-container-${word}-${i}-${Math.random().toString(36).slice(2, 11)}`} sx={{ display: 'inline', position: 'relative', verticalAlign: 'middle' }}>
                       {zeroWidthEmote}
                       {lastNormalEmote}
                     </Box>
@@ -430,18 +430,18 @@ export default function Chat(props) {
               lastNormalEmote = null;
               lastNormalEmoteIndex = -1;
               textFragments.push(
-                <Twemoji key={`${keyPrefix}-twemoji-${word}-${i}-${Math.random().toString(36).slice(2, 11)}`} noWrapper options={{ className: "twemoji" }}>
+                <Twemoji key={`${keyPrefix}-twemoji-${word}-${i}-${Math.random().toString(36).slice(2, 11)}`} noWrapper options={{ className: 'twemoji' }}>
                   <Typography variant="body1" display="inline">{`${word} `}</Typography>
-                </Twemoji>,
+                </Twemoji>
               );
             }
           }
         }
       }
 
-      return <Box sx={{ display: "inline" }}>{textFragments}</Box>;
+      return <Box sx={{ display: 'inline' }}>{textFragments}</Box>;
     },
-    [emoteLookup, renderEmoteTooltip, SEVENTV_isZeroWidth, renderZeroWidthEmote],
+    [emoteLookup, renderEmoteTooltip, SEVENTV_isZeroWidth, renderZeroWidthEmote]
   );
 
   const buildComments = useCallback(() => {
@@ -462,9 +462,9 @@ export default function Chat(props) {
 
     const fetchNextComments = () => {
       fetch(`${ARCHIVE_API_BASE}/v1/vods/${vodId}/comments?cursor=${cursor.current}`, {
-        method: "GET",
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       })
         .then((response) => response.json())
@@ -498,14 +498,14 @@ export default function Chat(props) {
             <MessageTooltip
               key={`${keyPrefix}-badge-${badgeId}-${version}`}
               title={
-                <Box sx={{ maxWidth: "30rem", textAlign: "center" }}>
+                <Box sx={{ maxWidth: '30rem', textAlign: 'center' }}>
                   <img
                     crossOrigin="anonymous"
                     style={{
-                      marginBottom: "0.3rem",
-                      border: "none",
-                      maxWidth: "100%",
-                      verticalAlign: "top",
+                      marginBottom: '0.3rem',
+                      border: 'none',
+                      maxWidth: '100%',
+                      verticalAlign: 'top',
                     }}
                     src={badgeVersion.image_url_4x}
                     alt=""
@@ -517,18 +517,18 @@ export default function Chat(props) {
               <img
                 crossOrigin="anonymous"
                 style={{
-                  display: "inline-block",
-                  minWidth: "1rem",
-                  height: "1rem",
-                  margin: "0 .2rem .1rem 0",
-                  backgroundPosition: "50%",
-                  verticalAlign: "middle",
+                  display: 'inline-block',
+                  minWidth: '1rem',
+                  height: '1rem',
+                  margin: '0 .2rem .1rem 0',
+                  backgroundPosition: '50%',
+                  verticalAlign: 'middle',
                 }}
                 srcSet={`${badgeVersion.image_url_1x} 1x, ${badgeVersion.image_url_2x} 2x, ${badgeVersion.image_url_4x} 4x`}
                 src={badgeVersion.image_url_1x}
                 alt=""
               />
-            </MessageTooltip>,
+            </MessageTooltip>
           );
           continue;
         }
@@ -545,14 +545,14 @@ export default function Chat(props) {
           <MessageTooltip
             key={`${keyPrefix}-badge-${badgeId}-${version}`}
             title={
-              <Box sx={{ maxWidth: "30rem", textAlign: "center" }}>
+              <Box sx={{ maxWidth: '30rem', textAlign: 'center' }}>
                 <img
                   crossOrigin="anonymous"
                   style={{
-                    marginBottom: "0.3rem",
-                    border: "none",
-                    maxWidth: "100%",
-                    verticalAlign: "top",
+                    marginBottom: '0.3rem',
+                    border: 'none',
+                    maxWidth: '100%',
+                    verticalAlign: 'top',
                   }}
                   src={badgeVersion.image_url_4x}
                   alt=""
@@ -564,22 +564,22 @@ export default function Chat(props) {
             <img
               crossOrigin="anonymous"
               style={{
-                display: "inline-block",
-                minWidth: "1rem",
-                height: "1rem",
-                margin: "0 .2rem .1rem 0",
-                backgroundPosition: "50%",
-                verticalAlign: "middle",
+                display: 'inline-block',
+                minWidth: '1rem',
+                height: '1rem',
+                margin: '0 .2rem .1rem 0',
+                backgroundPosition: '50%',
+                verticalAlign: 'middle',
               }}
               srcSet={`${badgeVersion.image_url_1x} 1x, ${badgeVersion.image_url_2x} 2x, ${badgeVersion.image_url_4x} 4x`}
               src={badgeVersion.image_url_1x}
               alt=""
             />
-          </MessageTooltip>,
+          </MessageTooltip>
         );
       }
 
-      return <Box sx={{ display: "inline" }}>{badgeWrapper}</Box>;
+      return <Box sx={{ display: 'inline' }}>{badgeWrapper}</Box>;
     };
 
     newMessages.current = [];
@@ -589,7 +589,7 @@ export default function Chat(props) {
       if (!comment.message) continue;
 
       // Check if message should be filtered out
-      const messageText = comment.message.map((fragment) => fragment.text).join(" ");
+      const messageText = comment.message.map((fragment) => fragment.text).join(' ');
 
       if (shouldFilterMessage(messageText)) {
         // Skip this message if it contains filtered words
@@ -597,21 +597,21 @@ export default function Chat(props) {
       }
 
       newMessages.current.push(
-        <Box key={comment.id} sx={{ width: "100%" }}>
+        <Box key={comment.id} sx={{ width: '100%' }}>
           <Box
             sx={{
-              alignItems: "flex-start",
-              display: "flex",
-              flexWrap: "nowrap",
-              width: "100%",
+              alignItems: 'flex-start',
+              display: 'flex',
+              flexWrap: 'nowrap',
+              width: '100%',
               pl: 0.5,
               pt: 0.5,
               pr: 0.5,
             }}
           >
-            <Box sx={{ display: "flex", alignItems: "flex-start" }}>
+            <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
               {showTimestamp && (
-                <Box sx={{ display: "inline", pl: 1, pr: 1 }}>
+                <Box sx={{ display: 'inline', pl: 1, pr: 1 }}>
                   <Typography variant="caption" color="textSecondary">
                     {toHHMMSS(comment.content_offset_seconds)}
                   </Typography>
@@ -619,17 +619,17 @@ export default function Chat(props) {
               )}
               <Box sx={{ flexGrow: 1 }}>
                 {comment.user_badges && transformBadges(comment.user_badges, `comment-${comment.id}`)}
-                <Box sx={{ textDecoration: "none", display: "inline" }}>
+                <Box sx={{ textDecoration: 'none', display: 'inline' }}>
                   <span style={{ color: comment.user_color, fontWeight: 600 }}>{comment.display_name}</span>
                 </Box>
-                <Box sx={{ display: "inline" }}>
+                <Box sx={{ display: 'inline' }}>
                   <span>: </span>
                   {transformMessage(comment.message, `comment-${comment.id}`)}
                 </Box>
               </Box>
             </Box>
           </Box>
-        </Box>,
+        </Box>
       );
     }
 
@@ -715,9 +715,9 @@ export default function Chat(props) {
 
     const fetchComments = (offset = 0) => {
       fetch(`${ARCHIVE_API_BASE}/v1/vods/${vodId}/comments?content_offset_seconds=${Math.floor(offset)}`, {
-        method: "GET",
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       })
         .then((response) => response.json())
@@ -738,7 +738,7 @@ export default function Chat(props) {
       stopLoop();
       // Clean up scroll event listener with proper ref handling
       if (currentChatRef) {
-        currentChatRef.removeEventListener("scroll", handleScroll);
+        currentChatRef.removeEventListener('scroll', handleScroll);
       }
     };
   }, [vodId, playerRef, playerState, getCurrentTime, handleScroll, loop, isPlaying]);
@@ -761,7 +761,7 @@ export default function Chat(props) {
       const chatContainer = chatRef.current;
       if (!chatContainer) return;
 
-      const images = chatContainer.querySelectorAll("img");
+      const images = chatContainer.querySelectorAll('img');
       if (images.length === 0) {
         scrollToBottomSmooth();
         return;
@@ -803,9 +803,9 @@ export default function Chat(props) {
   return (
     <Box
       sx={{
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
         minHeight: 0,
       }}
     >
@@ -813,13 +813,13 @@ export default function Chat(props) {
         <>
           <ChatHeader isPortrait={isPortrait} showChat={showChat} setShowChat={setShowChat} setShowModal={setShowModal} />
           <Divider />
-          <Box sx={{ height: "100%", width: isPortrait ? "unset" : `${chatWidth}px`, minHeight: 0 }}>
+          <Box sx={{ height: '100%', width: isPortrait ? 'unset' : `${chatWidth}px`, minHeight: 0 }}>
             <ChatMessages comments={comments.current} shownMessages={shownMessages} scrolling={scrolling} scrollToBottom={scrollToBottom} chatRef={chatRef} handleScroll={handleScroll} />
           </Box>
         </>
       )}
       {!isPortrait && !showChat && (
-        <Box sx={{ position: "absolute", right: 0, top: 0 }}>
+        <Box sx={{ position: 'absolute', right: 0, top: 0 }}>
           <Tooltip title="Expand">
             <ExpandMore expand={showChat} onClick={handleExpandClick} aria-expanded={showChat}>
               <ExpandMoreIcon />

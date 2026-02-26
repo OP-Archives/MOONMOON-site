@@ -1,39 +1,39 @@
-import { lazy, Suspense } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { createTheme, ThemeProvider, responsiveFontSizes } from "@mui/material/styles";
-import { CssBaseline, styled } from "@mui/material";
-import { blue } from "@mui/material/colors";
-import Loading from "./utils/Loading";
+import { lazy, Suspense } from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { createTheme, ThemeProvider, responsiveFontSizes } from '@mui/material/styles';
+import { CssBaseline, styled } from '@mui/material';
+import { blue } from '@mui/material/colors';
+import Loading from './utils/Loading';
 
 const channel = process.env.REACT_APP_CHANNEL;
 
-const Vods = lazy(() => import("./vods/Vods"));
-const Navbar = lazy(() => import("./navbar/navbar"));
-const YoutubeVod = lazy(() => import("./vods/YoutubeVod"));
-const Games = lazy(() => import("./vods/Games"));
-const CustomVod = lazy(() => import("./vods/CustomVod"));
-const NotFound = lazy(() => import("./utils/NotFound"));
+const Vods = lazy(() => import('./vods/Vods'));
+const Navbar = lazy(() => import('./navbar/navbar'));
+const YoutubeVod = lazy(() => import('./vods/YoutubeVod'));
+const Games = lazy(() => import('./vods/Games'));
+const CustomVod = lazy(() => import('./vods/CustomVod'));
+const NotFound = lazy(() => import('./utils/NotFound'));
 
 export default function App() {
   let darkTheme = createTheme({
     palette: {
-      mode: "dark",
+      mode: 'dark',
       background: {
-        default: "#0e0e10",
+        default: '#0e0e10',
       },
       primary: {
         main: blue[500],
       },
       secondary: {
-        main: "#292828",
+        main: '#292828',
       },
     },
     components: {
       MuiDrawer: {
         styleOverrides: {
           paper: {
-            color: "white",
-            backgroundImage: "none",
+            color: 'white',
+            backgroundImage: 'none',
           },
         },
       },

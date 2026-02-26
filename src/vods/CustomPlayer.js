@@ -1,9 +1,9 @@
-import { useRef, useEffect, useState } from "react";
-import canAutoPlay from "can-autoplay";
-import { Button, Box, Alert, Paper } from "@mui/material";
-import VideoJS from "./VideoJS";
-import "videojs-hotkeys";
-import { toSeconds, sleep } from "../utils/helpers";
+import { useRef, useEffect, useState } from 'react';
+import canAutoPlay from 'can-autoplay';
+import { Button, Box, Alert, Paper } from '@mui/material';
+import VideoJS from './VideoJS';
+import 'videojs-hotkeys';
+import { toSeconds, sleep } from '../utils/helpers';
 
 export default function Player(props) {
   const { playerRef, setCurrentTime, type, vod, timestamp, setDelay, setPlayerState } = props;
@@ -34,27 +34,27 @@ export default function Player(props) {
       if (!result) playerRef.current.muted(true);
     });
 
-    player.on("play", () => {
+    player.on('play', () => {
       setPlayerState(1);
       timeUpdate();
       loopTimeUpdate();
     });
 
-    player.on("pause", () => {
+    player.on('pause', () => {
       setPlayerState(2);
       clearTimeUpdate();
     });
 
-    player.on("end", () => {
+    player.on('end', () => {
       setPlayerState(0);
       clearTimeUpdate();
     });
 
-    player.on("waiting", () => {
+    player.on('waiting', () => {
       setPlayerState(3);
     });
 
-    player.on("playing", () => {
+    player.on('playing', () => {
       setPlayerState(1);
     });
   };
@@ -82,8 +82,8 @@ export default function Player(props) {
   const fileChange = (evt) => {
     setFileError(false);
     const file = evt.target.files[0];
-    if (file.type.split("/")[0] !== "video") {
-      return setFileError("It has to be a valid video file!");
+    if (file.type.split('/')[0] !== 'video') {
+      return setFileError('It has to be a valid video file!');
     }
 
     setSource({ src: URL.createObjectURL(file), type: file.type });
@@ -113,9 +113,9 @@ export default function Player(props) {
   }, [timestamp, playerRef, source]);
 
   return (
-    <Box sx={{ height: "100%", width: "100%" }}>
-      {type === "manual" && !source && (
-        <Paper sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%", flexDirection: "column" }}>
+    <Box sx={{ height: '100%', width: '100%' }}>
+      {type === 'manual' && !source && (
+        <Paper sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', flexDirection: 'column' }}>
           {fileError && <Alert severity="error">{fileError}</Alert>}
           <Box sx={{ mt: 1 }}>
             <Button variant="contained" component="label">
@@ -125,7 +125,7 @@ export default function Player(props) {
           </Box>
         </Paper>
       )}
-      <Box sx={{ visibility: !source ? "hidden" : "visible", height: "100%", width: "100%", outline: "none" }}>
+      <Box sx={{ visibility: !source ? 'hidden' : 'visible', height: '100%', width: '100%', outline: 'none' }}>
         <VideoJS options={videoJsOptions} onReady={onReady} />
       </Box>
     </Box>

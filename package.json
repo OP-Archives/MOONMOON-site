@@ -35,7 +35,9 @@
     "start": "react-app-rewired start",
     "build": "cross-env react-app-rewired build && rm -rf prod/ && mv build/ prod/",
     "test": "react-app-rewired test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix"
   },
   "eslintConfig": {
     "extends": [
@@ -61,9 +63,18 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@typescript-eslint/eslint-plugin": "^8.56.1",
+    "@typescript-eslint/parser": "^8.56.1",
     "babel-plugin-import": "^1.13.8",
     "cross-env": "^10.1.0",
     "customize-cra": "^1.0.0",
+    "eslint": "^10.0.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-config-react-app": "^7.0.1",
+    "eslint-plugin-prettier": "^5.5.5",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "prettier": "^3.8.1",
     "react-app-rewired": "^2.2.1"
   }
 }

@@ -5,7 +5,7 @@
  */
 export const getResumePosition = (vodId) => {
   try {
-    const savedPositions = localStorage.getItem("lastPlayed");
+    const savedPositions = localStorage.getItem('lastPlayed');
     if (savedPositions) {
       const positions = JSON.parse(savedPositions);
       if (positions[vodId] !== undefined) {
@@ -15,7 +15,7 @@ export const getResumePosition = (vodId) => {
 
     return null;
   } catch (error) {
-    console.error("Error reading resume position:", error);
+    console.error('Error reading resume position:', error);
     return null;
   }
 };
@@ -27,12 +27,12 @@ export const getResumePosition = (vodId) => {
  */
 export const saveResumePosition = (vodId, timestamp) => {
   try {
-    const savedPositions = localStorage.getItem("lastPlayed");
+    const savedPositions = localStorage.getItem('lastPlayed');
     const positions = savedPositions ? JSON.parse(savedPositions) : {};
     positions[vodId] = timestamp;
-    localStorage.setItem("lastPlayed", JSON.stringify(positions));
+    localStorage.setItem('lastPlayed', JSON.stringify(positions));
   } catch (error) {
-    console.error("Error saving resume position:", error);
+    console.error('Error saving resume position:', error);
   }
 };
 
@@ -42,13 +42,13 @@ export const saveResumePosition = (vodId, timestamp) => {
  */
 export const clearResumePosition = (vodId) => {
   try {
-    const savedPositions = localStorage.getItem("lastPlayed");
+    const savedPositions = localStorage.getItem('lastPlayed');
     if (!savedPositions) return;
 
     const positions = JSON.parse(savedPositions);
     delete positions[vodId];
-    localStorage.setItem("lastPlayed", JSON.stringify(positions));
+    localStorage.setItem('lastPlayed', JSON.stringify(positions));
   } catch (error) {
-    console.error("Error clearing resume position:", error);
+    console.error('Error clearing resume position:', error);
   }
 };

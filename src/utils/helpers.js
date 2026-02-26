@@ -1,4 +1,4 @@
-import { parse } from "tinyduration";
+import { parse } from 'tinyduration';
 
 /**
  * Parse Timestamp (1h2m3s) to seconds.
@@ -18,7 +18,7 @@ export const convertTimestamp = (timestamp) => {
  * seconds to HHMMSS
  */
 export const toSeconds = (hms) => {
-  var p = hms.split(":"),
+  var p = hms.split(':'),
     s = 0,
     m = 1;
 
@@ -52,9 +52,9 @@ export const toHHMMSS = (secs) => {
   var seconds = sec_num % 60;
 
   return [hours, minutes, seconds]
-    .map((v) => (v < 10 ? "0" + v : v))
-    .filter((v, i) => v !== "00" || i > 0)
-    .join(":");
+    .map((v) => (v < 10 ? '0' + v : v))
+    .filter((v, i) => v !== '00' || i > 0)
+    .join(':');
 };
 
 /**
@@ -73,6 +73,6 @@ export const sleep = (ms) => {
  * @returns {string} Image URL
  */
 export const getImage = (link, width = 40, height = 53) => {
-  if (!link) return "https://static-cdn.jtvnw.net/ttv-static/404_boxart.jpg";
-  return link.replace("{width}x{height}", `${width}x${height}`);
+  if (!link) return 'https://static-cdn.jtvnw.net/ttv-static/404_boxart.jpg';
+  return link.replace('{width}x{height}', `${width}x${height}`);
 };
