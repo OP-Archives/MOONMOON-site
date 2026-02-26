@@ -1,5 +1,10 @@
 import { useState } from 'react';
-import { Box, IconButton, Menu, MenuItem, Typography, Tooltip } from '@mui/material';
+import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Typography from '@mui/material/Typography';
+import Tooltip from '@mui/material/Tooltip';
 import CustomLink from '../utils/CustomLink';
 import humanize from 'humanize-duration';
 import { toHMS, toSeconds, getImage } from '../utils/helpers';

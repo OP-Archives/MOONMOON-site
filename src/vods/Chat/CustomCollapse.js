@@ -1,4 +1,4 @@
-import { Collapse } from '@mui/material';
+import Collapse from '@mui/material/Collapse';
 import { styled } from '@mui/material/styles';
 import { collapseClasses } from '@mui/material/Collapse';
 

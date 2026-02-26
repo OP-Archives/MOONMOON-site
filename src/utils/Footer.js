@@ -1,4 +1,6 @@
-import { styled, Typography, Box } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
 import CustomLink from './CustomLink';
 import GitInfo from 'react-git-info/macro';
 

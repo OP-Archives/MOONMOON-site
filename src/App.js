@@ -1,7 +1,8 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { createTheme, ThemeProvider, responsiveFontSizes } from '@mui/material/styles';
-import { CssBaseline, styled } from '@mui/material';
+import CssBaseline from '@mui/material/CssBaseline';
+import { styled } from '@mui/material/styles';
 import { blue } from '@mui/material/colors';
 import Loading from './utils/Loading';
 import ErrorBoundary from './utils/ErrorBoundary';

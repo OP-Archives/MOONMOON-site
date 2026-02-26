@@ -1,5 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Box, Typography, Tooltip, IconButton, Collapse, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Tooltip from '@mui/material/Tooltip';
+import IconButton from '@mui/material/IconButton';
+import Collapse from '@mui/material/Collapse';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 import Loading from '../utils/Loading';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Chapters from './VodChapters';

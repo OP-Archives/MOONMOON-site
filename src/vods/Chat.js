@@ -1,5 +1,8 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
-import { Box, Typography, Tooltip, Divider } from '@mui/material';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Tooltip from '@mui/material/Tooltip';
+import Divider from '@mui/material/Divider';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Twemoji from 'react-twemoji';
 import { toHHMMSS } from '../utils/helpers';

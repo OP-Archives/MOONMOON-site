@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { Box, useMediaQuery, Divider } from '@mui/material';
+import Box from '@mui/material/Box';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import Divider from '@mui/material/Divider';
 import Loading from '../utils/Loading';
 import { useLocation, useParams } from 'react-router-dom';
 import Chat from './Chat';

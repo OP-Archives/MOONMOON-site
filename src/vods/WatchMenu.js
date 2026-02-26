@@ -2,7 +2,10 @@ import { useState } from 'react';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import OpenInBrowserIcon from '@mui/icons-material/OpenInBrowser';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import { Box, Button, Typography, Menu } from '@mui/material';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import Menu from '@mui/material/Menu';
 
 export default function WatchMenu(props) {
   const { vod } = props;

@@ -1,6 +1,9 @@
 import { useRef, useEffect, useState } from 'react';
 import canAutoPlay from 'can-autoplay';
-import { Button, Box, Alert, Paper } from '@mui/material';
+import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import Alert from '@mui/material/Alert';
+import Paper from '@mui/material/Paper';
 import VideoJS from './VideoJS';
 import 'videojs-hotkeys';
 import { toSeconds, sleep } from '../utils/helpers';

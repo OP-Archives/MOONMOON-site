@@ -1,5 +1,7 @@
 import { useEffect, Component } from 'react';
-import { styled, Typography, Button } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
 import CustomLink from './CustomLink';
 import Logo from '../assets/logo.jpg';
 

@@ -1,4 +1,5 @@
-import { styled, IconButton } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import IconButton from '@mui/material/IconButton';
 
 const ExpandMore = styled(({ ...props }) => <IconButton {...props} />)`
   margin-left: auto;

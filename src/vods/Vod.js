@@ -1,4 +1,8 @@
-import { Box, Typography, Link, Grid } from '@mui/material';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Link from '@mui/material/Link';
+import Grid from '@mui/material/Grid';
+import { memo } from 'react';
 import CustomLink from '../utils/CustomLink';
 import sadge from '../assets/sadge.jpg';
 import Chapters from './ChaptersMenu';
@@ -8,8 +12,7 @@ import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat.js';
 dayjs.extend(localizedFormat);
 
-export default function Vod(props) {
-  const { vod } = props;
+export default memo(function Vod({ vod }) {
   const DEFAULT_VOD = vod.youtube.length > 0 ? `/youtube/${vod.id}` : vod.games.length > 0 ? `/games/${vod.id}` : `#`;
   const DEFAULT_THUMBNAIL =
     vod.youtube.length > 0 && vod.youtube[0]?.thumbnail_url
@@ -72,4 +75,4 @@ export default function Vod(props) {
       </Box>
     </Grid>
   );
-}
+});

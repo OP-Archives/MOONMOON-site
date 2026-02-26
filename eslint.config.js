@@ -18,6 +18,12 @@ module.exports = [
       'no-console': ['error', { allow: ['warn', 'error', 'info'] }],
       'no-case-declarations': 'off',
       'prettier/prettier': 'error',
+      "no-restricted-imports": [
+        "error",
+        {
+          "patterns": [{ "regex": "^@mui/[^/]+$" }]
+        }
+      ],
     },
     settings: {
       react: {

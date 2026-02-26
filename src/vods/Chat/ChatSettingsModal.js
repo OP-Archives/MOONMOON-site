@@ -1,6 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
 import debounce from 'lodash.debounce';
-import { Box, Modal, Typography, TextField, InputAdornment, FormGroup, FormControlLabel, Checkbox, Button, Slider } from '@mui/material';
+import Box from '@mui/material/Box';
+import Modal from '@mui/material/Modal';
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
+import Button from '@mui/material/Button';
+import Slider from '@mui/material/Slider';
 
 export default function ChatSettingsModal(props) {
   const { userChatDelay, setUserChatDelay, showModal, setShowModal, showTimestamp, setShowTimestamp, chatWidth, setChatWidth } = props;

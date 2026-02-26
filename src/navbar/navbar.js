@@ -1,4 +1,9 @@
-import { AppBar, Toolbar, Typography, useMediaQuery, Box, Divider } from '@mui/material';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
 import Logo from '../assets/logo.jpg';
 import CustomLink from '../utils/CustomLink';
 import TwitterIcon from '@mui/icons-material/Twitter';
