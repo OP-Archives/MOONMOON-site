@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Box, Tooltip, IconButton, Menu, MenuItem, Typography } from "@mui/material";
 import humanize from "humanize-duration";
-import { toSeconds } from "../utils/helpers";
+import { toSeconds, getImage } from "../utils/helpers";
 
 export default function Chapters(props) {
   const { chapters, chapter, setPart, youtube, setChapter, setTimestamp, isYoutubeVod } = props;
@@ -63,9 +63,3 @@ export default function Chapters(props) {
     </Box>
   );
 }
-
-//Support older vods that had {width}x{height} in the link
-const getImage = (link) => {
-  if (!link) return "https://static-cdn.jtvnw.net/ttv-static/404_boxart.jpg";
-  return link.replace("{width}x{height}", "40x53");
-};

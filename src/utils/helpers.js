@@ -1,15 +1,5 @@
 import { parse } from "tinyduration";
 
-//Parse seconds to 1h2m3s format
-export const toHMS = (secs) => {
-  let sec_num = parseInt(secs, 10);
-  let hours = Math.floor(sec_num / 3600);
-  let minutes = Math.floor(sec_num / 60) % 60;
-  let seconds = sec_num % 60;
-
-  return `${hours}h${minutes}m${seconds}s`;
-};
-
 /**
  * Parse Timestamp (1h2m3s) to seconds.
  */
@@ -25,7 +15,7 @@ export const convertTimestamp = (timestamp) => {
 };
 
 /**
- * HHMMSS/MMSS to seconds
+ * seconds to HHMMSS
  */
 export const toSeconds = (hms) => {
   var p = hms.split(":"),
@@ -38,6 +28,18 @@ export const toSeconds = (hms) => {
   }
 
   return s;
+};
+
+/**
+ * Parse seconds to 1h2m3s format
+ */
+export const toHMS = (secs) => {
+  let sec_num = parseInt(secs, 10);
+  let hours = Math.floor(sec_num / 3600);
+  let minutes = Math.floor(sec_num / 60) % 60;
+  let seconds = sec_num % 60;
+
+  return `${hours}h${minutes}m${seconds}s`;
 };
 
 /**
@@ -60,4 +62,17 @@ export const toHHMMSS = (secs) => {
  */
 export const sleep = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
+/**
+ * Get image URL with supported dimensions
+ * Handles older vod links that had {width}x{height} placeholder
+ * @param {string} link - Image URL
+ * @param {number} width - Desired width (default: 40)
+ * @param {number} height - Desired height (default: 53)
+ * @returns {string} Image URL
+ */
+export const getImage = (link, width = 40, height = 53) => {
+  if (!link) return "https://static-cdn.jtvnw.net/ttv-static/404_boxart.jpg";
+  return link.replace("{width}x{height}", `${width}x${height}`);
 };

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Box, IconButton, Menu, MenuItem, Typography, Tooltip } from "@mui/material";
 import CustomLink from "../utils/CustomLink";
 import humanize from "humanize-duration";
-import { toHMS, toSeconds } from "../utils/helpers";
+import { toHMS, toSeconds, getImage } from "../utils/helpers";
 
 export default function Chapters(props) {
   const { vod } = props;
@@ -46,9 +46,3 @@ export default function Chapters(props) {
     </Box>
   );
 }
-
-//Support older vods that had {width}x{height} in the link
-const getImage = (link) => {
-  if (!link) return "https://static-cdn.jtvnw.net/ttv-static/404_boxart.jpg";
-  return link.replace("{width}x{height}", "40x53");
-};
