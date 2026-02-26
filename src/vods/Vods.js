@@ -145,23 +145,19 @@ export default function Vods() {
     }
   };
 
-  const handleTitleChange = useMemo(
-    () =>
-      debounce((evt) => {
-        if (evt.target.value.length === 0) return;
-        setFilterTitle(evt.target.value);
-      }, 1000),
-    [setFilterTitle]
-  );
+  const handleTitleChange = useMemo(() => {
+    return debounce((evt) => {
+      if (evt.target.value.length === 0) return;
+      setFilterTitle(evt.target.value);
+    }, 1000);
+  }, []);
 
-  const handleGameChange = useMemo(
-    () =>
-      debounce((evt) => {
-        if (evt.target.value.length === 0) return;
-        setFilterGame(evt.target.value);
-      }, 1000),
-    [setFilterGame]
-  );
+  const handleGameChange = useMemo(() => {
+    return debounce((evt) => {
+      if (evt.target.value.length === 0) return;
+      setFilterGame(evt.target.value);
+    }, 1000);
+  }, []);
 
   const totalPages = Math.ceil(totalVods / limit);
 
@@ -245,9 +241,10 @@ export default function Vods() {
               renderItem={(item) => <PaginationItem component={Link} to={`${location.pathname}${item.page === 1 ? "" : `?page=${item.page}`}`} {...item} />}
             />
             <TextField
-              inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-              InputProps={{
-                startAdornment: <InputAdornment position="start">Page</InputAdornment>,
+              slotProps={{
+                input: {
+                  startAdornment: <InputAdornment position="start">Page</InputAdornment>,
+                },
               }}
               sx={{
                 width: "100px",
