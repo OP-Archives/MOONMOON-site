@@ -25,6 +25,8 @@ const BASE_7TV_EMOTE_API = 'https://7tv.io/v3';
 // Cache for badges
 let cachedBadges = new Map();
 
+const SCROLL_TOLERANCE = 350;
+
 export default function Chat(props) {
   const { isPortrait, vodId, playerRef, userChatDelay, delay, youtube, part, games, isYoutubeVod, playerState } = props;
 
@@ -658,6 +660,12 @@ export default function Chat(props) {
     if (loopRef.current !== null) clearInterval(loopRef.current);
     buildComments();
     loopRef.current = setInterval(buildComments, 1000);
+    return () => {
+      if (loopRef.current !== null) {
+        clearInterval(loopRef.current);
+        loopRef.current = null;
+      }
+    };
   }, [buildComments]);
 
   // Handle scroll events to detect when user scrolls up
@@ -666,8 +674,8 @@ export default function Chat(props) {
 
     const { scrollTop, scrollHeight, clientHeight } = chatRef.current;
 
-    // Check if user is at the bottom (within 350px tolerance)
-    const isAtBottom = Math.abs(scrollTop + clientHeight - scrollHeight) < 350;
+    // Check if user is at the bottom (within SCROLL_TOLERANCE tolerance)
+    const isAtBottom = Math.abs(scrollTop + clientHeight - scrollHeight) < SCROLL_TOLERANCE;
 
     // Update ref to track scroll position
     isAtBottomRef.current = isAtBottom;

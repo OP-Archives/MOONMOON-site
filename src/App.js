@@ -4,6 +4,7 @@ import { createTheme, ThemeProvider, responsiveFontSizes } from '@mui/material/s
 import { CssBaseline, styled } from '@mui/material';
 import { blue } from '@mui/material/colors';
 import Loading from './utils/Loading';
+import ErrorBoundary from './utils/ErrorBoundary';
 
 const channel = process.env.REACT_APP_CHANNEL;
 
@@ -48,34 +49,36 @@ export default function App() {
       <BrowserRouter>
         <Parent>
           <Suspense fallback={<Loading />}>
-            <Routes>
-              <Route path="*" element={<NotFound channel={channel} />} />
-              <Route
-                exact
-                path="/"
-                element={
-                  <>
-                    <Navbar channel={channel} />
-                    <Vods />
-                  </>
-                }
-              />
-              <Route
-                exact
-                path="/vods"
-                element={
-                  <>
-                    <Navbar channel={channel} />
-                    <Vods />
-                  </>
-                }
-              />
-              <Route exact path="/vods/:vodId" element={<YoutubeVod type="vod" />} />
-              <Route exact path="/live/:vodId" element={<YoutubeVod type="live" />} />
-              <Route exact path="/youtube/:vodId" element={<YoutubeVod />} />
-              <Route exact path="/games/:vodId" element={<Games />} />
-              <Route exact path="/manual/:vodId" element={<CustomVod type="manual" />} />
-            </Routes>
+            <ErrorBoundary channel={channel}>
+              <Routes>
+                <Route path="*" element={<NotFound channel={channel} />} />
+                <Route
+                  exact
+                  path="/"
+                  element={
+                    <>
+                      <Navbar channel={channel} />
+                      <Vods />
+                    </>
+                  }
+                />
+                <Route
+                  exact
+                  path="/vods"
+                  element={
+                    <>
+                      <Navbar channel={channel} />
+                      <Vods />
+                    </>
+                  }
+                />
+                <Route exact path="/vods/:vodId" element={<YoutubeVod type="vod" />} />
+                <Route exact path="/live/:vodId" element={<YoutubeVod type="live" />} />
+                <Route exact path="/youtube/:vodId" element={<YoutubeVod />} />
+                <Route exact path="/games/:vodId" element={<Games />} />
+                <Route exact path="/manual/:vodId" element={<CustomVod type="manual" />} />
+              </Routes>
+            </ErrorBoundary>
           </Suspense>
         </Parent>
       </BrowserRouter>

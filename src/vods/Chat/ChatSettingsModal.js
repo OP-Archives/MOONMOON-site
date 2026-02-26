@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import debounce from 'lodash.debounce';
 import { Box, Modal, Typography, TextField, InputAdornment, FormGroup, FormControlLabel, Checkbox, Button, Slider } from '@mui/material';
 
@@ -6,34 +6,37 @@ export default function ChatSettingsModal(props) {
   const { userChatDelay, setUserChatDelay, showModal, setShowModal, showTimestamp, setShowTimestamp, chatWidth, setChatWidth } = props;
   const [filterWords, setFilterWords] = useState([]);
 
-  const delayChange = useMemo(
-    () =>
-      debounce((evt) => {
-        if (evt.target.value.length === 0) return;
-        const value = Number(evt.target.value);
-        if (isNaN(value)) return;
-        setUserChatDelay(value);
-      }, 300),
-    [setUserChatDelay]
-  );
+  const delayChange = useRef(
+    debounce((evt) => {
+      if (evt.target.value.length === 0) return;
+      const value = Number(evt.target.value);
+      if (isNaN(value)) return;
+      setUserChatDelay(value);
+    }, 300)
+  ).current;
 
-  const debouncedSaveSetting = useMemo(
-    () =>
-      debounce((key, value) => {
-        const savedSettings = localStorage.getItem('chatSettings');
-        let settings = {};
-        if (savedSettings) {
-          try {
-            settings = JSON.parse(savedSettings);
-          } catch (e) {
-            console.error('Failed to parse chat settings from localStorage', e);
-          }
+  const debouncedSaveSetting = useRef(
+    debounce((key, value) => {
+      const savedSettings = localStorage.getItem('chatSettings');
+      let settings = {};
+      if (savedSettings) {
+        try {
+          settings = JSON.parse(savedSettings);
+        } catch (e) {
+          console.error('Failed to parse chat settings from localStorage', e);
         }
-        settings[key] = value;
-        localStorage.setItem('chatSettings', JSON.stringify(settings));
-      }, 500),
-    []
-  );
+      }
+      settings[key] = value;
+      localStorage.setItem('chatSettings', JSON.stringify(settings));
+    }, 500)
+  ).current;
+
+  useEffect(() => {
+    return () => {
+      delayChange.cancel();
+      debouncedSaveSetting.cancel();
+    };
+  }, [debouncedSaveSetting, delayChange]);
 
   const handleAddWord = () => {
     const input = document.getElementById('filter-word-input');

@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Box, Typography, Pagination, Grid, useMediaQuery, PaginationItem, TextField, InputAdornment, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import SimpleBar from 'simplebar-react';
 import Footer from '../utils/Footer';
@@ -133,25 +133,32 @@ export default function Vods() {
   };
 
   const handleSubmit = (e) => {
-    const value = e.target.value;
-    if (e.which === 13 && !isNaN(value) && value > 0) {
-      navigate(`${location.pathname}?page=${value}`);
+    const pageNum = parseInt(e.target.value, 10);
+    if (e.which === 13 && !isNaN(pageNum) && pageNum > 0) {
+      navigate(`${location.pathname}?page=${pageNum}`);
     }
   };
 
-  const handleTitleChange = useMemo(() => {
-    return debounce((evt) => {
+  const handleTitleChange = useRef(
+    debounce((evt) => {
       if (evt.target.value.length === 0) return;
       setFilterTitle(evt.target.value);
-    }, 1000);
-  }, []);
+    }, 500)
+  ).current;
 
-  const handleGameChange = useMemo(() => {
-    return debounce((evt) => {
+  const handleGameChange = useRef(
+    debounce((evt) => {
       if (evt.target.value.length === 0) return;
       setFilterGame(evt.target.value);
-    }, 1000);
-  }, []);
+    }, 500)
+  ).current;
+
+  useEffect(() => {
+    return () => {
+      handleTitleChange.cancel();
+      handleGameChange.cancel();
+    };
+  }, [handleGameChange, handleTitleChange]);
 
   const totalPages = Math.ceil(totalVods / limit);
 
@@ -162,8 +169,6 @@ export default function Vods() {
           <Typography variant="body1" color="error" sx={{ mt: 2, textAlign: 'center' }}>
             {error}
           </Typography>
-        ) : loading ? (
-          <Loading />
         ) : (
           <>
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, flexDirection: 'column', alignItems: 'center' }}>
@@ -220,6 +225,7 @@ export default function Vods() {
                 </Box>
               )}
             </Box>
+            {loading ? <Loading /> : <></>}
             {vods && vods.length > 0 && (
               <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }} sx={{ mt: 2, justifyContent: 'center' }}>
                 {vods.map((vod) => (
