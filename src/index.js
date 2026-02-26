@@ -2,7 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import './css/index.css';
 import 'simplebar-react/dist/simplebar.min.css';
-import EnvironmentError from './components/EnvironmentError';
+import EnvironmentError from './utils/EnvironmentError';
 
 const requiredEnvVars = ['REACT_APP_ARCHIVE_API_BASE', 'REACT_APP_TWITCH_ID', 'REACT_APP_CHANNEL', 'REACT_APP_DEFAULT_DELAY'];
 
