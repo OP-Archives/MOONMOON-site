@@ -760,7 +760,7 @@ export default function Chat(props) {
       const chatContainer = chatRef.current;
       if (!chatContainer) return;
 
-      const images = chatContainer.querySelectorAll('img');
+      const images = chatContainer.querySelectorAll("img");
       if (images.length === 0) {
         scrollToBottomSmooth();
         return;
