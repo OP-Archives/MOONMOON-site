@@ -749,14 +749,49 @@ export default function Chat(props) {
   const scrollToBottom = () => {
     if (!chatRef.current) return;
     setScrolling(false);
-    chatRef.current.scrollTop = chatRef.current.scrollHeight;
-    // Add a small delay to ensure all content is rendered
-    setTimeout(() => {
-      chatRef.current.scrollTop = chatRef.current.scrollHeight;
-    }, 100);
-    setTimeout(() => {
-      chatRef.current.scrollTop = chatRef.current.scrollHeight;
-    }, 300);
+
+    const scrollToBottomSmooth = () => {
+      if (chatRef.current) {
+        chatRef.current.scrollTop = chatRef.current.scrollHeight;
+      }
+    };
+
+    const waitForImages = () => {
+      const chatContainer = chatRef.current;
+      if (!chatContainer) return;
+
+      const images = chatContainer.querySelectorAll('img');
+      if (images.length === 0) {
+        scrollToBottomSmooth();
+        return;
+      }
+
+      let loadedCount = 0;
+      const totalImages = images.length;
+
+      const checkIfDone = () => {
+        loadedCount++;
+        if (loadedCount >= totalImages) {
+          scrollToBottomSmooth();
+        }
+      };
+
+      images.forEach((img) => {
+        if (img.complete) {
+          checkIfDone();
+        } else {
+          img.onload = checkIfDone;
+          img.onerror = checkIfDone;
+        }
+      });
+
+      // Fallback timeout in case images don't fire events
+      setTimeout(scrollToBottomSmooth, 500);
+    };
+
+    requestAnimationFrame(() => {
+      waitForImages();
+    });
   };
 
   const handleExpandClick = () => {
