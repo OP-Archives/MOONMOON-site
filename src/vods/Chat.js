@@ -1,12 +1,13 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from "react";
-import { Box, Typography, Tooltip, Divider, Collapse, styled, IconButton, Button, CircularProgress, tooltipClasses } from "@mui/material";
-import SimpleBar from "simplebar-react";
+import { Box, Typography, Tooltip, Divider } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { collapseClasses } from "@mui/material/Collapse";
 import Twemoji from "react-twemoji";
-import Settings from "./Settings";
 import { toHHMMSS } from "../utils/helpers";
-import SettingsIcon from "@mui/icons-material/Settings";
+import ChatHeader from "./Chat/ChatHeader";
+import ChatMessages from "./Chat/ChatMessages";
+import ChatSettingsModal from "./Chat/ChatSettingsModal";
+import ExpandMore from "./Chat/ExpandMore";
+import MessageTooltip from "./Chat/MessageTooltip";
 
 //ENV
 const twitchId = process.env.REACT_APP_TWITCH_ID,
@@ -808,109 +809,25 @@ export default function Chat(props) {
         minHeight: 0,
       }}
     >
-      {showChat ? (
+      {showChat && (
         <>
-          <Box sx={{ display: "grid", alignItems: "center", p: 1 }}>
-            {!isPortrait && (
-              <Box
-                sx={{
-                  justifySelf: "left",
-                  gridColumnStart: 1,
-                  gridRowStart: 1,
-                }}
-              >
-                <Tooltip title="Collapse">
-                  <ExpandMore expand={showChat} onClick={handleExpandClick} aria-expanded={showChat}>
-                    <ExpandMoreIcon />
-                  </ExpandMore>
-                </Tooltip>
-              </Box>
-            )}
-            <Box
-              sx={{
-                justifySelf: "center",
-                gridColumnStart: 1,
-                gridRowStart: 1,
-              }}
-            >
-              <Typography variant="body1">Chat Replay</Typography>
-            </Box>
-            <Box sx={{ justifySelf: "end", gridColumnStart: 1, gridRowStart: 1 }}>
-              <IconButton title="Settings" onClick={() => setShowModal(true)} color="primary">
-                <SettingsIcon />
-              </IconButton>
-            </Box>
-          </Box>
+          <ChatHeader isPortrait={isPortrait} showChat={showChat} setShowChat={setShowChat} setShowModal={setShowModal} />
           <Divider />
-          <CustomCollapse in={showChat} timeout="auto" unmountOnExit sx={{ width: isPortrait ? "unset" : `${chatWidth}px` }}>
-            {comments.current && comments.current.length === 0 ? (
-              <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%", width: "100%", flexDirection: "column" }}>
-                <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
-                  <CircularProgress sx={{ mt: 2 }} size="2rem" />
-                </Box>
-              </Box>
-            ) : (
-              <>
-                <SimpleBar scrollableNodeProps={{ ref: chatRef, onScroll: handleScroll }} style={{ height: "100%", overflowX: "hidden" }}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "flex-end",
-                      flexDirection: "column",
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        minHeight: 0,
-                        alignItems: "flex-end",
-                      }}
-                    >
-                      {shownMessages}
-                    </Box>
-                  </Box>
-                </SimpleBar>
-                {scrolling && (
-                  <Box
-                    sx={{
-                      position: "relative",
-                      display: "flex",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        background: "rgba(0,0,0,.6)",
-                        minHeight: 0,
-                        borderRadius: 1,
-                        mb: 1,
-                        bottom: 0,
-                        position: "absolute",
-                      }}
-                    >
-                      <Button size="small" onClick={scrollToBottom}>
-                        Chat Paused
-                      </Button>
-                    </Box>
-                  </Box>
-                )}
-              </>
-            )}
-          </CustomCollapse>
-        </>
-      ) : (
-        !isPortrait && (
-          <Box sx={{ position: "absolute", right: 0 }}>
-            <Tooltip title="Expand">
-              <ExpandMore expand={showChat} onClick={handleExpandClick} aria-expanded={showChat}>
-                <ExpandMoreIcon />
-              </ExpandMore>
-            </Tooltip>
+          <Box sx={{ height: "100%", width: isPortrait ? "unset" : `${chatWidth}px`, minHeight: 0 }}>
+            <ChatMessages comments={comments.current} shownMessages={shownMessages} scrolling={scrolling} scrollToBottom={scrollToBottom} chatRef={chatRef} handleScroll={handleScroll} />
           </Box>
-        )
+        </>
       )}
-      <Settings
+      {!isPortrait && !showChat && (
+        <Box sx={{ position: "absolute", right: 0, top: 0 }}>
+          <Tooltip title="Expand">
+            <ExpandMore expand={showChat} onClick={handleExpandClick} aria-expanded={showChat}>
+              <ExpandMoreIcon />
+            </ExpandMore>
+          </Tooltip>
+        </Box>
+      )}
+      <ChatSettingsModal
         userChatDelay={userChatDelay}
         setUserChatDelay={props.setUserChatDelay}
         showModal={showModal}
@@ -923,31 +840,3 @@ export default function Chat(props) {
     </Box>
   );
 }
-
-// === STYLED COMPONENTS ===
-const CustomCollapse = styled(({ _, ...props }) => <Collapse {...props} />)({
-  [`& .${collapseClasses.wrapper}`]: {
-    height: "100%",
-  },
-});
-
-const ExpandMore = styled(({ expand, ...props }, ref) => <IconButton {...props} />)`
-  margin-left: auto;
-  transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-
-  ${(props) =>
-    props.expand
-      ? `
-          transform: rotate(-90deg);
-        `
-      : `
-          transform: rotate(90deg);
-        `}
-`;
-
-const MessageTooltip = styled(({ className, ...props }) => <Tooltip {...props} PopperProps={{ disablePortal: true }} classes={{ popper: className }} />)(({ theme }) => ({
-  [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: "#fff",
-    color: "rgba(0, 0, 0, 0.87)",
-  },
-}));
