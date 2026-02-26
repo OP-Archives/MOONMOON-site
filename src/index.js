@@ -15,11 +15,7 @@ const root = createRoot(container);
 const App = React.lazy(() => import("./App"));
 
 if (missingVars.length === 0) {
-  root.render(
-    <React.Suspense fallback={<div style={{ height: "100vh", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>Loading...</div>}>
-      <App />
-    </React.Suspense>,
-  );
+  root.render(<App />);
 } else {
   root.render(<EnvironmentError missingVars={missingVars} />);
 }

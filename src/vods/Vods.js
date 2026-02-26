@@ -27,18 +27,26 @@ export default function Vods() {
   const [filterEndDate, setFilterEndDate] = useState(dayjs());
   const [filterTitle, setFilterTitle] = useState("");
   const [filterGame, setFilterGame] = useState("");
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const page = parseInt(query.get("page") || "1", 10);
   const limit = isMobile ? 10 : 20;
 
   useEffect(() => {
+    setError(null);
+    setLoading(true);
     setVods(null);
+
     const fetchVods = async () => {
-      switch (filter) {
-        case "Date":
-          if (filterStartDate > filterEndDate) break;
-          archiveClient
-            .service("vods")
-            .find({
+      try {
+        switch (filter) {
+          case "Date":
+            if (filterStartDate > filterEndDate) {
+              setError("End date must be after start date");
+              setLoading(false);
+              return;
+            }
+            const dateResponse = await archiveClient.service("vods").find({
               query: {
                 createdAt: {
                   $gte: filterStartDate.toISOString(),
@@ -50,20 +58,16 @@ export default function Vods() {
                   createdAt: -1,
                 },
               },
-            })
-            .then((response) => {
-              setVods(response.data);
-              setTotalVods(response.total);
-            })
-            .catch((e) => {
-              console.error(e);
             });
-          break;
-        case "Title":
-          if (filterTitle.length === 0) break;
-          archiveClient
-            .service("vods")
-            .find({
+            setVods(dateResponse.data);
+            setTotalVods(dateResponse.total);
+            break;
+          case "Title":
+            if (filterTitle.length === 0) {
+              setLoading(false);
+              return;
+            }
+            const titleResponse = await archiveClient.service("vods").find({
               query: {
                 title: {
                   $iLike: `%${filterTitle}%`,
@@ -74,20 +78,16 @@ export default function Vods() {
                   createdAt: -1,
                 },
               },
-            })
-            .then((response) => {
-              setVods(response.data);
-              setTotalVods(response.total);
-            })
-            .catch((e) => {
-              console.error(e);
             });
-          break;
-        case "Game":
-          if (filterGame.length === 0) break;
-          archiveClient
-            .service("vods")
-            .find({
+            setVods(titleResponse.data);
+            setTotalVods(titleResponse.total);
+            break;
+          case "Game":
+            if (filterGame.length === 0) {
+              setLoading(false);
+              return;
+            }
+            const gameResponse = await archiveClient.service("vods").find({
               query: {
                 chapters: {
                   name: filterGame,
@@ -98,19 +98,12 @@ export default function Vods() {
                   createdAt: -1,
                 },
               },
-            })
-            .then((response) => {
-              setVods(response.data);
-              setTotalVods(response.total);
-            })
-            .catch((e) => {
-              console.error(e);
             });
-          break;
-        default:
-          archiveClient
-            .service("vods")
-            .find({
+            setVods(gameResponse.data);
+            setTotalVods(gameResponse.total);
+            break;
+          default:
+            const defaultResponse = await archiveClient.service("vods").find({
               query: {
                 $limit: limit,
                 $skip: (page - 1) * limit,
@@ -118,14 +111,15 @@ export default function Vods() {
                   createdAt: -1,
                 },
               },
-            })
-            .then((response) => {
-              setVods(response.data);
-              setTotalVods(response.total);
-            })
-            .catch((e) => {
-              console.error(e);
             });
+            setVods(defaultResponse.data);
+            setTotalVods(defaultResponse.total);
+        }
+      } catch (e) {
+        console.error(e);
+        setError("Failed to load VODs. Please try again later.");
+      } finally {
+        setLoading(false);
       }
     };
     fetchVods();
@@ -163,97 +157,105 @@ export default function Vods() {
 
   return (
     <SimpleBar style={{ minHeight: 0, height: "100%" }}>
-      <Box sx={{ padding: 2 }}>
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 2, flexDirection: "column", alignItems: "center" }}>
-          {totalVods !== null && (
-            <Typography variant="h4" color="primary" sx={{ textTransform: "uppercase", fontWeight: "550" }}>
-              {`${totalVods} Vods`}
-            </Typography>
-          )}
-        </Box>
-        <Box sx={{ pl: !isMobile ? 12 : 1, pr: !isMobile ? 12 : 1, pt: 1, display: "flex", flexDirection: "row", alignItems: "center" }}>
-          <FormControl sx={{ display: "flex" }}>
-            <InputLabel id="select-label">Filter</InputLabel>
-            <Select labelId="select-label" label={filter} value={filter} onChange={changeFilter} autoWidth>
-              {FILTERS.map((data, i) => {
-                return (
-                  <MenuItem key={i} value={data}>
-                    {data}
-                  </MenuItem>
-                );
-              })}
-            </Select>
-          </FormControl>
-          {filter === "Date" && (
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <Box sx={{ ml: 1 }}>
-                <DatePicker
-                  minDate={dayjs(START_DATE)}
-                  maxDate={dayjs()}
-                  sx={{ mr: 1 }}
-                  label="Start Date"
-                  defaultValue={filterStartDate}
-                  onAccept={(newDate) => setFilterStartDate(newDate)}
-                  views={["year", "month", "day"]}
-                />
-                <DatePicker
-                  minDate={dayjs(START_DATE)}
-                  maxDate={dayjs()}
-                  label="End Date"
-                  defaultValue={filterEndDate}
-                  onAccept={(newDate) => setFilterEndDate(newDate)}
-                  views={["year", "month", "day"]}
-                />
-              </Box>
-            </LocalizationProvider>
-          )}
-          {filter === "Title" && (
-            <Box sx={{ ml: 1 }}>
-              <TextField fullWidth label="Search by Title" type="text" onChange={handleTitleChange} defaultValue={filterTitle} />
-            </Box>
-          )}
-          {filter === "Game" && (
-            <Box sx={{ ml: 1 }}>
-              <TextField fullWidth label="Search by Game" type="text" onChange={handleGameChange} defaultValue={filterGame} />
-            </Box>
-          )}
-        </Box>
-        {vods ? (
-          <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }} sx={{ mt: 2, justifyContent: "center" }}>
-            {vods.map((vod, _) => (
-              <Vod key={vod.id} vod={vod} isMobile={isMobile} />
-            ))}
-          </Grid>
-        ) : (
+      <Box sx={{ p: 2 }}>
+        {error ? (
+          <Typography variant="body1" color="error" sx={{ mt: 2, textAlign: "center" }}>
+            {error}
+          </Typography>
+        ) : loading ? (
           <Loading />
-        )}
-      </Box>
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 2, mb: 2, alignItems: "center", flexDirection: isMobile ? "column" : "row" }}>
-        {totalPages !== null && (
+        ) : (
           <>
-            <Pagination
-              shape="rounded"
-              variant="outlined"
-              count={totalPages}
-              disabled={totalPages <= 1}
-              color="primary"
-              page={page}
-              renderItem={(item) => <PaginationItem component={Link} to={`${location.pathname}${item.page === 1 ? "" : `?page=${item.page}`}`} {...item} />}
-            />
-            <TextField
-              slotProps={{
-                input: {
-                  startAdornment: <InputAdornment position="start">Page</InputAdornment>,
-                },
-              }}
-              sx={{
-                width: "100px",
-                m: 1,
-              }}
-              size="small"
-              type="text"
-              onKeyDown={handleSubmit}
-            />
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 2, flexDirection: "column", alignItems: "center" }}>
+              {totalVods !== null && (
+                <Typography variant="h4" color="primary" sx={{ textTransform: "uppercase", fontWeight: "550" }}>
+                  {`${totalVods} Vods`}
+                </Typography>
+              )}
+            </Box>
+            <Box sx={{ pl: !isMobile ? 12 : 1, pr: !isMobile ? 12 : 1, pt: 1, display: "flex", flexDirection: "row", alignItems: "center" }}>
+              <FormControl sx={{ display: "flex" }}>
+                <InputLabel id="select-label">Filter</InputLabel>
+                <Select labelId="select-label" label={filter} value={filter} onChange={changeFilter} autoWidth>
+                  {FILTERS.map((data, i) => {
+                    return (
+                      <MenuItem key={i} value={data}>
+                        {data}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
+              {filter === "Date" && (
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <Box sx={{ ml: 1 }}>
+                    <DatePicker
+                      minDate={dayjs(START_DATE)}
+                      maxDate={dayjs()}
+                      sx={{ mr: 1 }}
+                      label="Start Date"
+                      defaultValue={filterStartDate}
+                      onAccept={(newDate) => setFilterStartDate(newDate)}
+                      views={["year", "month", "day"]}
+                    />
+                    <DatePicker
+                      minDate={dayjs(START_DATE)}
+                      maxDate={dayjs()}
+                      label="End Date"
+                      defaultValue={filterEndDate}
+                      onAccept={(newDate) => setFilterEndDate(newDate)}
+                      views={["year", "month", "day"]}
+                    />
+                  </Box>
+                </LocalizationProvider>
+              )}
+              {filter === "Title" && (
+                <Box sx={{ ml: 1 }}>
+                  <TextField fullWidth label="Search by Title" type="text" onChange={handleTitleChange} defaultValue={filterTitle} />
+                </Box>
+              )}
+              {filter === "Game" && (
+                <Box sx={{ ml: 1 }}>
+                  <TextField fullWidth label="Search by Game" type="text" onChange={handleGameChange} defaultValue={filterGame} />
+                </Box>
+              )}
+            </Box>
+            {vods && vods.length > 0 && (
+              <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }} sx={{ mt: 2, justifyContent: "center" }}>
+                {vods.map((vod, _) => (
+                  <Vod key={vod.id} vod={vod} isMobile={isMobile} />
+                ))}
+              </Grid>
+            )}
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 2, mb: 2, alignItems: "center", flexDirection: isMobile ? "column" : "row" }}>
+              {totalPages !== null && (
+                <>
+                  <Pagination
+                    shape="rounded"
+                    variant="outlined"
+                    count={totalPages}
+                    disabled={totalPages <= 1}
+                    color="primary"
+                    page={page}
+                    renderItem={(item) => <PaginationItem component={Link} to={`${location.pathname}${item.page === 1 ? "" : `?page=${item.page}`}`} {...item} />}
+                  />
+                  <TextField
+                    slotProps={{
+                      input: {
+                        startAdornment: <InputAdornment position="start">Page</InputAdornment>,
+                      },
+                    }}
+                    sx={{
+                      width: "100px",
+                      m: 1,
+                    }}
+                    size="small"
+                    type="text"
+                    onKeyDown={handleSubmit}
+                  />
+                </>
+              )}
+            </Box>
           </>
         )}
       </Box>
