@@ -51,25 +51,26 @@ export default function YoutubeVod(props) {
     if (!youtube || !vodId) return;
 
     const search = new URLSearchParams(location.search);
-    let timestamp = search.get("t") !== null ? convertTimestamp(search.get("t")) : 0;
-    let tmpPart = search.get("part") !== null ? parseInt(search.get("part")) : 1;
+    const timestampParam = search.get("t");
+    let timestamp = timestampParam !== null ? convertTimestamp(timestampParam) : 0;
+    const partParam = search.get("part");
+    let tmpPart = partParam !== null ? parseInt(partParam) : 1;
     if (timestamp > 0) {
-      for (let data of youtube) {
+      for (const data of youtube) {
         if (data.duration > timestamp) {
-          tmpPart = data?.part || youtube.indexOf(data) + 1;
+          tmpPart = data.part ?? youtube.indexOf(data) + 1;
           break;
         }
         timestamp -= data.duration;
       }
     } else {
-      // Load saved position when component mounts if no timestamp provided.
       const savedPosition = getResumePosition(vodId);
       if (savedPosition !== null && savedPosition > 0) {
         console.info(`Resuming Playback from ${savedPosition}`);
         timestamp = savedPosition;
       }
     }
-    setPart({ part: tmpPart, timestamp: timestamp });
+    setPart({ part: tmpPart, timestamp });
     return;
   }, [location.search, vodId, youtube]);
 
@@ -77,14 +78,14 @@ export default function YoutubeVod(props) {
     if (!youtube || !vod) return;
     const vodDuration = toSeconds(vod.duration);
     let totalYoutubeDuration = 0;
-    for (let data of youtube) {
+    for (const data of youtube) {
       if (!data.duration) {
-        totalYoutubeDuration += process.env.REACT_APP_DEFAULT_DELAY;
+        totalYoutubeDuration += process.env.REACT_APP_DEFAULT_DELAY ?? 0;
         continue;
       }
       totalYoutubeDuration += data.duration;
     }
-    const tmpDelay = vodDuration - totalYoutubeDuration < 0 ? 0 : vodDuration - totalYoutubeDuration;
+    const tmpDelay = Math.max(0, vodDuration - totalYoutubeDuration);
     setDelay(tmpDelay);
     return;
   }, [youtube, vod]);
@@ -100,9 +101,10 @@ export default function YoutubeVod(props) {
         clearResumePosition(vodId);
         break;
       case 2:
-        // Save Resume Position when video has paused.
-        const currentTime = playerRef.current.getCurrentTime();
-        if (currentTime !== null && currentTime > 0) saveResumePosition(vodId, currentTime);
+        const currentTime = playerRef.current?.getCurrentTime();
+        if (currentTime !== null && currentTime > 0) {
+          saveResumePosition(vodId, currentTime);
+        }
         break;
       default:
         break;
@@ -120,7 +122,7 @@ export default function YoutubeVod(props) {
     console.info(`Chat Delay: ${userChatDelay + delay} seconds`);
   }, [userChatDelay, delay]);
 
-  if (vod === undefined || part === undefined || delay === undefined) return <Loading />;
+  if (vod === undefined || part === undefined || delay === undefined || youtube === undefined) return <Loading />;
 
   if (youtube.length === 0) return <NotFound channel={channel} />;
 
@@ -128,17 +130,7 @@ export default function YoutubeVod(props) {
     <Box sx={{ height: "100%", width: "100%" }}>
       <Box sx={{ display: "flex", flexDirection: isPortrait ? "column" : "row", height: "100%", width: "100%" }}>
         <Box sx={{ display: "flex", height: isPortrait ? "auto" : "100%", width: "100%" }}>
-          <BaseVod
-            {...props}
-            handlePartChange={handlePartChange}
-            youtube={youtube}
-            isYoutubeVod={true}
-            playerRef={playerRef}
-            part={part}
-            setPart={setPart}
-            vod={vod}
-            setPlayerState={setPlayerState}
-          />
+          <BaseVod {...props} handlePartChange={handlePartChange} youtube={youtube} isYoutubeVod={true} playerRef={playerRef} part={part} setPart={setPart} vod={vod} setPlayerState={setPlayerState} />
         </Box>
         {isPortrait && <Divider />}
         <Chat

@@ -5,14 +5,14 @@ import { CssBaseline, styled } from "@mui/material";
 import { blue } from "@mui/material/colors";
 import Loading from "./utils/Loading";
 
+const channel = process.env.REACT_APP_CHANNEL;
+
 const Vods = lazy(() => import("./vods/Vods"));
 const Navbar = lazy(() => import("./navbar/navbar"));
 const YoutubeVod = lazy(() => import("./vods/YoutubeVod"));
 const Games = lazy(() => import("./vods/Games"));
 const CustomVod = lazy(() => import("./vods/CustomVod"));
 const NotFound = lazy(() => import("./utils/NotFound"));
-
-const channel = process.env.REACT_APP_CHANNEL;
 
 export default function App() {
   let darkTheme = createTheme({

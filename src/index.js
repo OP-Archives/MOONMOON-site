@@ -1,13 +1,28 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import "./css/index.css";
-import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import "simplebar-react/dist/simplebar.min.css";
+import EnvironmentError from "./components/EnvironmentError";
+
+const requiredEnvVars = ["REACT_APP_ARCHIVE_API_BASE", "REACT_APP_TWITCH_ID", "REACT_APP_CHANNEL", "REACT_APP_DEFAULT_DELAY"];
+
+const missingVars = requiredEnvVars.filter((varName) => !process.env[varName]);
 
 const container = document.getElementById("root");
 const root = createRoot(container);
-root.render(<App />);
+
+const App = React.lazy(() => import("./App"));
+
+if (missingVars.length === 0) {
+  root.render(
+    <React.Suspense fallback={<div style={{ height: "100vh", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>Loading...</div>}>
+      <App />
+    </React.Suspense>,
+  );
+} else {
+  root.render(<EnvironmentError missingVars={missingVars} />);
+}
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
