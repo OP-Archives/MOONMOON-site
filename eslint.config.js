@@ -15,7 +15,7 @@ module.exports = [
       'react/prop-types': 'off',
       'react/react-in-jsx-scope': 'off',
       'no-unused-vars': 'warn',
-      'no-console': ["error", { allow: ["warn", "error", "info"] }],
+      'no-console': ['error', { allow: ['warn', 'error', 'info'] }],
       'no-case-declarations': 'off',
       'prettier/prettier': 'error',
     },
