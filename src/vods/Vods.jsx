@@ -22,7 +22,7 @@ import dayjs from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import archiveClient from './client';
-import { useDebouncedSetter } from '../utils/useDebouncedCallback';
+import { useDebouncedSetter } from '../utils/debounceHelper';
 
 const FILTERS = ['Default', 'Date', 'Title', 'Game'];
 const START_DATE = import.meta.env.VITE_START_DATE;
@@ -127,8 +127,7 @@ export default function Vods() {
             setVods(defaultResponse.data);
             setTotalVods(defaultResponse.total);
         }
-      } catch (e) {
-        console.error(e);
+      } catch {
         setError('Failed to load VODs. Please try again later.');
       } finally {
         setLoading(false);
@@ -211,12 +210,12 @@ export default function Vods() {
               )}
               {filter === 'Title' && (
                 <Box sx={{ ml: 1 }}>
-                  <TextField fullWidth label="Search by Title" type="text" onChange={handleTitleChange} defaultValue={filterTitle} />
+                  <TextField fullWidth label="Search by Title" type="text" onChange={(e) => handleTitleChange(e.target.value)} defaultValue={filterTitle} />
                 </Box>
               )}
               {filter === 'Game' && (
                 <Box sx={{ ml: 1 }}>
-                  <TextField fullWidth label="Search by Game" type="text" onChange={handleGameChange} defaultValue={filterGame} />
+                  <TextField fullWidth label="Search by Game" type="text" onChange={(e) => handleGameChange(e.target.value)} defaultValue={filterGame} />
                 </Box>
               )}
             </Box>

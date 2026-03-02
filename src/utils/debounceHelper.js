@@ -1,4 +1,4 @@
-import { useCallback, useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import debounce from 'lodash.debounce';
 
 export const useDebouncedCallback = (callback, delay) => {
@@ -8,12 +8,17 @@ export const useDebouncedCallback = (callback, delay) => {
     callbackRef.current = callback;
   }, [callback]);
 
-  return useCallback(
+  const debouncedFn = useRef(
     debounce((...args) => {
       callbackRef.current(...args);
-    }, delay),
-    [delay]
+    }, delay)
   );
+
+  useEffect(() => {
+    return () => debouncedFn.current.cancel();
+  }, []);
+
+  return debouncedFn.current;
 };
 
 export const useDebouncedSetter = (setter, delay) => {
@@ -23,12 +28,17 @@ export const useDebouncedSetter = (setter, delay) => {
     setterRef.current = setter;
   }, [setter]);
 
-  return useCallback(
+  const debouncedFn = useRef(
     debounce((value) => {
       if (value !== undefined && value !== '' && value !== null) {
         setterRef.current(value);
       }
-    }, delay),
-    [delay]
+    }, delay)
   );
+
+  useEffect(() => {
+    return () => debouncedFn.current.cancel();
+  }, []);
+
+  return debouncedFn.current;
 };

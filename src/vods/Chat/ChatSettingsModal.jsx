@@ -10,7 +10,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
 import Slider from '@mui/material/Slider';
-import { useDebouncedCallback } from '../../utils/useDebouncedCallback';
+import { useDebouncedCallback } from '../../utils/debounceHelper';
 
 export default function ChatSettingsModal(props) {
   const { userChatDelay, setUserChatDelay, showModal, setShowModal, showTimestamp, setShowTimestamp, chatWidth, setChatWidth } = props;
@@ -75,9 +75,7 @@ export default function ChatSettingsModal(props) {
               fullWidth
               label="Chat Delay"
               size="small"
-              onChange={(evt) => {
-                debouncedDelayChange(evt.target.value);
-              }}
+              onChange={(evt) => debouncedDelayChange(evt.target.value)}
               defaultValue={userChatDelay}
               onFocus={(evt) => evt.target.select()}
             />
