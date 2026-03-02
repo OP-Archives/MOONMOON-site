@@ -12,16 +12,22 @@ import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat.js';
 dayjs.extend(localizedFormat);
 
+const getVodLink = (vod) => {
+  if (vod.youtube?.length > 0) return `/youtube/${vod.id}`;
+  if (vod.games?.length > 0) return `/games/${vod.id}`;
+  return '#';
+};
+
+const getThumbnail = (vod) => {
+  return vod.youtube?.[0]?.thumbnail_url || 
+         vod.games?.[0]?.thumbnail_url || 
+         vod.thumbnail_url || 
+         sadge;
+};
+
 export default memo(function Vod({ vod }) {
-  const DEFAULT_VOD = vod.youtube.length > 0 ? `/youtube/${vod.id}` : vod.games.length > 0 ? `/games/${vod.id}` : `#`;
-  const DEFAULT_THUMBNAIL =
-    vod.youtube.length > 0 && vod.youtube[0]?.thumbnail_url
-      ? vod.youtube[0].thumbnail_url
-      : vod.games.length > 0 && vod.games[0]?.thumbnail_url
-        ? vod.games[0].thumbnail_url
-        : vod.thumbnail_url
-          ? vod.thumbnail_url
-          : sadge;
+  const DEFAULT_VOD = getVodLink(vod);
+  const DEFAULT_THUMBNAIL = getThumbnail(vod);
 
   return (
     <Grid size="auto" sx={{ maxWidth: '20rem', flexBasis: '20rem' }}>
