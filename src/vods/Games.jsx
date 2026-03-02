@@ -9,7 +9,7 @@ import Chat from './Chat';
 import archiveClient from './client';
 import BaseVod from './BaseVod';
 
-const channel = process.env.REACT_APP_CHANNEL;
+const channel = import.meta.env.VITE_CHANNEL;
 
 export default function Games(props) {
   const location = useLocation();

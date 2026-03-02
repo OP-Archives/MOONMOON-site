@@ -24,7 +24,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import archiveClient from './client';
 
 const FILTERS = ['Default', 'Date', 'Title', 'Game'];
-const START_DATE = process.env.REACT_APP_START_DATE;
+const START_DATE = import.meta.env.VITE_START_DATE;
 
 export default function Vods() {
   const navigate = useNavigate();

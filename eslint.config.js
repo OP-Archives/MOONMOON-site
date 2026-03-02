@@ -18,11 +18,11 @@ module.exports = [
       'no-console': ['error', { allow: ['warn', 'error', 'info'] }],
       'no-case-declarations': 'off',
       'prettier/prettier': 'error',
-      "no-restricted-imports": [
-        "error",
+      'no-restricted-imports': [
+        'error',
         {
-          "patterns": [{ "regex": "^@mui/[^/]+$" }]
-        }
+          patterns: [{ regex: '^@mui/[^/]+$' }],
+        },
       ],
     },
     settings: {
@@ -56,6 +56,7 @@ module.exports = [
         URL: 'readonly',
         URLSearchParams: 'readonly',
         requestAnimationFrame: 'readonly',
+        __GIT_HASH__: 'readonly',
       },
     },
   },

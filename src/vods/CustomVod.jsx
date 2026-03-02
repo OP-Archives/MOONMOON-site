@@ -10,7 +10,7 @@ import archiveClient from './client';
 import BaseVod from './BaseVod';
 import { getResumePosition, saveResumePosition, clearResumePosition } from '../utils/positionStorage';
 
-const channel = process.env.REACT_APP_CHANNEL;
+const channel = import.meta.env.VITE_CHANNEL;
 
 export default function CustomVod(props) {
   const location = useLocation();

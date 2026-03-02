@@ -103,7 +103,7 @@ export default function YoutubePlayer(props) {
           playsinline: 1,
           rel: 0,
           modestbranding: 1,
-          origin: process.env.REACT_APP_DOMAIN,
+          origin: import.meta.env.VITE_DOMAIN,
         },
       }}
       onReady={onReady}

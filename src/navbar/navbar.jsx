@@ -96,7 +96,7 @@ export default function Navbar(props) {
           {!isMobile && (
             <Box sx={{ display: 'flex', justifyContent: 'end', flex: 1 }}>
               <Box sx={{ mr: 2 }}>
-                <CustomLink href={`${process.env.REACT_APP_GITHUB}/issues`} rel="noopener noreferrer" target="_blank">
+                <CustomLink href={`${import.meta.env.VITE_GITHUB}/issues`} rel="noopener noreferrer" target="_blank">
                   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                     <ReportIcon color="primary" sx={{ mr: 0.5 }} />
                     <Typography color="primary" variant="h6">

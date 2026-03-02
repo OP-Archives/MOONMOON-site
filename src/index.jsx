@@ -1,12 +1,12 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import './css/index.css';
+import './index.css';
 import 'simplebar-react/dist/simplebar.min.css';
 import EnvironmentError from './utils/EnvironmentError';
 
-const requiredEnvVars = ['REACT_APP_ARCHIVE_API_BASE', 'REACT_APP_TWITCH_ID', 'REACT_APP_CHANNEL', 'REACT_APP_DEFAULT_DELAY'];
+const requiredEnvVars = ['VITE_ARCHIVE_API_BASE', 'VITE_TWITCH_ID', 'VITE_CHANNEL', 'VITE_DEFAULT_DELAY'];
 
-const missingVars = requiredEnvVars.filter((varName) => !process.env[varName]);
+const missingVars = requiredEnvVars.filter((varName) => !import.meta.env[varName]);
 
 const container = document.getElementById('root');
 const root = createRoot(container);

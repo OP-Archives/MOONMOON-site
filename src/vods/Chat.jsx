@@ -13,8 +13,8 @@ import ExpandMore from './Chat/ExpandMore';
 import MessageTooltip from './Chat/MessageTooltip';
 
 //ENV
-const twitchId = process.env.REACT_APP_TWITCH_ID,
-  ARCHIVE_API_BASE = process.env.REACT_APP_ARCHIVE_API_BASE;
+const twitchId = import.meta.env.VITE_TWITCH_ID,
+  ARCHIVE_API_BASE = import.meta.env.VITE_ARCHIVE_API_BASE;
 
 // CDN URLs for emotes and badges
 const BASE_TWITCH_CDN = 'https://static-cdn.jtvnw.net';
@@ -832,7 +832,7 @@ export default function Chat(props) {
       {!isPortrait && !showChat && (
         <Box sx={{ position: 'absolute', right: 0, top: 0 }}>
           <Tooltip title="Expand">
-            <ExpandMore expand={showChat} onClick={handleExpandClick} aria-expanded={showChat}>
+            <ExpandMore expand={showChat.toString()} onClick={handleExpandClick} aria-expanded={showChat}>
               <ExpandMoreIcon />
             </ExpandMore>
           </Tooltip>

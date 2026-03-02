@@ -65,7 +65,7 @@ export default function BaseVod(props) {
       </Box>
       <Box sx={{ position: 'absolute', bottom: 0, left: '50%' }}>
         <Tooltip title={showMenu ? 'Collapse' : 'Expand'}>
-          <ExpandMore expand={showMenu} onClick={handleExpandClick} aria-expanded={showMenu} aria-label="show menu">
+          <ExpandMore expand={showMenu.toString()} onClick={handleExpandClick} aria-expanded={showMenu} aria-label="show menu">
             <ExpandMoreIcon />
           </ExpandMore>
         </Tooltip>

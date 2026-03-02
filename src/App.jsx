@@ -7,7 +7,7 @@ import { blue } from '@mui/material/colors';
 import Loading from './utils/Loading';
 import ErrorBoundary from './utils/ErrorBoundary';
 
-const channel = process.env.REACT_APP_CHANNEL;
+const channel = import.meta.env.VITE_CHANNEL;
 
 const Vods = lazy(() => import('./vods/Vods'));
 const Navbar = lazy(() => import('./navbar/navbar'));

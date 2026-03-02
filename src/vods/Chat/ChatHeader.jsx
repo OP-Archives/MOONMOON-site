@@ -24,7 +24,7 @@ export default function ChatHeader(props) {
           }}
         >
           <Tooltip title="Collapse">
-            <ExpandMore expand={showChat} onClick={handleExpandClick} aria-expanded={showChat}>
+            <ExpandMore expand={showChat.toString()} onClick={handleExpandClick} aria-expanded={showChat}>
               <ExpandMoreIcon />
             </ExpandMore>
           </Tooltip>
