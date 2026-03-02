@@ -20,6 +20,8 @@ export const getResumePosition = (vodId) => {
   }
 };
 
+const MAX_POSITIONS = 100;
+
 /**
  * Save the resume position for a VOD
  * @param {string} vodId - The VOD ID
@@ -27,9 +29,18 @@ export const getResumePosition = (vodId) => {
  */
 export const saveResumePosition = (vodId, timestamp) => {
   try {
-    const savedPositions = localStorage.getItem('lastPlayed');
-    const positions = savedPositions ? JSON.parse(savedPositions) : {};
+    let positions = JSON.parse(localStorage.getItem('lastPlayed') || '{}');
+    
     positions[vodId] = timestamp;
+    
+    if (Object.keys(positions).length > MAX_POSITIONS) {
+      const sortedEntries = Object.entries(positions)
+        .sort((a, b) => a[1] - b[1])
+        .slice(0, Object.keys(positions).length - MAX_POSITIONS);
+      
+      sortedEntries.forEach(([key]) => delete positions[key]);
+    }
+    
     localStorage.setItem('lastPlayed', JSON.stringify(positions));
   } catch (error) {
     console.error('Error saving resume position:', error);
