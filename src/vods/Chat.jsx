@@ -40,6 +40,7 @@ const BASE_7TV_EMOTE_API = 'https://7tv.io/v3';
 // Cache for badges
 let cachedBadges = new Map();
 
+// Pixels of tolerance before considering user scrolled up from bottom
 const SCROLL_TOLERANCE = 350;
 
 const sanitizeEmoteData = (emote) => {

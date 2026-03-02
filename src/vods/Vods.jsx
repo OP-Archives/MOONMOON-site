@@ -151,6 +151,7 @@ export default function Vods() {
     }
   };
 
+  // Debounce filter searches to reduce API calls while typing
   const handleTitleChange = useDebouncedSetter(setFilterTitle, 500);
   const handleGameChange = useDebouncedSetter(setFilterGame, 500);
 

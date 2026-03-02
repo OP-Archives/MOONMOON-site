@@ -16,6 +16,7 @@ export default function ChatSettingsModal(props) {
   const { userChatDelay, setUserChatDelay, showModal, setShowModal, showTimestamp, setShowTimestamp, chatWidth, setChatWidth } = props;
   const [filterWords, setFilterWords] = useState([]);
 
+  // Debounce delay for chat delay input to prevent excessive state updates while typing
   const debouncedDelayChange = useDebouncedCallback((value) => {
     if (!isNaN(Number(value))) {
       setUserChatDelay(Number(value));
@@ -36,6 +37,7 @@ export default function ChatSettingsModal(props) {
     safeLocalStorage.setItem('chatSettings', JSON.stringify(settings));
   };
 
+  // Debounce save to avoid excessive localStorage writes
   const debouncedSaveSetting = useDebouncedCallback(saveSetting, 500);
 
   const handleAddWord = () => {
