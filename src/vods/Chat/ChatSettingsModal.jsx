@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
+import { safeLocalStorage } from '../../utils/safeLocalStorage';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
@@ -9,42 +10,20 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Button from '@mui/material/Button';
 import Slider from '@mui/material/Slider';
-import { useDebouncedCallback, useDebouncedSetter } from '../../utils/useDebouncedCallback';
+import { useDebouncedCallback } from '../../utils/useDebouncedCallback';
 
 export default function ChatSettingsModal(props) {
   const { userChatDelay, setUserChatDelay, showModal, setShowModal, showTimestamp, setShowTimestamp, chatWidth, setChatWidth } = props;
   const [filterWords, setFilterWords] = useState([]);
 
-  const createDebouncedSetter = (setter, delay) => {
-    let timeoutId = null;
-    return (value) => {
-      if (timeoutId) clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        if (value !== undefined && value !== '' && value !== null) {
-          setter(value);
-        }
-      }, delay);
-    };
-  };
-
-  const createDebouncedAction = (action, delay) => {
-    let timeoutId = null;
-    return (...args) => {
-      if (timeoutId) clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        action(...args);
-      }, delay);
-    };
-  };
-
-  const handleDelayChange = useDebouncedCallback((value) => {
+  const debouncedDelayChange = useDebouncedCallback((value) => {
     if (!isNaN(Number(value))) {
       setUserChatDelay(Number(value));
     }
   }, 300);
 
   const saveSetting = (key, value) => {
-    const savedSettings = localStorage.getItem('chatSettings');
+    const savedSettings = safeLocalStorage.getItem('chatSettings');
     let settings = {};
     if (savedSettings) {
       try {
@@ -54,7 +33,7 @@ export default function ChatSettingsModal(props) {
       }
     }
     settings[key] = value;
-    localStorage.setItem('chatSettings', JSON.stringify(settings));
+    safeLocalStorage.setItem('chatSettings', JSON.stringify(settings));
   };
 
   const debouncedSaveSetting = useDebouncedCallback(saveSetting, 500);
@@ -94,7 +73,9 @@ export default function ChatSettingsModal(props) {
               fullWidth
               label="Chat Delay"
               size="small"
-              onChange={(evt) => debouncedDelayChange(evt.target.value)}
+              onChange={(evt) => {
+                debouncedDelayChange(evt.target.value);
+              }}
               defaultValue={userChatDelay}
               onFocus={(evt) => evt.target.select()}
             />

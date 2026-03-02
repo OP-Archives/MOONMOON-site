@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import { safeLocalStorage } from '../utils/safeLocalStorage';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
@@ -11,6 +12,17 @@ import ChatMessages from './Chat/ChatMessages';
 import ChatSettingsModal from './Chat/ChatSettingsModal';
 import ExpandMore from './Chat/ExpandMore';
 import MessageTooltip from './Chat/MessageTooltip';
+
+const AbortController =
+  window.AbortController ||
+  class AbortController {
+    constructor() {
+      this.signal = { aborted: false };
+    }
+    abort() {
+      this.signal.aborted = true;
+    }
+  };
 
 //ENV
 const twitchId = import.meta.env.VITE_TWITCH_ID,
@@ -36,7 +48,7 @@ const sanitizeEmoteData = (emote) => {
 };
 
 export default function Chat(props) {
-  const { isPortrait, vodId, playerRef, userChatDelay, delay, youtube, part, games, isYoutubeVod, playerState } = props;
+  const { isPortrait, vodId, playerRef, userChatDelay, delay, youtube, part, games, isYoutubeVod, playerState, setUserChatDelay } = props;
 
   // State management
   const [showChat, setShowChat] = useState(true);
@@ -50,29 +62,26 @@ export default function Chat(props) {
   // Set responsive default width based on screen size, but only if not already set by user
   useEffect(() => {
     const updateChatWidth = () => {
-      if (typeof window !== 'undefined') {
-        const savedSettings = localStorage.getItem('chatSettings');
+      if (typeof window === 'undefined') return;
 
-        if (savedSettings) {
-          // Set User defined width
-          try {
-            const settings = JSON.parse(savedSettings);
-            if (settings.chatWidth !== undefined) {
-              setChatWidth(settings.chatWidth);
-              return;
-            }
-          } catch (e) {
-            console.error('Failed to parse chat settings from localStorage', e);
+      const savedSettings = safeLocalStorage.getItem('chatSettings');
+
+      if (savedSettings) {
+        try {
+          const settings = JSON.parse(savedSettings);
+          if (settings.chatWidth !== undefined) {
+            setChatWidth(settings.chatWidth);
+            return;
           }
+        } catch (e) {
+          console.error('Failed to parse chat settings from localStorage', e);
         }
-
-        // Only set default width if it hasn't been set by user already
-        const screenWidth = window.innerWidth;
-        setChatWidth(screenWidth <= 600 ? 250 : screenWidth <= 900 ? 300 : 340);
       }
+
+      const screenWidth = window.innerWidth;
+      setChatWidth(screenWidth <= 600 ? 250 : screenWidth <= 900 ? 300 : 340);
     };
 
-    // Set initial width
     updateChatWidth();
   }, []);
   const isAtBottomRef = useRef(true);
@@ -374,7 +383,7 @@ export default function Chat(props) {
 
   // Function to check if a message should be filtered out
   const shouldFilterMessage = useCallback((message) => {
-    const savedSettings = localStorage.getItem('chatSettings');
+    const savedSettings = safeLocalStorage.getItem('chatSettings');
     if (!savedSettings) return false;
 
     try {
@@ -876,7 +885,7 @@ export default function Chat(props) {
       )}
       <ChatSettingsModal
         userChatDelay={userChatDelay}
-        setUserChatDelay={props.setUserChatDelay}
+        setUserChatDelay={setUserChatDelay}
         showModal={showModal}
         setShowModal={setShowModal}
         showTimestamp={showTimestamp}

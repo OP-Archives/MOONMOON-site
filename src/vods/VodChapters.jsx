@@ -21,8 +21,8 @@ export default memo(function Chapters({ chapters, chapter, setPart, youtube, set
 
   const handleChapterClick = (data) => {
     if (isYoutubeVod && youtube) {
-      let part = 1,
-        timestamp = data?.start || toSeconds(data.duration);
+      let part = 1;
+      let timestamp = data?.start || toSeconds(data.duration);
       if (timestamp > 1) {
         for (let data of youtube) {
           if (data.duration > timestamp) {

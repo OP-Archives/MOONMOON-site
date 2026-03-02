@@ -33,9 +33,7 @@ export default function BaseVod(props) {
   useEffect(() => {
     if (!playerRef.current || !vod?.chapters?.length || currentTime === undefined) return;
 
-    const currentChapter = vod.chapters.find(chapter => 
-      currentTime >= chapter.start && currentTime < (chapter.start + chapter.end)
-    );
+    const currentChapter = vod.chapters.find((chapter) => currentTime >= chapter.start && currentTime < chapter.start + chapter.end);
 
     if (currentChapter) {
       setChapter(currentChapter);

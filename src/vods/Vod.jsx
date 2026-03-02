@@ -19,10 +19,7 @@ const getVodLink = (vod) => {
 };
 
 const getThumbnail = (vod) => {
-  return vod.youtube?.[0]?.thumbnail_url || 
-         vod.games?.[0]?.thumbnail_url || 
-         vod.thumbnail_url || 
-         sadge;
+  return vod.youtube?.[0]?.thumbnail_url || vod.games?.[0]?.thumbnail_url || vod.thumbnail_url || sadge;
 };
 
 export default memo(function Vod({ vod }) {

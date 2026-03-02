@@ -1,29 +1,34 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useEffect } from 'react';
+import debounce from 'lodash.debounce';
 
 export const useDebouncedCallback = (callback, delay) => {
-  const timeoutIdRef = useRef(null);
+  const callbackRef = useRef(callback);
 
-  return useCallback((...args) => {
-    if (timeoutIdRef.current) {
-      clearTimeout(timeoutIdRef.current);
-    }
-    timeoutIdRef.current = setTimeout(() => {
-      callback(...args);
-    }, delay);
-  }, [callback, delay]);
+  useEffect(() => {
+    callbackRef.current = callback;
+  }, [callback]);
+
+  return useCallback(
+    debounce((...args) => {
+      callbackRef.current(...args);
+    }, delay),
+    [delay]
+  );
 };
 
 export const useDebouncedSetter = (setter, delay) => {
-  const timeoutIdRef = useRef(null);
+  const setterRef = useRef(setter);
 
-  return useCallback((value) => {
-    if (timeoutIdRef.current) {
-      clearTimeout(timeoutIdRef.current);
-    }
-    timeoutIdRef.current = setTimeout(() => {
+  useEffect(() => {
+    setterRef.current = setter;
+  }, [setter]);
+
+  return useCallback(
+    debounce((value) => {
       if (value !== undefined && value !== '' && value !== null) {
-        setter(value);
+        setterRef.current(value);
       }
-    }, delay);
-  }, [setter, delay]);
+    }, delay),
+    [delay]
+  );
 };
