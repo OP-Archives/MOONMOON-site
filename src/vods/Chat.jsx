@@ -81,6 +81,7 @@ export default function Chat(props) {
   const chatRef = useRef();
   const stoppedAtIndex = useRef(0);
   const newMessages = useRef();
+  const fetchControllerRef = useRef(null);
 
   // === EFFECT HOOKS ===
   useEffect(() => {
@@ -725,19 +726,30 @@ export default function Chat(props) {
     };
 
     const fetchComments = (offset = 0) => {
+      if (fetchControllerRef.current) {
+        fetchControllerRef.current.abort();
+      }
+
+      fetchControllerRef.current = new AbortController();
+
       fetch(`${ARCHIVE_API_BASE}/v1/vods/${vodId}/comments?content_offset_seconds=${Math.floor(offset)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
+        signal: fetchControllerRef.current.signal,
       })
         .then((response) => response.json())
         .then((response) => {
-          comments.current = response.comments;
-          cursor.current = response.cursor;
+          if (fetchControllerRef.current && !fetchControllerRef.current.signal.aborted) {
+            comments.current = response.comments;
+            cursor.current = response.cursor;
+          }
         })
         .catch((e) => {
-          console.error(e);
+          if (e.name !== 'AbortError') {
+            console.error(e);
+          }
         });
     };
 
@@ -747,6 +759,10 @@ export default function Chat(props) {
 
     return () => {
       stopLoop();
+      if (fetchControllerRef.current) {
+        fetchControllerRef.current.abort();
+        fetchControllerRef.current = null;
+      }
       // Clean up scroll event listener with proper ref handling
       if (currentChatRef) {
         currentChatRef.removeEventListener('scroll', handleScroll);
