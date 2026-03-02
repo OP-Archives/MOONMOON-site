@@ -31,15 +31,16 @@ export default function BaseVod(props) {
   }, [vod]);
 
   useEffect(() => {
-    if (!playerRef.current || !vod || !vod.chapters) return;
-    for (let chapter of vod.chapters) {
-      if (currentTime > chapter.start && currentTime < chapter.start + chapter.end) {
-        setChapter(chapter);
-        break;
-      }
+    if (!playerRef.current || !vod?.chapters?.length || currentTime === undefined) return;
+
+    const currentChapter = vod.chapters.find(chapter => 
+      currentTime >= chapter.start && currentTime < (chapter.start + chapter.end)
+    );
+
+    if (currentChapter) {
+      setChapter(currentChapter);
     }
     saveResumePosition(vod.id, currentTime);
-    return;
   }, [currentTime, vod, playerRef]);
 
   const handleExpandClick = () => {
