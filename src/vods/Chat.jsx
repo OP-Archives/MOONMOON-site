@@ -99,11 +99,15 @@ export default function Chat(props) {
       })
         .then((response) => response.json())
         .then((data) => {
-          if (data.error) return;
-          badges.current = data;
+          if (data.error) {
+            console.warn('Failed to load badges:', data.error);
+            return;
+          }
+          badges.current = data || { channel: {}, global: {} };
         })
         .catch((e) => {
-          console.error(e);
+          console.error('Badge loading failed:', e);
+          badges.current = { channel: {}, global: {} };
         });
     };
 
