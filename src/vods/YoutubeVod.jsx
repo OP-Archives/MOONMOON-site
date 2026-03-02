@@ -11,7 +11,7 @@ import BaseVod from './BaseVod';
 import archiveClient from './client';
 import { getResumePosition, saveResumePosition, clearResumePosition } from '../utils/positionStorage';
 
-const channel = import.meta.env.VITE_;
+const channel = import.meta.env.VITE_CHANNEL;
 
 export default function YoutubeVod(props) {
   const { type } = props;
@@ -82,7 +82,7 @@ export default function YoutubeVod(props) {
     let totalYoutubeDuration = 0;
     for (const data of youtube) {
       if (!data.duration) {
-        totalYoutubeDuration += import.meta.env.VITE_ ?? 0;
+        totalYoutubeDuration += parseFloat(import.meta.env.VITE_DEFAULT_DELAY) ?? 0;
         continue;
       }
       totalYoutubeDuration += data.duration;
