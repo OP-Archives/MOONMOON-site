@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Pagination from '@mui/material/Pagination';
@@ -18,10 +18,11 @@ import Vod from './Vod';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
-import debounce from 'lodash.debounce';
+
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import archiveClient from './client';
+import { useDebouncedSetter } from '../utils/useDebouncedCallback';
 
 const FILTERS = ['Default', 'Date', 'Title', 'Game'];
 const START_DATE = import.meta.env.VITE_START_DATE;
@@ -150,26 +151,8 @@ export default function Vods() {
     }
   };
 
-  const handleTitleChange = useRef(
-    debounce((evt) => {
-      if (evt.target.value.length === 0) return;
-      setFilterTitle(evt.target.value);
-    }, 500)
-  ).current;
-
-  const handleGameChange = useRef(
-    debounce((evt) => {
-      if (evt.target.value.length === 0) return;
-      setFilterGame(evt.target.value);
-    }, 500)
-  ).current;
-
-  useEffect(() => {
-    return () => {
-      handleTitleChange.cancel();
-      handleGameChange.cancel();
-    };
-  }, [handleGameChange, handleTitleChange]);
+  const handleTitleChange = useDebouncedSetter(setFilterTitle, 500);
+  const handleGameChange = useDebouncedSetter(setFilterGame, 500);
 
   const totalPages = Math.ceil(totalVods / limit);
 
