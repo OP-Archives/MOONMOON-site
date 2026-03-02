@@ -2,9 +2,9 @@ import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import SettingsIcon from '@mui/icons-material/Settings';
-import ExpandMore from './ExpandMore';
+import ExpandMore from '../../utils/ExpandMore';
 
 export default function ChatHeader(props) {
   const { isPortrait, showChat, setShowChat, setShowModal } = props;
@@ -24,8 +24,8 @@ export default function ChatHeader(props) {
           }}
         >
           <Tooltip title="Collapse">
-            <ExpandMore expand={showChat.toString()} onClick={handleExpandClick} aria-expanded={showChat}>
-              <ExpandMoreIcon />
+            <ExpandMore expand={showChat} onClick={handleExpandClick} aria-expanded={showChat}>
+              <ChevronLeftIcon />
             </ExpandMore>
           </Tooltip>
         </Box>

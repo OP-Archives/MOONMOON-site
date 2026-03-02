@@ -4,13 +4,13 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
 import Divider from '@mui/material/Divider';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import Twemoji from 'react-twemoji';
 import { toHHMMSS } from '../utils/helpers';
 import ChatHeader from './Chat/ChatHeader';
 import ChatMessages from './Chat/ChatMessages';
 import ChatSettingsModal from './Chat/ChatSettingsModal';
-import ExpandMore from './Chat/ExpandMore';
+import ExpandMore from '../utils/ExpandMore';
 import MessageTooltip from './Chat/MessageTooltip';
 
 const AbortController =
@@ -878,8 +878,8 @@ export default function Chat(props) {
       {!isPortrait && !showChat && (
         <Box sx={{ position: 'absolute', right: 0, top: 0 }}>
           <Tooltip title="Expand">
-            <ExpandMore expand={showChat.toString()} onClick={handleExpandClick} aria-expanded={showChat}>
-              <ExpandMoreIcon />
+            <ExpandMore expand={showChat} onClick={handleExpandClick} aria-expanded={showChat}>
+              <ChevronRightIcon />
             </ExpandMore>
           </Tooltip>
         </Box>

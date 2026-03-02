@@ -11,7 +11,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Loading from '../utils/Loading';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Chapters from './VodChapters';
-import ExpandMore from '../utils/CustomExpandMore';
+import ExpandMore from '../utils/ExpandMore';
 import CustomWidthTooltip from '../utils/CustomToolTip';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { toHMS } from '../utils/helpers';
@@ -64,7 +64,7 @@ export default function BaseVod(props) {
       </Box>
       <Box sx={{ position: 'absolute', bottom: 0, left: '50%' }}>
         <Tooltip title={showMenu ? 'Collapse' : 'Expand'}>
-          <ExpandMore expand={showMenu.toString()} onClick={handleExpandClick} aria-expanded={showMenu} aria-label="show menu">
+          <ExpandMore expand={showMenu} onClick={handleExpandClick} aria-expanded={showMenu} aria-label="show menu">
             <ExpandMoreIcon />
           </ExpandMore>
         </Tooltip>
