@@ -6,15 +6,19 @@ import { styled } from '@mui/material/styles';
 import { blue } from '@mui/material/colors';
 import Loading from './utils/Loading';
 import ErrorBoundary from './utils/ErrorBoundary';
+import Logo from './assets/logo.jpg';
 
 const channel = import.meta.env.VITE_CHANNEL;
+const origin = import.meta.env.VITE_DOMAIN || window.location.origin;
+const archiveApiBase = import.meta.env.VITE_ARCHIVE_API_BASE;
+const defaultDelay = import.meta.env.VITE_DEFAULT_DELAY;
 
 const Vods = lazy(() => import('./vods/Vods'));
 const Navbar = lazy(() => import('./navbar/navbar'));
-const YoutubeVod = lazy(() => import('./vods/YoutubeVod'));
-const Games = lazy(() => import('./vods/Games'));
-const CustomVod = lazy(() => import('./vods/CustomVod'));
 const NotFound = lazy(() => import('./utils/NotFound'));
+const YoutubeVod = lazy(() => import('@op-archives/vod-components').then((m) => ({ default: m.YoutubeVod })));
+const CustomVod = lazy(() => import('@op-archives/vod-components').then((m) => ({ default: m.CustomVod })));
+const Games = lazy(() => import('@op-archives/vod-components').then((m) => ({ default: m.Games })));
 
 export default function App() {
   let darkTheme = createTheme({
@@ -73,11 +77,11 @@ export default function App() {
                     </>
                   }
                 />
-                <Route exact path="/vods/:vodId" element={<YoutubeVod type="vod" />} />
-                <Route exact path="/live/:vodId" element={<YoutubeVod type="live" />} />
-                <Route exact path="/youtube/:vodId" element={<YoutubeVod />} />
-                <Route exact path="/games/:vodId" element={<Games />} />
-                <Route exact path="/manual/:vodId" element={<CustomVod type="manual" />} />
+                <Route exact path="/vods/:vodId" element={<YoutubeVod type="vod" logo={Logo} origin={origin} channel={channel} archiveApiBase={archiveApiBase} />} defaultDelay={defaultDelay} />
+                <Route exact path="/live/:vodId" element={<YoutubeVod type="live" logo={Logo} origin={origin} channel={channel} archiveApiBase={archiveApiBase} defaultDelay={defaultDelay} />} />
+                <Route exact path="/youtube/:vodId" element={<YoutubeVod logo={Logo} origin={origin} channel={channel} archiveApiBase={archiveApiBase} defaultDelay={defaultDelay} />} />
+                <Route exact path="/games/:vodId" element={<Games channel={channel} logo={Logo} origin={origin} archiveApiBase={archiveApiBase} />} />
+                <Route exact path="/manual/:vodId" element={<CustomVod type="manual" logo={Logo} channel={channel} archiveApiBase={archiveApiBase} />} />
               </Routes>
             </ErrorBoundary>
           </Suspense>
