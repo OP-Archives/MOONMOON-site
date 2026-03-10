@@ -19,7 +19,9 @@ export default function EnvironmentError({ missingVars }) {
       <Typography variant="h4" fontWeight={600} gutterBottom>
         Configuration Error
       </Typography>
-      <Typography variant="body1" color="textSecondary" paragraph>
+      <Typography variant="body1" color="textSecondary" sx={{
+        marginBottom: "16px"
+      }}>
         The application cannot start because required environment variables are missing.
       </Typography>
       <Box sx={{ backgroundColor: 'rgba(0,0,0,0.3)', p: 2, borderRadius: 1, my: 2 }}>

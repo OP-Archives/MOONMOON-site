@@ -28,7 +28,8 @@
     "preview": "vite preview",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
-    "mui:imports": "npx @mui/codemod@latest v5.0.0/path-imports src/"
+    "mui:imports": "npx @mui/codemod@latest v5.0.0/path-imports src/",
+    "mui:deprecations": "npx @mui/codemod@latest deprecations/all src/"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.29.0",
