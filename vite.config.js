@@ -30,6 +30,18 @@ export default defineConfig({
     outDir: 'prod',
     emptyOutDir: true,
     sourcemap: false,
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          muiCore: ['@mui/material', '@mui/system', '@mui/icons-material'],
+          muiX: ['@mui/x-date-pickers'],
+          emotion: ['@emotion/react', '@emotion/styled'],
+          date: ['dayjs'],
+          react: ['react', 'react-dom', 'react-router-dom'],
+        },
+      },
+    },
   },
   optimizeDeps: {
     include: ['react', 'react-dom'],
