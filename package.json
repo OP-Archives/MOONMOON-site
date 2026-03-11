@@ -13,7 +13,7 @@
     "@mui/material": "^7.3.9",
     "@mui/system": "^7.3.9",
     "@mui/x-date-pickers": "^8.27.2",
-    "@op-archives/vod-components": "^0.1.9",
+    "@op-archives/vod-components": "^0.1.11",
     "dayjs": "^1.11.19",
     "humanize-duration": "^3.33.2",
     "lodash.debounce": "^4.0.8",
@@ -24,7 +24,8 @@
     "tinyduration": "^3.4.1"
   },
   "scripts": {
-    "dev": "vite",
+    "start": "vite --force --no-open",
+    "dev": "nodemon --signal SIGKILL --watch .yalc --exec npm run start",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint src/",
@@ -43,6 +44,7 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "prettier": "^3.8.1",
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "yalc": "^1.0.0-pre.53"
   }
 }
