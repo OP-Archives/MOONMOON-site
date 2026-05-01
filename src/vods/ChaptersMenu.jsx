@@ -32,7 +32,10 @@ export default function Chapters(props) {
       <Menu anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
         {vod.chapters.map((data) => {
           return (
-            <CustomLink key={vod.id + (data?.gameId || data.name) + (data?.start || data.duration)} href={`${DEFAULT_VOD}?t=${toHMS(data?.start || toSeconds(data.duration) || 1)}`}>
+            <CustomLink
+              key={vod.id + (data?.gameId || data.name) + (data?.start || data.duration)}
+              href={`${DEFAULT_VOD}?t=${toHMS(data?.start || toSeconds(data.duration) || 1)}`}
+            >
               <MenuItem>
                 <Box sx={{ display: 'flex' }}>
                   <Box sx={{ mr: 1 }}>
@@ -40,7 +43,12 @@ export default function Chapters(props) {
                   </Box>
                   <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                     <Typography color="primary" variant="body2">{`${data.name}`}</Typography>
-                    {data.end !== undefined && <Typography variant="caption" color="textSecondary">{`${humanize(data.end * 1000, { largest: 2 })}`}</Typography>}
+                    {data.end !== undefined && (
+                      <Typography
+                        variant="caption"
+                        color="textSecondary"
+                      >{`${humanize(data.end * 1000, { largest: 2 })}`}</Typography>
+                    )}
                   </Box>
                 </Box>
               </MenuItem>

@@ -63,7 +63,10 @@ export default memo(function Vod({ vod }) {
           <Box sx={{ p: 0.5 }}>
             <CustomWidthTooltip title={vod.title} placement="top">
               <span>
-                <CustomLink href={DEFAULT_VOD} sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}>
+                <CustomLink
+                  href={DEFAULT_VOD}
+                  sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}
+                >
                   <Typography variant="caption" color="primary" sx={{ fontWeight: '550' }}>
                     {vod.title}
                   </Typography>
