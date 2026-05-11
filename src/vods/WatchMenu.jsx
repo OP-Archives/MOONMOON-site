@@ -27,7 +27,7 @@ export default function WatchMenu(props) {
           <Box>
             <Button
               color="primary"
-              disabled={vod.youtube.length === 0}
+              disabled={vod?.vod_uploads.length === 0}
               href={`/youtube/${vod.id}`}
               startIcon={<YouTubeIcon />}
               size="large"
@@ -49,7 +49,7 @@ export default function WatchMenu(props) {
               Manual (VOD)
             </Button>
           </Box>
-          {vod.games.length !== 0 && (
+          {vod?.games?.length !== 0 && (
             <Box>
               <Button
                 color="primary"

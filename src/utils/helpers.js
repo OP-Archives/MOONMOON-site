@@ -66,7 +66,7 @@ export const sleep = (ms) => {
 
 /**
  * Get image URL with supported dimensions
- * Handles older vod links that had {width}x{height} placeholder
+ * Handles vod links that have {width}x{height} placeholder
  * @param {string} link - Image URL
  * @param {number} width - Desired width (default: 40)
  * @param {number} height - Desired height (default: 53)

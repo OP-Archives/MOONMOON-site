@@ -10,16 +10,17 @@ import WatchMenu from './WatchMenu';
 import CustomWidthTooltip from '../utils/CustomToolTip';
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat.js';
+import { toHHMMSS } from '../utils/helpers';
 dayjs.extend(localizedFormat);
 
 const getVodLink = (vod) => {
-  if (vod.youtube?.length > 0) return `/youtube/${vod.id}`;
+  if (vod.vod_uploads?.length > 0) return `/youtube/${vod.id}`;
   if (vod.games?.length > 0) return `/games/${vod.id}`;
   return '#';
 };
 
 const getThumbnail = (vod) => {
-  return vod.youtube?.[0]?.thumbnail_url || vod.games?.[0]?.thumbnail_url || vod.thumbnail_url || sadge;
+  return vod.vod_uploads?.[0]?.thumbnail_url || vod.games?.[0]?.thumbnail_url || vod.thumbnail_url || sadge;
 };
 
 export default memo(function Vod({ vod }) {
@@ -45,14 +46,14 @@ export default memo(function Vod({ vod }) {
         <Box sx={{ pointerEvents: 'none', position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
           <Box sx={{ position: 'absolute', bottom: 0, left: 0 }}>
             <Typography variant="caption" sx={{ p: 0.3, backgroundColor: 'rgba(0,0,0,.6)' }}>
-              {`${dayjs(vod.createdAt).format('LL')}`}
+              {`${dayjs(vod.created_at).format('LL')}`}
             </Typography>
           </Box>
         </Box>
         <Box sx={{ pointerEvents: 'none', position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
           <Box sx={{ position: 'absolute', bottom: 0, right: 0 }}>
             <Typography variant="caption" sx={{ p: 0.3, backgroundColor: 'rgba(0,0,0,.6)' }}>
-              {`${vod.duration}`}
+              {`${toHHMMSS(vod.duration)}`}
             </Typography>
           </Box>
         </Box>
