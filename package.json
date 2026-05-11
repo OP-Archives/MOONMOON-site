@@ -12,7 +12,7 @@
     "@mui/material": "^9.0.1",
     "@mui/system": "^9.0.1",
     "@mui/x-date-pickers": "^9.1.0",
-    "@op-archives/vod-components": "^0.1.23",
+    "@op-archives/vod-components": "^0.1.25",
     "dayjs": "^1.11.20",
     "humanize-duration": "^3.33.2",
     "lodash.debounce": "^4.0.8",
@@ -43,7 +43,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "nodemon": "^3.1.14",
     "prettier": "^3.8.3",
-    "vite": "^8.0.11",
+    "vite": "^8.0.12",
     "yalc": "^1.0.0-pre.53"
   }
 }
