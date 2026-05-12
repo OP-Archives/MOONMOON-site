@@ -12,7 +12,7 @@
     "@mui/material": "^9.0.1",
     "@mui/system": "^9.0.1",
     "@mui/x-date-pickers": "^9.1.0",
-    "@op-archives/vod-components": "^0.1.25",
+    "@op-archives/vod-components": "^0.1.27",
     "dayjs": "^1.11.20",
     "humanize-duration": "^3.33.2",
     "lodash.debounce": "^4.0.8",
