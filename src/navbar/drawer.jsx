@@ -13,10 +13,12 @@ import HomeIcon from '@mui/icons-material/Home';
 import OndemandVideoIcon from '@mui/icons-material/OndemandVideo';
 import ReportIcon from '@mui/icons-material/Report';
 import VideogameAssetIcon from '@mui/icons-material/VideogameAsset';
+import BookIcon from '@mui/icons-material/Book';
 
 const mainLinks = [
   { title: `Home`, path: `/`, icon: <HomeIcon color="primary" /> },
   { title: `Vods`, path: `/vods`, icon: <OndemandVideoIcon color="primary" /> },
+   { title: `Library`, path: `/library`, icon: <BookIcon color="primary" /> },
   { title: `Issues`, path: `${import.meta.env.VITE_GITHUB}/issues`, icon: <ReportIcon color="primary" /> },
   { title: `Game Jam`, path: `https://jam.moon2.tv`, icon: <VideogameAssetIcon color="primary" /> },
 ];

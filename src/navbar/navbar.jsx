@@ -12,6 +12,7 @@ import Drawer from './drawer';
 import OndemandVideoIcon from '@mui/icons-material/OndemandVideo';
 import ReportIcon from '@mui/icons-material/Report';
 import VideogameAssetIcon from '@mui/icons-material/VideogameAsset';
+import BookIcon from '@mui/icons-material/Book';
 
 const socials = [
   {
@@ -86,6 +87,16 @@ export default function Navbar(props) {
                     <OndemandVideoIcon color="primary" sx={{ mr: 0.5 }} />
                     <Typography color="primary" variant="h6">
                       Vods
+                    </Typography>
+                  </Box>
+                </CustomLink>
+              </Box>
+              <Box sx={{ mr: 2 }}>
+                <CustomLink href="/library">
+                  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <BookIcon color="primary" sx={{ mr: 0.5 }} />
+                    <Typography color="primary" variant="h6">
+                      Library
                     </Typography>
                   </Box>
                 </CustomLink>

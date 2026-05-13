@@ -20,6 +20,7 @@ const NotFound = lazy(() => import('./utils/NotFound'));
 const YoutubeVod = lazy(() => import('@op-archives/vod-components').then((m) => ({ default: m.YoutubeVod })));
 const CustomVod = lazy(() => import('@op-archives/vod-components').then((m) => ({ default: m.CustomVod })));
 const Games = lazy(() => import('@op-archives/vod-components').then((m) => ({ default: m.Games })));
+const ChaptersLibrary = lazy(() => import('./library/ChaptersLibrary'));
 
 export default function App() {
   let darkTheme = createTheme({
@@ -133,6 +134,16 @@ export default function App() {
                       archiveApiBase={archiveApiBase}
                       twitchId={twitchId}
                     />
+                  }
+                />
+                <Route
+                  exact
+                  path="/library"
+                  element={
+                    <>
+                      <Navbar channel={channel} />
+                      <ChaptersLibrary />
+                    </>
                   }
                 />
                 <Route

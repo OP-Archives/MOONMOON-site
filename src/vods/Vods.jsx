@@ -23,6 +23,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { listVods } from './client';
 import { useDebouncedSetter } from '../utils/debounceHelper';
+import Button from '@mui/material/Button';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const FILTERS = ['Default', 'Date', 'Title', 'Game'];
 const START_DATE = import.meta.env.VITE_START_DATE;
@@ -43,6 +45,7 @@ export default function Vods() {
   const [loading, setLoading] = useState(false);
   const page = parseInt(query.get('page') || '1', 10);
   const limit = isMobile ? 10 : 20;
+  const gameId = query.get('game_id');
 
   useEffect(() => {
     setError(null);
@@ -53,30 +56,34 @@ export default function Vods() {
       try {
         const params = { limit, page, sort: 'created_at', order: 'desc' };
 
-        switch (filter) {
-          case 'Date':
-            if (filterStartDate > filterEndDate) {
-              setError('End date must be after start date');
-              setLoading(false);
-              return;
-            }
-            params.from = filterStartDate.toISOString();
-            params.to = filterEndDate.toISOString();
-            break;
-          case 'Title':
-            if (filterTitle.length === 0) {
-              setLoading(false);
-              return;
-            }
-            params.title = filterTitle;
-            break;
-          case 'Game':
-            if (filterGame.length === 0) {
-              setLoading(false);
-              return;
-            }
-            params.chapter = filterGame;
-            break;
+        if (gameId) {
+          params.game_id = gameId;
+        } else {
+          switch (filter) {
+            case 'Date':
+              if (filterStartDate > filterEndDate) {
+                setError('End date must be after start date');
+                setLoading(false);
+                return;
+              }
+              params.from = filterStartDate.toISOString();
+              params.to = filterEndDate.toISOString();
+              break;
+            case 'Title':
+              if (filterTitle.length === 0) {
+                setLoading(false);
+                return;
+              }
+              params.title = filterTitle;
+              break;
+            case 'Game':
+              if (filterGame.length === 0) {
+                setLoading(false);
+                return;
+              }
+              params.chapter = filterGame;
+              break;
+          }
         }
 
         const response = await listVods(params);
@@ -90,12 +97,13 @@ export default function Vods() {
     };
     fetchVods();
     return;
-  }, [limit, page, filter, filterStartDate, filterEndDate, filterTitle, filterGame]);
+  }, [limit, page, filter, filterStartDate, filterEndDate, filterTitle, filterGame, gameId]);
 
   const changeFilter = (evt) => {
     setFilter(evt.target.value);
-    //reset page to 1 when filter changes
-    navigate(`${location.pathname}?page=1`);
+    const params = new URLSearchParams({ page: '1' });
+    if (gameId) params.set('game_id', gameId);
+    navigate(`${location.pathname}?${params}`);
   };
 
   const handleSubmit = (e) => {
@@ -139,7 +147,18 @@ export default function Vods() {
                 alignItems: 'center',
               }}
             >
-              <FormControl sx={{ display: 'flex' }}>
+               {gameId && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  startIcon={<ArrowBackIcon fontSize="small" />}
+                  onClick={() => navigate('/vods')}
+                  sx={{ mr: 2 }}
+                >
+                  Back
+                </Button>
+              )}
+              <FormControl sx={{ display: 'flex' }} disabled={!!gameId}>
                 <InputLabel id="select-label">Filter</InputLabel>
                 <Select labelId="select-label" label={filter} value={filter} onChange={changeFilter} autoWidth>
                   {FILTERS.map((data, i) => {
@@ -151,7 +170,7 @@ export default function Vods() {
                   })}
                 </Select>
               </FormControl>
-              {filter === 'Date' && (
+              {filter === 'Date' && !gameId && (
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <Box sx={{ ml: 1 }}>
                     <DatePicker
@@ -174,7 +193,7 @@ export default function Vods() {
                   </Box>
                 </LocalizationProvider>
               )}
-              {filter === 'Title' && (
+              {filter === 'Title' && !gameId && (
                 <Box sx={{ ml: 1 }}>
                   <TextField
                     fullWidth
@@ -185,7 +204,7 @@ export default function Vods() {
                   />
                 </Box>
               )}
-              {filter === 'Game' && (
+              {filter === 'Game' && !gameId && (
                 <Box sx={{ ml: 1 }}>
                   <TextField
                     fullWidth
