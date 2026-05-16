@@ -6,44 +6,37 @@
     "node": ">=22.0.0"
   },
   "dependencies": {
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.1",
-    "@mui/icons-material": "^9.0.1",
-    "@mui/material": "^9.0.1",
-    "@mui/system": "^9.0.1",
-    "@mui/x-date-pickers": "^9.2.0",
-    "@op-archives/vod-components": "^0.1.29",
-    "dayjs": "^1.11.20",
-    "humanize-duration": "^3.33.2",
-    "lodash.debounce": "^4.0.8",
+    "@op-archives/vod-components": "^0.1.31",
+    "@tanstack/react-query": "^5.100.10",
+    "lucide-react": "^1.16.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
-    "react-router-dom": "^7.15.0",
-    "simplebar-react": "^3.3.2",
-    "tinyduration": "^3.4.1"
+    "react-router-dom": "^7.15.1",
+    "simplebar-react": "^3.3.2"
   },
   "scripts": {
     "dev": "vite --force --no-open",
     "start": "nodemon --signal SIGKILL --watch .yalc --exec npm run dev",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint src/ --fix",
-    "mui:imports": "npx @mui/codemod@latest v5.0.0/path-imports src/",
-    "mui:deprecations": "npx @mui/codemod@latest deprecations/all src/"
+    "lint": "eslint src/ --fix"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.29.5",
-    "@babel/preset-react": "^7.28.5",
-    "@eslint/js": "^10.0.1",
-    "@vitejs/plugin-react": "^6.0.1",
-    "eslint": "^10.3.0",
+    "@tailwindcss/vite": "^4.3.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.2",
+    "eslint": "^10.4.0",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import-x": "^4.16.2",
     "eslint-plugin-prettier": "^5.5.5",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^7.1.1",
     "nodemon": "^3.1.14",
     "prettier": "^3.8.3",
-    "vite": "^8.0.12",
+    "tailwindcss": "^4.3.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.3",
+    "vite": "^8.0.13",
+    "vite-plugin-compression2": "^2.5.3",
     "yalc": "^1.0.0-pre.53"
   }
 }

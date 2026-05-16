@@ -1,0 +1,365 @@
+import { useQueryClient } from '@tanstack/react-query';
+import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left.mjs';
+import X from 'lucide-react/dist/esm/icons/x.mjs';
+import { useEffect, useState, useMemo, useRef, startTransition } from 'react';
+import { type LoaderFunctionArgs, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
+import type SimpleBarCore from 'simplebar-core';
+import SimpleBar from 'simplebar-react';
+import { listVods } from '../utils/archive-client';
+import { useDebouncedSetter } from '../utils/debounceHelper';
+import Footer from '../utils/Footer';
+import Loading from '../utils/Loading';
+import PaginationControls from '../utils/PaginationControls';
+import { queryClient } from '../utils/queryClient';
+import { useMediaQuery } from '../utils/useMediaQuery';
+import { useVods, prefetchNextPageVods } from '../utils/useVods';
+import Vod from './Vod';
+
+export const vodsLoader = async ({ request }: LoaderFunctionArgs) => {
+  const url = new URL(request.url);
+  const filter = url.searchParams.get('filter') || 'Default';
+  const from = url.searchParams.get('from') || FORMATTED_START;
+  const to = url.searchParams.get('to') || TODAY_STRING;
+  const title = url.searchParams.get('title') || '';
+  const chapter = url.searchParams.get('chapter') || '';
+  const page = parseInt(url.searchParams.get('page') || '1', 10);
+  const gameId = url.searchParams.get('game_id');
+  const limit = 20;
+
+  const memoizedDateRange = (() => {
+    if (filter !== 'Date' || !from || !to) return null;
+    try {
+      return {
+        from: new Date(from).toISOString(),
+        to: new Date(to).toISOString(),
+      };
+    } catch {
+      return null;
+    }
+  })();
+
+  const queryKeyParams = {
+    limit,
+    page,
+    sort: 'created_at',
+    order: 'desc',
+    ...(gameId ? { game_id: gameId } : {}),
+    ...(memoizedDateRange ? memoizedDateRange : {}),
+    ...(filter === 'Title' && title ? { title } : {}),
+    ...(filter === 'Game' && chapter ? { chapter } : {}),
+  };
+
+  await queryClient.ensureQueryData({
+    queryKey: ['vods', queryKeyParams],
+    queryFn: ({ signal }: { signal: AbortSignal }) => listVods({ ...queryKeyParams, signal }),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  return null;
+};
+
+const FILTERS = ['Default', 'Date', 'Title', 'Game'];
+const START_DATE = import.meta.env.VITE_START_DATE;
+
+const TODAY_STRING = new Date().toISOString().split('T')[0];
+const FORMATTED_START = START_DATE ? new Date(START_DATE).toISOString().split('T')[0] : '';
+
+export default function Vods() {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const isMobile = useMediaQuery('(max-width: 900px)');
+  const location = useLocation();
+  const todayString = new Date().toISOString().split('T')[0];
+
+  const scrollRef = useRef<SimpleBarCore | null>(null);
+
+  const filter = searchParams.get('filter') || FILTERS[0];
+  const filterStartDate = searchParams.get('from') || FORMATTED_START;
+  const filterEndDate = searchParams.get('to') || todayString;
+  const filterTitle = searchParams.get('title') || '';
+  const filterGame = searchParams.get('chapter') || '';
+  const page = parseInt(searchParams.get('page') || '1', 10);
+  const gameId = searchParams.get('game_id');
+  const limit = 20;
+
+  const memoizedDateRange = useMemo(() => {
+    if (filter !== 'Date' || !filterStartDate || !filterEndDate) return null;
+    try {
+      return {
+        from: new Date(filterStartDate).toISOString(),
+        to: new Date(filterEndDate).toISOString(),
+      };
+    } catch {
+      return null;
+    }
+  }, [filter, filterStartDate, filterEndDate]);
+
+  const [inputTitle, setInputTitle] = useState(filterTitle);
+  const [inputGame, setInputGame] = useState(filterGame);
+  const [inputStartDate, setInputStartDate] = useState(filterStartDate);
+  const [inputEndDate, setInputEndDate] = useState(filterEndDate);
+
+  useEffect(() => {
+    setInputTitle(filterTitle);
+  }, [filterTitle]);
+  useEffect(() => {
+    setInputGame(filterGame);
+  }, [filterGame]);
+  useEffect(() => {
+    setInputStartDate(filterStartDate);
+  }, [filterStartDate]);
+  useEffect(() => {
+    setInputEndDate(filterEndDate);
+  }, [filterEndDate]);
+
+  useEffect(() => {
+    const el = scrollRef.current?.getScrollElement();
+    if (!el) return;
+
+    const savedScroll = sessionStorage.getItem(`scroll-${location.key}`);
+
+    if (savedScroll) {
+      el.scrollTo({ top: parseInt(savedScroll, 10), behavior: 'instant' });
+    } else {
+      el.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    let scrollTimeout: number;
+
+    const handleScroll = () => {
+      if (scrollTimeout) window.clearTimeout(scrollTimeout);
+
+      scrollTimeout = window.setTimeout(() => {
+        sessionStorage.setItem(`scroll-${location.key}`, el.scrollTop.toString());
+      }, 150);
+    };
+
+    el.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      el.removeEventListener('scroll', handleScroll);
+      if (scrollTimeout) window.clearTimeout(scrollTimeout);
+    };
+  }, [page, location.key]);
+
+  const updateUrlParams = (updates: Record<string, string | null>) => {
+    startTransition(() => {
+      setSearchParams(
+        (prev) => {
+          const nextParams = new URLSearchParams(prev);
+
+          for (const [key, val] of Object.entries(updates)) {
+            if (val) nextParams.set(key, val);
+            else nextParams.delete(key);
+          }
+          if (gameId) nextParams.set('game_id', gameId);
+          return nextParams;
+        },
+        { replace: true }
+      );
+    });
+  };
+
+  const debouncedSetFilterTitle = useDebouncedSetter((val: string) => {
+    updateUrlParams({ title: val, filter: 'Title', page: '1' });
+  }, 500);
+
+  const debouncedSetFilterGame = useDebouncedSetter((val: string) => {
+    updateUrlParams({ chapter: val, filter: 'Game', page: '1' });
+  }, 500);
+
+  const debouncedSetStartDate = useDebouncedSetter((val: string) => {
+    updateUrlParams({ from: val, page: '1' });
+  }, 600);
+
+  const debouncedSetEndDate = useDebouncedSetter((val: string) => {
+    updateUrlParams({ to: val, page: '1' });
+  }, 600);
+
+  const queryKeyParams = useMemo(
+    () => ({
+      limit,
+      page,
+      sort: 'created_at',
+      order: 'desc',
+      ...(gameId ? { game_id: gameId } : {}),
+      ...(memoizedDateRange ? memoizedDateRange : {}),
+      ...(filter === 'Title' && filterTitle ? { title: filterTitle } : {}),
+      ...(filter === 'Game' && filterGame ? { chapter: filterGame } : {}),
+    }),
+    [limit, page, gameId, filter, memoizedDateRange, filterTitle, filterGame]
+  );
+
+  const { data, isLoading, isFetching } = useVods(queryKeyParams);
+  const vods = data?.data ?? null;
+  const totalVods = data?.meta?.total ?? null;
+  const totalPages = Math.ceil((totalVods || 0) / limit);
+  const isBackgroundFetching = isFetching && !isLoading;
+
+  const paginationParams = useMemo(
+    () => ({
+      ...(gameId ? { game_id: gameId } : {}),
+      ...(filter !== 'Default' ? { filter } : {}),
+      ...(filter === 'Date' ? { from: filterStartDate, to: filterEndDate } : {}),
+      ...(filterTitle ? { title: filterTitle } : {}),
+      ...(filterGame ? { chapter: filterGame } : {}),
+    }),
+    [gameId, filter, filterStartDate, filterEndDate, filterTitle, filterGame]
+  );
+
+  useEffect(() => {
+    if (totalPages !== null && page < totalPages) {
+      prefetchNextPageVods(queryClient, { ...queryKeyParams, page: page + 1 });
+    }
+  }, [page, totalPages, queryKeyParams, queryClient]);
+
+  const handleClearTitle = () => {
+    setInputTitle('');
+    updateUrlParams({ title: null, filter: 'Title', page: '1' });
+  };
+
+  const handleClearGame = () => {
+    setInputGame('');
+    updateUrlParams({ chapter: null, filter: 'Game', page: '1' });
+  };
+
+  const changeFilter = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newFilter = e.target.value;
+    const updates: Record<string, string | null> = { page: '1', filter: newFilter === 'Default' ? null : newFilter };
+    if (newFilter !== 'Title') updates.title = null;
+    if (newFilter !== 'Game') updates.chapter = null;
+    if (newFilter !== 'Date') {
+      updates.from = null;
+      updates.to = null;
+    }
+    updateUrlParams(updates);
+  };
+
+  return (
+    <SimpleBar ref={scrollRef} className="min-h-0 h-full">
+      <div className="p-2">
+        <div className="flex justify-center mt-2 flex-col items-center">
+          {totalVods !== null && (
+            <h4 className="text-blue-500 text-3xl uppercase font-medium">{`${totalVods} Vods`}</h4>
+          )}
+        </div>
+        <div className="max-w-[1600px] mx-auto pt-1 flex flex-row items-center">
+          {gameId && (
+            <button
+              onClick={() => navigate(-1)}
+              className="mr-2 bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700 transition-colors flex items-center gap-1 text-sm"
+            >
+              <ArrowLeft size={16} /> Back
+            </button>
+          )}
+          <select
+            disabled={!!gameId}
+            value={filter}
+            onChange={changeFilter}
+            className="bg-dark-light border border-gray-600 rounded px-3 py-1.5 text-sm mr-1 text-white w-max"
+          >
+            {FILTERS.map((data) => (
+              <option key={data} value={data}>
+                {data}
+              </option>
+            ))}
+          </select>
+          {filter === 'Date' && !gameId && (
+            <div className="flex items-center gap-1 ml-1">
+              <input
+                type="date"
+                min={FORMATTED_START}
+                max={todayString}
+                value={inputStartDate}
+                onChange={(e) => {
+                  setInputStartDate(e.target.value);
+                  debouncedSetStartDate(e.target.value);
+                }}
+                className="bg-dark-light border border-gray-600 rounded px-2 py-1.5 text-sm text-white"
+              />
+              <input
+                type="date"
+                min={FORMATTED_START}
+                max={todayString}
+                value={inputEndDate}
+                onChange={(e) => {
+                  setInputEndDate(e.target.value);
+                  debouncedSetEndDate(e.target.value);
+                }}
+                className="bg-dark-light border border-gray-600 rounded px-2 py-1.5 text-sm text-white"
+              />
+            </div>
+          )}
+          {filter === 'Title' && !gameId && (
+            <div className="ml-1 relative">
+              <input
+                type="text"
+                placeholder="Search by Title"
+                onChange={(e) => {
+                  setInputTitle(e.target.value);
+                  debouncedSetFilterTitle(e.target.value);
+                }}
+                value={inputTitle}
+                className="w-44 bg-dark-light border border-gray-600 rounded px-3 py-1.5 text-sm text-white placeholder-gray-500 pr-8"
+              />
+              {inputTitle && (
+                <button
+                  onClick={handleClearTitle}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors cursor-pointer"
+                >
+                  <X size={16} />
+                </button>
+              )}
+            </div>
+          )}
+          {filter === 'Game' && !gameId && (
+            <div className="ml-1 relative">
+              <input
+                type="text"
+                placeholder="Search by Game"
+                onChange={(e) => {
+                  setInputGame(e.target.value);
+                  debouncedSetFilterGame(e.target.value);
+                }}
+                value={inputGame}
+                className="w-44 bg-dark-light border border-gray-600 rounded px-3 py-1.5 text-sm text-white placeholder-gray-500 pr-8"
+              />
+              {inputGame && (
+                <button
+                  onClick={handleClearGame}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors cursor-pointer"
+                >
+                  <X size={16} />
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+        {isLoading && <Loading />}
+
+        {!isLoading && vods && vods.length === 0 && (
+          <p className="mt-12 text-center text-gray-400 text-sm">No VODs found matching your search filters.</p>
+        )}
+
+        {vods && vods.length > 0 && (
+          <div
+            className={`max-w-[1600px] mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 mt-2 transition-opacity duration-200 ${isBackgroundFetching ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}
+          >
+            {vods.map((vod, index) => (
+              <Vod key={vod.id} vod={vod} isMobile={isMobile} priority={index < (isMobile ? 4 : 10)} />
+            ))}
+          </div>
+        )}
+        <div className={`flex justify-center ${totalPages <= 1 ? 'mt-2' : 'mt-4'} items-center flex-col md:flex-row`}>
+          <PaginationControls
+            page={page}
+            totalPages={totalPages}
+            preserveParams={paginationParams}
+            onHoverPage={(targetPage) => prefetchNextPageVods(queryClient, { ...queryKeyParams, page: targetPage })}
+          />
+        </div>
+      </div>
+      <Footer />
+    </SimpleBar>
+  );
+}

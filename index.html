@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" style="background-color: #0e0e10">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="/favicon.png" />
@@ -30,13 +30,25 @@
 
     <!-- Preconnect to external domains -->
     <link rel="preconnect" href="https://static-cdn.jtvnw.net" />
+    <link rel="dns-prefetch" href="https://static-cdn.jtvnw.net" />
+
     <link rel="preconnect" href="https://cdn.frankerfacez.com" />
+    <link rel="dns-prefetch" href="https://cdn.frankerfacez.com" />
+
     <link rel="preconnect" href="https://emotes.overpowered.tv" />
+    <link rel="dns-prefetch" href="https://emotes.overpowered.tv" />
+
     <link rel="preconnect" href="https://cdn.7tv.app" />
+    <link rel="dns-prefetch" href="https://cdn.7tv.app" />
+
+    <link rel="preconnect" href="%VITE_ARCHIVE_API_BASE%" crossorigin />
+    <link rel="dns-prefetch" href="%VITE_ARCHIVE_API_BASE%" />
+
+    <link rel="preload" href="/logo.jpg" as="image" type="image/jpeg" />
   </head>
   <body>
     <noscript>You need to enable JavaScript to run the app.</noscript>
     <div id="root"></div>
-    <script type="module" src="/src/index.jsx"></script>
+    <script type="module" src="/src/index.tsx"></script>
   </body>
 </html>
