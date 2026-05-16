@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import X from 'lucide-react/dist/esm/icons/x.mjs';
-import { useEffect, useState, useRef, useMemo, startTransition } from 'react';
+import { useEffect, useState, useRef, startTransition } from 'react';
 import { type LoaderFunctionArgs, useSearchParams, useLocation } from 'react-router-dom';
 import type SimpleBarCore from 'simplebar-core';
 import SimpleBar from 'simplebar-react';
@@ -114,16 +114,13 @@ export default function ChaptersLibrary() {
   const apiSort = sort === 'recent' ? 'recent' : sort === 'chapter_name' ? 'chapter_name' : 'count';
   const displaySort = sort === 'recent' ? 'Recently Played' : sort === 'chapter_name' ? 'Game Name' : 'Most Played';
 
-  const queryKeyParams = useMemo(
-    () => ({
-      page,
-      limit,
-      ...(searchTerm.length > 0 ? { chapter_name: searchTerm } : {}),
-      sort: apiSort,
-      order: sort === 'chapter_name' ? 'asc' : 'desc',
-    }),
-    [page, limit, searchTerm, apiSort, sort]
-  );
+  const queryKeyParams = {
+    page,
+    limit,
+    ...(searchTerm.length > 0 ? { chapter_name: searchTerm } : {}),
+    sort: apiSort,
+    order: sort === 'chapter_name' ? 'asc' : 'desc',
+  };
 
   const { data, isLoading, isFetching } = useChapters(queryKeyParams);
   const chapters = data?.data ?? null;
@@ -131,13 +128,10 @@ export default function ChaptersLibrary() {
   const totalPages = Math.ceil((totalChapters || 0) / limit);
   const isBackgroundFetching = isFetching && !isLoading;
 
-  const paginationParams = useMemo(
-    () => ({
-      ...(searchTerm ? { search: searchTerm } : {}),
-      ...(sort !== 'count' ? { sort } : {}),
-    }),
-    [searchTerm, sort]
-  );
+  const paginationParams = {
+    ...(searchTerm ? { search: searchTerm } : {}),
+    ...(sort !== 'count' ? { sort } : {}),
+  };
 
   useEffect(() => {
     if (totalPages !== null && page < totalPages) {

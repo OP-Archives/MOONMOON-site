@@ -1,4 +1,4 @@
-import { useEffect, useRef, memo, useMemo } from 'react';
+import { useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 interface PaginationControlsProps {
@@ -8,12 +8,7 @@ interface PaginationControlsProps {
   onHoverPage?: (_page: number) => void;
 }
 
-export default memo(function PaginationControls({
-  page,
-  totalPages,
-  preserveParams,
-  onHoverPage,
-}: PaginationControlsProps) {
+export default function PaginationControls({ page, totalPages, preserveParams, onHoverPage }: PaginationControlsProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const pageInputRef = useRef<HTMLInputElement>(null);
@@ -24,7 +19,7 @@ export default memo(function PaginationControls({
     }
   }, [page]);
 
-  const baseParams = useMemo(() => {
+  const baseParams = (() => {
     const params = new URLSearchParams();
     if (preserveParams) {
       Object.entries(preserveParams).forEach(([k, v]) => {
@@ -32,7 +27,7 @@ export default memo(function PaginationControls({
       });
     }
     return params;
-  }, [preserveParams]);
+  })();
 
   const buildPageUrl = (pageNum: number) => {
     const params = new URLSearchParams(baseParams);
@@ -50,7 +45,7 @@ export default memo(function PaginationControls({
     }
   };
 
-  const pageNumbers = useMemo(() => {
+  const pageNumbers = (() => {
     if (totalPages <= 7) {
       return Array.from({ length: totalPages }, (_, i) => i + 1);
     }
@@ -68,7 +63,7 @@ export default memo(function PaginationControls({
     }
 
     return pages;
-  }, [page, totalPages]);
+  })();
 
   return (
     <div className={`flex justify-center items-center ${totalPages <= 1 ? '' : 'mt-3 mb-3'}`}>
@@ -152,4 +147,4 @@ export default memo(function PaginationControls({
       )}
     </div>
   );
-});
+}

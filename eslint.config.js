@@ -1,6 +1,7 @@
 const importX = require('eslint-plugin-import-x');
 const prettier = require('eslint-plugin-prettier');
 const tseslint = require('typescript-eslint');
+const reactCompiler = require('eslint-plugin-react-compiler');
 
 module.exports = [
   ...tseslint.configs.recommended,
@@ -8,8 +9,10 @@ module.exports = [
     plugins: {
       'import-x': importX,
       prettier,
+      'react-compiler': reactCompiler,
     },
     rules: {
+      'react-compiler/react-compiler': 'error',
       'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
       'no-console': ['error', { allow: ['warn', 'error', 'info'] }],
       'no-case-declarations': 'off',

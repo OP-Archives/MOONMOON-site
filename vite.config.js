@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import { compression } from 'vite-plugin-compression2';
+import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 
 const getGitInfo = (cmd, fallback = 'unknown') => {
   try {
@@ -18,7 +19,17 @@ export default defineConfig({
     __GIT_HASH__: JSON.stringify(getGitInfo('git rev-parse --short HEAD')),
   },
   plugins: [
-    react(),
+    react({
+      babel: {
+        plugins: [['babel-plugin-react-compiler', { target: '19' }]],
+      },
+    }),
+    ViteImageOptimizer({
+      test: /\.(jpe?g|png|gif|tiff|webp|svg)$/i,
+      jpg: { quality: 80 },
+      jpeg: { quality: 80 },
+      png: { quality: 80 },
+    }),
     tailwindcss(),
     compression({ algorithm: 'gzip', exclude: [/\.(br)$/, /\.(gz)$/] }),
     compression({ algorithm: 'brotli', exclude: [/\.(br)$/, /\.(gz)$/] }),

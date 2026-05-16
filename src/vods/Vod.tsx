@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import sadge from '../assets/sadge.jpg';
 import { type VodData } from '../utils/archive-client';
@@ -34,7 +33,7 @@ const prefetchPlayerChunk = () => {
   import('@op-archives/vod-components').catch(() => {});
 };
 
-export default memo(function Vod({ vod, priority }: VodProps) {
+export default function Vod({ vod, priority }: VodProps) {
   const DEFAULT_VOD = getVodLink(vod);
   const DEFAULT_THUMBNAIL = getThumbnail(vod);
 
@@ -83,4 +82,4 @@ export default memo(function Vod({ vod, priority }: VodProps) {
       </div>
     </div>
   );
-});
+}

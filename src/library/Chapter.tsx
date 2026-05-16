@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import CustomWidthTooltip from '../utils/CustomToolTip';
 import { getImage } from '../utils/helpers';
@@ -13,7 +12,7 @@ interface ChapterProps {
   priority?: boolean;
 }
 
-export default memo(function Chapter({ chapter, priority }: ChapterProps) {
+export default function Chapter({ chapter, priority }: ChapterProps) {
   return (
     <Link
       to={`/vods?game_id=${chapter.game_id}`}
@@ -45,4 +44,4 @@ export default memo(function Chapter({ chapter, priority }: ChapterProps) {
       </div>
     </Link>
   );
-});
+}

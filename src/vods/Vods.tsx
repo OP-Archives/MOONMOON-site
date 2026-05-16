@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left.mjs';
 import X from 'lucide-react/dist/esm/icons/x.mjs';
-import { useEffect, useState, useMemo, useRef, startTransition } from 'react';
+import { useEffect, useState, useRef, startTransition } from 'react';
 import { type LoaderFunctionArgs, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import type SimpleBarCore from 'simplebar-core';
 import SimpleBar from 'simplebar-react';
@@ -19,7 +19,8 @@ export const vodsLoader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const filter = url.searchParams.get('filter') || 'Default';
   const from = url.searchParams.get('from') || FORMATTED_START;
-  const to = url.searchParams.get('to') || TODAY_STRING;
+  const currentDayString = new Date().toISOString().split('T')[0];
+  const to = url.searchParams.get('to') || currentDayString;
   const title = url.searchParams.get('title') || '';
   const chapter = url.searchParams.get('chapter') || '';
   const page = parseInt(url.searchParams.get('page') || '1', 10);
@@ -61,7 +62,6 @@ export const vodsLoader = async ({ request }: LoaderFunctionArgs) => {
 const FILTERS = ['Default', 'Date', 'Title', 'Game'];
 const START_DATE = import.meta.env.VITE_START_DATE;
 
-const TODAY_STRING = new Date().toISOString().split('T')[0];
 const FORMATTED_START = START_DATE ? new Date(START_DATE).toISOString().split('T')[0] : '';
 
 export default function Vods() {
@@ -83,7 +83,7 @@ export default function Vods() {
   const gameId = searchParams.get('game_id');
   const limit = 20;
 
-  const memoizedDateRange = useMemo(() => {
+  const memoizedDateRange = (() => {
     if (filter !== 'Date' || !filterStartDate || !filterEndDate) return null;
     try {
       return {
@@ -93,7 +93,7 @@ export default function Vods() {
     } catch {
       return null;
     }
-  }, [filter, filterStartDate, filterEndDate]);
+  })();
 
   const [inputTitle, setInputTitle] = useState(filterTitle);
   const [inputGame, setInputGame] = useState(filterGame);
@@ -176,19 +176,16 @@ export default function Vods() {
     updateUrlParams({ to: val, page: '1' });
   }, 600);
 
-  const queryKeyParams = useMemo(
-    () => ({
-      limit,
-      page,
-      sort: 'created_at',
-      order: 'desc',
-      ...(gameId ? { game_id: gameId } : {}),
-      ...(memoizedDateRange ? memoizedDateRange : {}),
-      ...(filter === 'Title' && filterTitle ? { title: filterTitle } : {}),
-      ...(filter === 'Game' && filterGame ? { chapter: filterGame } : {}),
-    }),
-    [limit, page, gameId, filter, memoizedDateRange, filterTitle, filterGame]
-  );
+  const queryKeyParams = {
+    limit,
+    page,
+    sort: 'created_at',
+    order: 'desc',
+    ...(gameId ? { game_id: gameId } : {}),
+    ...(memoizedDateRange ? memoizedDateRange : {}),
+    ...(filter === 'Title' && filterTitle ? { title: filterTitle } : {}),
+    ...(filter === 'Game' && filterGame ? { chapter: filterGame } : {}),
+  };
 
   const { data, isLoading, isFetching } = useVods(queryKeyParams);
   const vods = data?.data ?? null;
@@ -196,16 +193,13 @@ export default function Vods() {
   const totalPages = Math.ceil((totalVods || 0) / limit);
   const isBackgroundFetching = isFetching && !isLoading;
 
-  const paginationParams = useMemo(
-    () => ({
-      ...(gameId ? { game_id: gameId } : {}),
-      ...(filter !== 'Default' ? { filter } : {}),
-      ...(filter === 'Date' ? { from: filterStartDate, to: filterEndDate } : {}),
-      ...(filterTitle ? { title: filterTitle } : {}),
-      ...(filterGame ? { chapter: filterGame } : {}),
-    }),
-    [gameId, filter, filterStartDate, filterEndDate, filterTitle, filterGame]
-  );
+  const paginationParams = {
+    ...(gameId ? { game_id: gameId } : {}),
+    ...(filter !== 'Default' ? { filter } : {}),
+    ...(filter === 'Date' ? { from: filterStartDate, to: filterEndDate } : {}),
+    ...(filterTitle ? { title: filterTitle } : {}),
+    ...(filterGame ? { chapter: filterGame } : {}),
+  };
 
   useEffect(() => {
     if (totalPages !== null && page < totalPages) {
