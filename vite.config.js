@@ -17,10 +17,6 @@ export default defineConfig({
   define: {
     __GIT_HASH__: JSON.stringify(getGitInfo('git rev-parse --short HEAD')),
   },
-  esbuild: {
-    pure: ['console.log'],
-    drop: ['debugger'],
-  },
   plugins: [
     react(),
     tailwindcss(),
