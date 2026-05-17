@@ -62,3 +62,9 @@ input[type='date']::-webkit-calendar-picker-indicator {
   filter: invert(1);
   cursor: pointer;
 }
+
+@media (max-width: 768px) {
+  .simplebar-content-wrapper {
+    overflow-x: hidden !important;
+  }
+}

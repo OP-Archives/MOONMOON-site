@@ -152,8 +152,8 @@ export default function ChaptersLibrary() {
   };
 
   return (
-    <SimpleBar ref={scrollRef} className="min-h-0 h-full">
-      <div className="px-2 py-1">
+    <SimpleBar ref={scrollRef} className="min-h-0 h-full overflow-x-hidden">
+      <div className="px-2 md:px-0 py-1 max-w-full">
         <div className="flex justify-center mt-2 flex-col items-center">
           {totalChapters !== null && (
             <h4 className="text-blue-500 text-3xl uppercase font-medium">{`${totalChapters} Games`}</h4>

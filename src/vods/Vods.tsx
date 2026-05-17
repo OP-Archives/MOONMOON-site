@@ -230,8 +230,8 @@ export default function Vods() {
   };
 
   return (
-    <SimpleBar ref={scrollRef} className="min-h-0 h-full">
-      <div className="p-2">
+    <SimpleBar ref={scrollRef} className="min-h-0 h-full w-full">
+      <div className="p-2 md:p-4 w-full">
         <div className="flex justify-center mt-2 flex-col items-center">
           {totalVods !== null && (
             <h4 className="text-blue-500 text-3xl uppercase font-medium">{`${totalVods} Vods`}</h4>
