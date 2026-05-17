@@ -4,6 +4,14 @@
   --color-dark: #0e0e10;
   --color-dark-light: #1a1a1b;
   --color-dark-hover: #292828;
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-border: #2e2e30;
+  --color-muted: #7a7a7d;
+  --color-muted-dim: #5a5a5d;
+  --color-error: #ef4444;
+  --color-overlay: rgba(0, 0, 0, 0.6);
+  --color-overlay-light: rgba(0, 0, 0, 0.5);
   --animate-spin: spin 1s linear infinite;
   @keyframes spin {
     from {

@@ -54,14 +54,14 @@ export default function Vod({ vod, priority }: VodProps) {
         </Link>
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute bottom-0 left-0">
-            <span className="text-xs p-1.5 bg-black/60 text-white">
+            <span className="text-xs p-1.5 bg-overlay text-white">
               {DATE_FORMATTER.format(new Date(vod.created_at))}
             </span>
           </div>
         </div>
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute bottom-0 right-0">
-            <span className="text-xs p-1.5 bg-black/60 text-white">{`${toHHMMSS(vod.duration)}`}</span>
+            <span className="text-xs p-1.5 bg-overlay text-white">{`${toHHMMSS(vod.duration)}`}</span>
           </div>
         </div>
       </div>
@@ -71,7 +71,7 @@ export default function Vod({ vod, priority }: VodProps) {
           <div className="p-0.5 min-w-0 w-full">
             <CustomWidthTooltip title={vod.title}>
               <CustomLink href={DEFAULT_VOD} className="block overflow-hidden">
-                <span className="text-blue-500 font-medium text-xs block truncate">{vod.title}</span>
+                <span className="text-primary font-medium text-xs block truncate">{vod.title}</span>
               </CustomLink>
             </CustomWidthTooltip>
           </div>

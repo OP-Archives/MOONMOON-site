@@ -73,17 +73,17 @@ export default function PaginationControls({ page, totalPages, preserveParams, o
             {page <= 1 ? (
               <button
                 disabled
-                className="w-9 h-9 flex items-center justify-center border border-gray-600 rounded-lg opacity-30 cursor-not-allowed text-sm text-white"
+className="w-9 h-9 flex items-center justify-center border border-border rounded-lg opacity-30 cursor-not-allowed text-sm text-white"
               >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-            ) : (
-              <Link
-                to={buildPageUrl(page - 1)}
-                onMouseEnter={() => onHoverPage && onHoverPage(page - 1)}
-                className="w-9 h-9 flex items-center justify-center border border-gray-600 rounded-lg hover:bg-gray-800 text-sm text-white"
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+          ) : (
+            <Link
+              to={buildPageUrl(page - 1)}
+              onMouseEnter={() => onHoverPage && onHoverPage(page - 1)}
+              className="w-9 h-9 flex items-center justify-center border border-border rounded-lg hover:bg-dark-hover text-sm text-white"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -93,7 +93,7 @@ export default function PaginationControls({ page, totalPages, preserveParams, o
             {pageNumbers.map((p, idx) => {
               if (p === 'ellipsis') {
                 return (
-                  <span key={`ellipsis-${idx}`} className="px-1 text-sm text-gray-400">
+                  <span key={`ellipsis-${idx}`} className="px-1 text-sm text-muted">
                     ...
                   </span>
                 );
@@ -105,8 +105,8 @@ export default function PaginationControls({ page, totalPages, preserveParams, o
                   onMouseEnter={() => onHoverPage && onHoverPage(p)}
                   className={`w-9 h-9 flex items-center justify-center border rounded-lg text-sm ${
                     p === page
-                      ? 'bg-blue-500/20 border-blue-400 text-blue-300'
-                      : 'border-gray-600 hover:bg-gray-800 text-white'
+                      ? 'bg-primary/20 border-primary text-primary'
+                      : 'border-border hover:bg-dark-hover text-white'
                   }`}
                 >
                   {p}
@@ -116,17 +116,17 @@ export default function PaginationControls({ page, totalPages, preserveParams, o
             {page >= totalPages ? (
               <button
                 disabled
-                className="w-9 h-9 flex items-center justify-center border border-gray-600 rounded-lg opacity-30 cursor-not-allowed text-sm text-white"
+className="w-9 h-9 flex items-center justify-center border border-border rounded-lg opacity-30 cursor-not-allowed text-sm text-white"
               >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            ) : (
-              <Link
-                to={buildPageUrl(page + 1)}
-                onMouseEnter={() => onHoverPage && onHoverPage(page + 1)}
-                className="w-9 h-9 flex items-center justify-center border border-gray-600 rounded-lg hover:bg-gray-800 text-sm text-white"
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          ) : (
+            <Link
+              to={buildPageUrl(page + 1)}
+              onMouseEnter={() => onHoverPage && onHoverPage(page + 1)}
+              className="w-9 h-9 flex items-center justify-center border border-border rounded-lg hover:bg-dark-hover text-sm text-white"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -135,7 +135,7 @@ export default function PaginationControls({ page, totalPages, preserveParams, o
             )}
             <input
               ref={pageInputRef}
-              className="w-14 ml-1 border border-gray-600 rounded-lg px-0 py-0 h-8 bg-dark-light text-white text-sm text-center placeholder-gray-400"
+              className="w-14 ml-1 border border-border rounded-lg px-0 py-0 h-8 bg-dark-light text-white text-sm text-center placeholder-muted-dim"
               type="text"
               defaultValue={page}
               onKeyDown={handleSubmit}

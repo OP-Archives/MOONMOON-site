@@ -5,7 +5,7 @@ export default function Footer() {
   return (
     <footer className="flex flex-col justify-center items-center">
       <div className="mt-1">
-        <span className="text-gray-500 text-xs">{`${import.meta.env.VITE_CHANNEL} © ${CURRENT_YEAR}`}</span>
+        <span className="text-muted-dim text-xs">{`${import.meta.env.VITE_CHANNEL} © ${CURRENT_YEAR}`}</span>
       </div>
       <a
         href="https://twitter.com/overpowered"
@@ -13,7 +13,7 @@ export default function Footer() {
         target="_blank"
         className="hover:opacity-50 transition-opacity flex items-center justify-center"
       >
-        <span className="text-gray-400 text-xs">made by OP with 💜</span>
+        <span className="text-muted text-xs">made by OP with 💜</span>
       </a>
       <a
         href={`${import.meta.env.VITE_GITHUB}/commit/${hash}`}
@@ -21,7 +21,7 @@ export default function Footer() {
         target="_blank"
         className="hover:opacity-50 transition-opacity flex items-center justify-center mb-1"
       >
-        <span className="text-gray-400 text-xs">{`Build Version: ${hash}`}</span>
+        <span className="text-muted text-xs">{`Build Version: ${hash}`}</span>
       </a>
     </footer>
   );

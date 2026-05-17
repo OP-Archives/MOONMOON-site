@@ -68,14 +68,14 @@ export default function WatchMenu({ vod }: WatchMenuProps) {
         onMouseDown={(e) => e.stopPropagation()}
         onClick={handleClick}
         onMouseEnter={prefetchPlayerChunk}
-        className="border border-blue-500 text-blue-500 font-semibold flex items-center gap-1 px-3 py-1 rounded hover:bg-blue-500/10 transition-colors cursor-pointer"
+        className="border border-primary text-primary font-semibold flex items-center gap-1 px-3 py-1 rounded hover:bg-primary/10 transition-colors cursor-pointer"
       >
         <Play size={16} /> Watch
       </button>
       {anchorEl && (
         <div
           ref={menuRef}
-          className="fixed z-50 bg-dark-light border border-gray-700 rounded shadow-xl w-max"
+          className="fixed z-50 bg-dark-light border border-border rounded shadow-xl w-max"
           style={{ left: coords.left, top: coords.top }}
         >
           <div className="p-1">

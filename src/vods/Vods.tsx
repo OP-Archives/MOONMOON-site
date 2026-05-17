@@ -234,14 +234,14 @@ export default function Vods() {
       <div className="p-2 md:p-4 w-full">
         <div className="flex justify-center mt-2 flex-col items-center">
           {totalVods !== null && (
-            <h4 className="text-blue-500 text-3xl uppercase font-medium">{`${totalVods} Vods`}</h4>
+            <h4 className="text-primary text-3xl uppercase font-medium">{`${totalVods} Vods`}</h4>
           )}
         </div>
         <div className="max-w-[1600px] mx-auto pt-1 flex flex-row items-center">
           {gameId && (
             <button
               onClick={() => navigate(-1)}
-              className="mr-2 bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700 transition-colors flex items-center gap-1 text-sm"
+              className="mr-2 bg-primary text-white px-3 py-1.5 rounded hover:bg-primary-hover transition-colors flex items-center gap-1 text-sm"
             >
               <ArrowLeft size={16} /> Back
             </button>
@@ -250,7 +250,7 @@ export default function Vods() {
             disabled={!!gameId}
             value={filter}
             onChange={changeFilter}
-            className="bg-dark-light border border-gray-600 rounded px-3 py-1.5 text-sm mr-1 text-white w-max"
+            className="bg-dark-light border border-border rounded px-3 py-1.5 text-sm mr-1 text-white w-max"
           >
             {FILTERS.map((data) => (
               <option key={data} value={data}>
@@ -269,7 +269,7 @@ export default function Vods() {
                   setInputStartDate(e.target.value);
                   debouncedSetStartDate(e.target.value);
                 }}
-                className="bg-dark-light border border-gray-600 rounded px-2 py-1.5 text-sm text-white"
+                className="bg-dark-light border border-border rounded px-2 py-1.5 text-sm text-white"
               />
               <input
                 type="date"
@@ -280,7 +280,7 @@ export default function Vods() {
                   setInputEndDate(e.target.value);
                   debouncedSetEndDate(e.target.value);
                 }}
-                className="bg-dark-light border border-gray-600 rounded px-2 py-1.5 text-sm text-white"
+                className="bg-dark-light border border-border rounded px-2 py-1.5 text-sm text-white"
               />
             </div>
           )}
@@ -294,12 +294,12 @@ export default function Vods() {
                   debouncedSetFilterTitle(e.target.value);
                 }}
                 value={inputTitle}
-                className="w-44 bg-dark-light border border-gray-600 rounded px-3 py-1.5 text-sm text-white placeholder-gray-500 pr-8"
+                className="w-44 bg-dark-light border border-border rounded px-3 py-1.5 text-sm text-white placeholder-muted-dim pr-8"
               />
               {inputTitle && (
                 <button
                   onClick={handleClearTitle}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors cursor-pointer"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted hover:text-white transition-colors cursor-pointer"
                 >
                   <X size={16} />
                 </button>
@@ -316,12 +316,12 @@ export default function Vods() {
                   debouncedSetFilterGame(e.target.value);
                 }}
                 value={inputGame}
-                className="w-44 bg-dark-light border border-gray-600 rounded px-3 py-1.5 text-sm text-white placeholder-gray-500 pr-8"
+                className="w-44 bg-dark-light border border-border rounded px-3 py-1.5 text-sm text-white placeholder-muted-dim pr-8"
               />
               {inputGame && (
                 <button
                   onClick={handleClearGame}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors cursor-pointer"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted hover:text-white transition-colors cursor-pointer"
                 >
                   <X size={16} />
                 </button>
@@ -332,7 +332,7 @@ export default function Vods() {
         {isLoading && <Loading />}
 
         {!isLoading && vods && vods.length === 0 && (
-          <p className="mt-12 text-center text-gray-400 text-sm">No VODs found matching your search filters.</p>
+          <p className="mt-12 text-center text-muted text-sm">No VODs found matching your search filters.</p>
         )}
 
         {vods && vods.length > 0 && (

@@ -156,7 +156,7 @@ export default function ChaptersLibrary() {
       <div className="px-2 md:px-0 py-1 max-w-full">
         <div className="flex justify-center mt-2 flex-col items-center">
           {totalChapters !== null && (
-            <h4 className="text-blue-500 text-3xl uppercase font-medium">{`${totalChapters} Games`}</h4>
+            <h4 className="text-primary text-3xl uppercase font-medium">{`${totalChapters} Games`}</h4>
           )}
         </div>
         <div className="max-w-[1100px] mx-auto">
@@ -171,12 +171,12 @@ export default function ChaptersLibrary() {
                   debouncedSetSearchTerm(e.target.value);
                 }}
                 value={inputSearch}
-                className="w-full bg-dark-light border border-gray-600 rounded px-3 py-1.5 text-sm text-white placeholder-gray-500 pr-8"
+                className="w-full bg-dark-light border border-border rounded px-3 py-1.5 text-sm text-white placeholder-muted-dim pr-8"
               />
               {inputSearch && (
                 <button
                   onClick={handleClearSearch}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted hover:text-white transition-colors"
                 >
                   <X size={16} />
                 </button>
@@ -185,7 +185,7 @@ export default function ChaptersLibrary() {
             <select
               value={displaySort}
               onChange={changeSort}
-              className="mt-1 sm:mt-0 bg-dark-light border border-gray-600 rounded px-3 py-1.5 text-sm w-max"
+              className="mt-1 sm:mt-0 bg-dark-light border border-border rounded px-3 py-1.5 text-sm w-max"
             >
               {SORTS.map((data) => (
                 <option key={data} value={data}>
@@ -197,7 +197,7 @@ export default function ChaptersLibrary() {
           {isLoading && <Loading />}
 
           {!isLoading && chapters && chapters.length === 0 && (
-            <p className="mt-12 text-center text-gray-400 text-sm">No library games found matching your search text.</p>
+            <p className="mt-12 text-center text-muted text-sm">No library games found matching your search text.</p>
           )}
 
           {chapters && chapters.length > 0 && (

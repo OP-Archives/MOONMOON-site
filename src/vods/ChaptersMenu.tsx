@@ -106,7 +106,7 @@ export default function Chapters({ vod }: ChaptersProps) {
       {anchorEl && (
         <div
           ref={menuRef}
-          className="fixed z-50 bg-dark-light border border-gray-700 rounded shadow-xl max-h-[400px] overflow-y-auto"
+          className="fixed z-50 bg-dark-light border border-border rounded shadow-xl max-h-[400px] overflow-y-auto"
           style={{
             ...(coords.top !== undefined ? { top: coords.top } : {}),
             ...(coords.bottom !== undefined ? { bottom: coords.bottom } : {}),
@@ -121,7 +121,7 @@ export default function Chapters({ vod }: ChaptersProps) {
               key={`${vod.id}${data?.game_id}${data?.start}`}
               href={`${DEFAULT_VOD}?t=${toHMS(data?.start as number)}`}
               onClick={handleClose}
-              className="flex items-start px-3 py-2 hover:bg-dark-hover transition-colors border-b border-gray-800 last:border-0"
+              className="flex items-start px-3 py-2 hover:bg-dark-hover transition-colors border-b border-dark-hover last:border-0"
             >
               <div className="mr-2 shrink-0">
                 <img
@@ -135,9 +135,9 @@ export default function Chapters({ vod }: ChaptersProps) {
                 />
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="text-blue-500 text-sm whitespace-normal break-words leading-snug">{data.name}</span>
+                <span className="text-primary text-sm whitespace-normal break-words leading-snug">{data.name}</span>
                 {data.end !== undefined && data.duration !== undefined && (
-                  <span className="text-gray-400 text-xs mt-0.5">{toHHMMSS(data.duration)}</span>
+                  <span className="text-muted text-xs mt-0.5">{toHHMMSS(data.duration)}</span>
                 )}
               </div>
             </CustomLink>
@@ -146,7 +146,7 @@ export default function Chapters({ vod }: ChaptersProps) {
           {!expanded && chaptersArray.length > 15 && (
             <button
               onClick={() => setExpanded(true)}
-              className="w-full text-center py-2 text-xs text-blue-400 font-semibold bg-dark hover:bg-dark-hover transition-colors cursor-pointer block"
+              className="w-full text-center py-2 text-xs text-primary font-semibold bg-dark hover:bg-dark-hover transition-colors cursor-pointer block"
             >
               {`Show ${chaptersArray.length - 15} More Chapters...`}
             </button>

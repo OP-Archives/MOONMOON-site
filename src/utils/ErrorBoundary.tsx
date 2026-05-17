@@ -12,12 +12,12 @@ const ErrorView = ({ channel, logo }: ErrorProps) => {
       <title>{`Error - ${channel}`}</title>
       <img src={logo} alt="" style={{ height: 'auto', maxWidth: '200px' }} />
       <div className="flex justify-center mt-4">
-        <h5 className="text-red-400 text-xl font-semibold">Something went wrong</h5>
+        <h5 className="text-error text-xl font-semibold">Something went wrong</h5>
       </div>
       <div className="flex justify-center mt-4">
         <CustomLink
           href="/"
-          className="border border-blue-500 text-blue-500 px-4 py-2 rounded hover:bg-blue-500/10 transition-colors inline-block"
+          className="border border-primary text-primary px-4 py-2 rounded hover:bg-primary/10 transition-colors inline-block"
         >
           Go Home
         </CustomLink>

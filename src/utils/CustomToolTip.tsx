@@ -26,7 +26,7 @@ export default function CustomWidthTooltip({ title, placement = 'top', children 
         }
       >
         <div
-          className="bg-gray-900 text-white text-sm px-3 py-1.5 rounded shadow-lg whitespace-normal break-words"
+          className="bg-dark text-white text-sm px-3 py-1.5 rounded shadow-lg whitespace-normal break-words"
           style={{ maxWidth: 'min(400px, calc(100vw - 2rem))' }}
         >
           {title}

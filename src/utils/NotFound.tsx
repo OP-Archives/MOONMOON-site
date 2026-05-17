@@ -6,7 +6,7 @@ export default function NotFound({ channel, logo }: { channel: string; logo: str
       <title>{`Not Found - ${channel}`}</title>
       <img src={logo} alt="" style={{ height: 'auto', maxWidth: '200px' }} />
       <div className="flex justify-center mt-4">
-        <CustomLink href="/" className="text-gray-400 hover:opacity-50 transition-opacity">
+        <CustomLink href="/" className="text-muted hover:opacity-50 transition-opacity">
           Nothing over here..
         </CustomLink>
       </div>
