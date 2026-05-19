@@ -130,7 +130,7 @@ export default function ChaptersLibrary() {
 
   const paginationParams = {
     ...(searchTerm ? { search: searchTerm } : {}),
-    ...(sort !== 'count' ? { sort } : {}),
+    sort,
   };
 
   useEffect(() => {
