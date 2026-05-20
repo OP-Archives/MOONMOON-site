@@ -70,6 +70,7 @@ export interface VodData {
   title: string;
   created_at: string;
   duration: number;
+  platform?: string;
   thumbnail_url?: string;
   chapters?: ChapterItem[];
   vod_uploads: VodUpload[];
@@ -83,6 +84,25 @@ export interface LibraryChapterItem {
   count: number;
 }
 
+export interface LibraryGameItem {
+  game_id: string;
+  game_name: string;
+  chapter_image?: string;
+  count: number;
+}
+
+export interface GameData {
+  id: string;
+  vod_id: string;
+  title: string;
+  created_at: string;
+  duration: number;
+  thumbnail_url?: string;
+  chapters?: ChapterItem[];
+  game_name?: string;
+  chapter_image?: string;
+}
+
 const buildParams = (params: object) => {
   const query = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
@@ -94,16 +114,29 @@ const buildParams = (params: object) => {
 };
 
 async function fetchJson<T>(url: string, options: FetchOptions = {}): Promise<T> {
-  const timeoutSignal = AbortSignal.timeout(8000);
-  const combinedSignal = options.signal ? AbortSignal.any([options.signal, timeoutSignal]) : timeoutSignal;
+  const timeoutController = new AbortController();
+  const timeoutId = setTimeout(() => timeoutController.abort(), 8000);
 
-  const res = await window.fetch(url, {
-    ...options,
-    signal: combinedSignal,
-    headers: { 'Content-Type': 'application/json', ...options.headers },
-  });
-  if (!res.ok) throw new Error(`API error: ${res.status}`);
-  return res.json() as Promise<T>;
+  let signal: AbortSignal = timeoutController.signal;
+  if (options.signal) {
+    const combined = new AbortController();
+    const handler = () => combined.abort();
+    options.signal.addEventListener('abort', handler, { once: true });
+    timeoutController.signal.addEventListener('abort', () => combined.abort(), { once: true });
+    signal = combined.signal;
+  }
+
+  try {
+    const res = await window.fetch(url, {
+      ...options,
+      signal,
+      headers: { 'Content-Type': 'application/json', ...options.headers },
+    });
+    if (!res.ok) throw new Error(`API error: ${res.status}`);
+    return res.json() as Promise<T>;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 export async function listVods(params: ListParams & { signal?: AbortSignal } = {}): Promise<ApiResponse<VodData>> {
@@ -123,14 +156,16 @@ export async function getVodByPlatform(
   return fetchJson(`${apiBase}/${TENANT_ID}/vods/${platform}/${platformVodId}`, { signal: options.signal });
 }
 
-export async function listGames(params: GameListParams & { signal?: AbortSignal } = {}): Promise<ApiResponse<VodData>> {
+export async function listGames(
+  params: GameListParams & { signal?: AbortSignal } = {}
+): Promise<ApiResponse<GameData>> {
   const url = `${apiBase}/${TENANT_ID}/games?${buildParams(params)}`;
   return fetchJson(url, { signal: params.signal });
 }
 
 export async function getGamesLibrary(
   params: LibraryParams & { signal?: AbortSignal } = {}
-): Promise<ApiResponse<LibraryChapterItem>> {
+): Promise<ApiResponse<LibraryGameItem>> {
   const url = `${apiBase}/${TENANT_ID}/games/library?${buildParams(params)}`;
   return fetchJson(url, { signal: params.signal });
 }
