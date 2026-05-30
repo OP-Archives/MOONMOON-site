@@ -6,12 +6,12 @@
     "node": ">=22.0.0"
   },
   "dependencies": {
-    "@op-archives/vod-components": "^0.1.38",
+    "@op-archives/vod-components": "^0.1.42",
     "@tanstack/react-query": "^5.100.14",
-    "lucide-react": "^1.16.0",
+    "lucide-react": "^1.17.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
-    "react-router-dom": "^7.15.1",
+    "react-router-dom": "^7.16.0",
     "simplebar-react": "^3.3.2"
   },
   "scripts": {
@@ -27,10 +27,10 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.2",
     "babel-plugin-react-compiler": "^1.0.0",
-    "eslint": "^10.4.0",
+    "eslint": "^10.4.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import-x": "^4.16.2",
-    "eslint-plugin-prettier": "^5.5.5",
+    "eslint-plugin-prettier": "^5.5.6",
     "eslint-plugin-react-compiler": "^19.1.0-rc.2",
     "nodemon": "^3.1.14",
     "prettier": "^3.8.3",
