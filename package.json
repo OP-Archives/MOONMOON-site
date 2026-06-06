@@ -6,12 +6,12 @@
     "node": ">=22.0.0"
   },
   "dependencies": {
-    "@op-archives/vod-components": "^0.1.46",
-    "@tanstack/react-query": "^5.100.14",
+    "@op-archives/vod-components": "^0.1.49",
+    "@tanstack/react-query": "^5.101.0",
     "lucide-react": "^1.17.0",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6",
-    "react-router-dom": "^7.16.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-router-dom": "^7.17.0",
     "simplebar-react": "^3.3.2"
   },
   "scripts": {
@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.0",
-    "@types/react": "^19.2.15",
+    "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.2",
     "babel-plugin-react-compiler": "^1.0.0",
@@ -38,8 +38,8 @@
     "svgo": "^4.0.1",
     "tailwindcss": "^4.3.0",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.60.0",
-    "vite": "^8.0.15",
+    "typescript-eslint": "^8.60.1",
+    "vite": "^8.0.16",
     "vite-plugin-compression2": "^2.5.3",
     "vite-plugin-image-optimizer": "^2.0.3",
     "yalc": "^1.0.0-pre.53"
