@@ -6,7 +6,7 @@
     "node": ">=22.0.0"
   },
   "dependencies": {
-    "@op-archives/vod-components": "^0.1.50",
+    "@op-archives/vod-components": "^0.1.51",
     "@tanstack/react-query": "^5.101.0",
     "lucide-react": "^1.17.0",
     "react": "^19.2.7",
