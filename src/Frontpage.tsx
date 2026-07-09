@@ -5,11 +5,9 @@ import { listVods, getChaptersLibrary } from './utils/archive-client';
 import type { VodData, LibraryChapterItem } from './utils/archive-client';
 import CustomLink from './utils/CustomLink';
 import Footer from './utils/Footer';
-import { useMediaQuery } from './utils/useMediaQuery';
 import Vod from './vods/Vod';
 
 export default function Frontpage() {
-  const isMobile = useMediaQuery('(max-width: 800px)');
   const [vods, setVods] = useState<VodData[]>([]);
   const [games, setGames] = useState<LibraryChapterItem[]>([]);
 
@@ -30,12 +28,11 @@ export default function Frontpage() {
   }, []);
 
   if (vods.length === 0) return null;
-  const vodsToUse = isMobile ? vods.slice(0, 2) : vods.slice(0, 3);
   return (
     <SimpleBar className="min-h-0 h-full w-full">
       <div className="p-2 md:p-4">
         <div className="flex justify-center w-full">
-          <div className={`flex flex-col ${isMobile ? 'w-full' : 'w-1/2'}`}>
+          <div className="flex flex-col w-1/2">
             <div className="bg-dark-light border border-gray-700 rounded p-2 mt-1 w-full">
               <div className="flex items-center justify-between mb-3">
                 <h6 className="text-primary font-semibold">Recent Vods</h6>
@@ -44,8 +41,8 @@ export default function Frontpage() {
                 </CustomLink>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mt-2 justify-center">
-                {vodsToUse.map((vod: VodData) => (
-                  <Vod key={vod.id} vod={vod} isMobile={isMobile} />
+                {vods.map((vod: VodData) => (
+                  <Vod key={vod.id} vod={vod} />
                 ))}
               </div>
             </div>
@@ -54,7 +51,7 @@ export default function Frontpage() {
       </div>
       <div className="p-2 md:p-4">
         <div className="flex justify-center w-full">
-          <div className={`flex flex-col ${isMobile ? 'w-full' : 'w-1/2'}`}>
+          <div className="flex flex-col w-1/2">
             <div className="bg-dark-light border border-gray-700 rounded p-2 w-full">
               <div className="flex items-center justify-between mb-3">
                 <h6 className="text-primary font-semibold">Most Played Games</h6>

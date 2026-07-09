@@ -9,7 +9,6 @@ import WatchMenu from './WatchMenu';
 
 interface VodProps {
   vod: VodData;
-  isMobile?: boolean;
   priority?: boolean;
 }
 
