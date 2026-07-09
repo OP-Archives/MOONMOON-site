@@ -4,41 +4,14 @@ import { useEffect, useState, useRef, useMemo } from 'react';
 import { useSearchParams, useLocation } from 'react-router-dom';
 import type SimpleBarCore from 'simplebar-core';
 import SimpleBar from 'simplebar-react';
-import { getChaptersLibrary } from '../utils/archive-client';
 import { useDebouncedSetter } from '../utils/debounceHelper';
 import Footer from '../utils/Footer';
 import Loading from '../utils/Loading';
 import PaginationControls from '../utils/PaginationControls';
-import { queryClient } from '../utils/queryClient';
 import { useChapters, prefetchNextPageChapters } from '../utils/useChapters';
 import { useListFilters } from '../utils/useListFilters';
 import { useMediaQuery } from '../utils/useMediaQuery';
 import GameCard from './GameCard';
-
-export const chaptersLoader = async ({ request }: import('react-router-dom').LoaderFunctionArgs) => {
-  const url = new URL(request.url);
-  const searchTerm = url.searchParams.get('search') || '';
-  const sort = url.searchParams.get('sort') || 'recent';
-  const page = parseInt(url.searchParams.get('page') || '1', 10);
-  const limit = 20;
-
-  const apiSort = sort === 'recent' ? 'recent' : sort === 'chapter_name' ? 'chapter_name' : 'count';
-  const queryKeyParams = {
-    page,
-    limit,
-    ...(searchTerm.length > 0 ? { chapter_name: searchTerm } : {}),
-    sort: apiSort,
-    order: sort === 'chapter_name' ? 'asc' : 'desc',
-  };
-
-  await queryClient.ensureQueryData({
-    queryKey: ['chapters', queryKeyParams],
-    queryFn: ({ signal }: { signal: AbortSignal }) => getChaptersLibrary({ ...queryKeyParams, signal }),
-    staleTime: 5 * 60 * 1000,
-  });
-
-  return null;
-};
 
 const SORTS = ['Recently Played', 'Most Played', 'Game Name'];
 

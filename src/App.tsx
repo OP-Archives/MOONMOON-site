@@ -1,47 +1,12 @@
-import { lazy, Suspense } from 'react';
-import {
-  createBrowserRouter,
-  RouterProvider,
-  createRoutesFromElements,
-  Route,
-  Outlet,
-  type LoaderFunctionArgs,
-} from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Frontpage from './Frontpage';
-import ChaptersLibrary, { chaptersLoader } from './library/ChaptersLibrary';
 import Navbar from './navbar/navbar';
-import { getVod } from './utils/archive-client';
 import ErrorBoundary from './utils/ErrorBoundary';
-import Loading from './utils/Loading';
-import { queryClient } from './utils/queryClient';
-import Vods, { vodsLoader } from './vods/Vods';
-const NotFound = lazy(() => import('./utils/NotFound'));
-const YoutubeVod = lazy(() =>
-  Promise.all([import('@op-archives/vod-components'), import('@op-archives/vod-components/index.css')]).then((m) => ({
-    default: m[0].YoutubeVod,
-  }))
-);
-const CustomVod = lazy(() =>
-  Promise.all([import('@op-archives/vod-components'), import('@op-archives/vod-components/index.css')]).then((m) => ({
-    default: m[0].CustomVod,
-  }))
-);
-const videoLoader = async ({ params, request }: LoaderFunctionArgs) => {
-  if (params.vodId) {
-    queryClient.prefetchQuery({
-      queryKey: ['vod', params.vodId],
-      queryFn: () => getVod(params.vodId as string, { signal: request.signal }),
-      staleTime: 5 * 60 * 1000,
-    });
-  }
-  return null;
-};
-
-const Games = lazy(() =>
-  Promise.all([import('@op-archives/vod-components'), import('@op-archives/vod-components/index.css')]).then((m) => ({
-    default: m[0].Games,
-  }))
-);
+import Vods from './vods/Vods';
+import ChaptersLibrary from './library/ChaptersLibrary';
+import NotFound from './utils/NotFound';
+import '@op-archives/vod-components/index.css';
+import { YoutubeVod, CustomVod, Games } from '@op-archives/vod-components';
 
 const channel = import.meta.env.VITE_CHANNEL;
 const logo = '/logo.jpg';
@@ -50,107 +15,90 @@ const archiveApiBase = import.meta.env.VITE_ARCHIVE_API_BASE;
 const defaultDelay = Number(import.meta.env.VITE_DEFAULT_DELAY);
 const twitchId = Number(import.meta.env.VITE_TWITCH_ID);
 
-const MainLayout = () => (
-  <>
-    <Navbar channel={channel} logo={logo} />
-    <Suspense fallback={<Loading />}>
-      <Outlet />
-    </Suspense>
-  </>
-);
-
-const router = createBrowserRouter(
-  createRoutesFromElements(
-    <Route hydrateFallbackElement={<Loading />}>
-      <Route element={<MainLayout />}>
-        <Route path="/" element={<Frontpage />} />
-        <Route path="/vods" element={<Vods />} loader={vodsLoader} />
-        <Route path="/library" element={<ChaptersLibrary />} loader={chaptersLoader} />
-        <Route path="*" element={<NotFound channel={channel} logo={logo} />} />
-      </Route>
-      <Route
-        path="/vods/:vodId"
-        loader={videoLoader}
-        element={
-          <Suspense fallback={<Loading />}>
-            <YoutubeVod
-              type="vod"
-              logo={logo}
-              origin={origin}
-              channel={channel}
-              archiveApiBase={archiveApiBase}
-              defaultDelay={defaultDelay}
-              twitchId={twitchId}
-            />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/live/:vodId"
-        loader={videoLoader}
-        element={
-          <Suspense fallback={<Loading />}>
-            <YoutubeVod
-              type="live"
-              logo={logo}
-              origin={origin}
-              channel={channel}
-              archiveApiBase={archiveApiBase}
-              defaultDelay={defaultDelay}
-              twitchId={twitchId}
-            />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/youtube/:vodId"
-        loader={videoLoader}
-        element={
-          <Suspense fallback={<Loading />}>
-            <YoutubeVod
-              logo={logo}
-              origin={origin}
-              channel={channel}
-              archiveApiBase={archiveApiBase}
-              defaultDelay={defaultDelay}
-              twitchId={twitchId}
-            />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/games/:vodId"
-        loader={videoLoader}
-        element={
-          <Suspense fallback={<Loading />}>
-            <Games channel={channel} logo={logo} origin={origin} archiveApiBase={archiveApiBase} twitchId={twitchId} />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/manual/:vodId"
-        loader={videoLoader}
-        element={
-          <Suspense fallback={<Loading />}>
-            <CustomVod
-              type="manual"
-              logo={logo}
-              channel={channel}
-              archiveApiBase={archiveApiBase}
-              twitchId={twitchId}
-            />
-          </Suspense>
-        }
-      />
-    </Route>
-  )
-);
+function AppLayout() {
+  return (
+    <>
+      <Navbar channel={channel} logo={logo} />
+      <main className="relative mx-auto flex min-h-0 w-full flex-1 flex-col max-w-full">
+        <Routes>
+          <Route path="/" element={<Frontpage />} />
+          <Route path="/vods" element={<Vods />} />
+          <Route path="/library" element={<ChaptersLibrary />} />
+          <Route
+            path="/vods/:vodId"
+            element={
+              <YoutubeVod
+                type="vod"
+                logo={logo}
+                origin={origin}
+                channel={channel}
+                archiveApiBase={archiveApiBase}
+                defaultDelay={defaultDelay}
+                twitchId={twitchId}
+              />
+            }
+          />
+          <Route
+            path="/live/:vodId"
+            element={
+              <YoutubeVod
+                type="live"
+                logo={logo}
+                origin={origin}
+                channel={channel}
+                archiveApiBase={archiveApiBase}
+                defaultDelay={defaultDelay}
+                twitchId={twitchId}
+              />
+            }
+          />
+          <Route
+            path="/youtube/:vodId"
+            element={
+              <YoutubeVod
+                logo={logo}
+                origin={origin}
+                channel={channel}
+                archiveApiBase={archiveApiBase}
+                defaultDelay={defaultDelay}
+                twitchId={twitchId}
+              />
+            }
+          />
+          <Route
+            path="/games/:vodId"
+            element={
+              <Games channel={channel} logo={logo} origin={origin} archiveApiBase={archiveApiBase} twitchId={twitchId} />
+            }
+          />
+          <Route
+            path="/manual/:vodId"
+            element={
+              <CustomVod
+                type="manual"
+                logo={logo}
+                channel={channel}
+                archiveApiBase={archiveApiBase}
+                twitchId={twitchId}
+              />
+            }
+          />
+          <Route path="*" element={<NotFound channel={channel} logo={logo} />} />
+        </Routes>
+      </main>
+    </>
+  );
+}
 
 export default function App() {
   return (
     <div className="fixed inset-0 overflow-hidden flex flex-col bg-dark">
       <ErrorBoundary channel={channel} logo={logo}>
-        <RouterProvider router={router} />
+        <BrowserRouter>
+          <div className="flex min-h-0 flex-1 flex-col">
+            <AppLayout />
+          </div>
+        </BrowserRouter>
       </ErrorBoundary>
     </div>
   );
