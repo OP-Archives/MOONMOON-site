@@ -33,3 +33,35 @@ export const YouTubeIcon = function YouTubeIcon({ className = '', size = 24, ...
     </svg>
   );
 };
+
+export const TwitchIcon = function TwitchIcon({ className = '', size = 24, ...props }: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      {...props}
+    >
+      <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z" />
+    </svg>
+  );
+};
+
+export const KickIcon = function KickIcon({ className = '', size = 24, ...props }: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      {...props}
+    >
+      <path d="M2.71 3.29L9.12 19.71C9.39 20.5 10.17 21 11 21H16.17C16.42 21 16.66 20.91 16.88 20.74L21.58 17.24L23 16.17L3.5 2.29L2.71 3.29ZM19.5 15.5L17.5 17H13L6.5 3.5L19.5 15.5Z" />
+    </svg>
+  );
+};

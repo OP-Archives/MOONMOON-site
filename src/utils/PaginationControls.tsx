@@ -73,17 +73,17 @@ export default function PaginationControls({ page, totalPages, preserveParams, o
             {page <= 1 ? (
               <button
                 disabled
-className="w-9 h-9 flex items-center justify-center border border-border rounded-lg opacity-30 cursor-not-allowed text-sm text-white"
+                className="w-9 h-9 flex items-center justify-center border border-border rounded-lg opacity-30 cursor-not-allowed text-sm text-white"
               >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-          ) : (
-            <Link
-              to={buildPageUrl(page - 1)}
-              onMouseEnter={() => onHoverPage && onHoverPage(page - 1)}
-              className="w-9 h-9 flex items-center justify-center border border-border rounded-lg hover:bg-dark-hover text-sm text-white"
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+            ) : (
+              <Link
+                to={buildPageUrl(page - 1)}
+                onMouseEnter={() => onHoverPage && onHoverPage(page - 1)}
+                className="w-9 h-9 flex items-center justify-center border border-border rounded-lg hover:bg-dark-hover text-sm text-white"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -116,17 +116,17 @@ className="w-9 h-9 flex items-center justify-center border border-border rounded
             {page >= totalPages ? (
               <button
                 disabled
-className="w-9 h-9 flex items-center justify-center border border-border rounded-lg opacity-30 cursor-not-allowed text-sm text-white"
+                className="w-9 h-9 flex items-center justify-center border border-border rounded-lg opacity-30 cursor-not-allowed text-sm text-white"
               >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          ) : (
-            <Link
-              to={buildPageUrl(page + 1)}
-              onMouseEnter={() => onHoverPage && onHoverPage(page + 1)}
-              className="w-9 h-9 flex items-center justify-center border border-border rounded-lg hover:bg-dark-hover text-sm text-white"
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            ) : (
+              <Link
+                to={buildPageUrl(page + 1)}
+                onMouseEnter={() => onHoverPage && onHoverPage(page + 1)}
+                className="w-9 h-9 flex items-center justify-center border border-border rounded-lg hover:bg-dark-hover text-sm text-white"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

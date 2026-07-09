@@ -17,14 +17,14 @@ interface DrawerProps {
 }
 
 const mainLinks = [
-   { title: 'Home', path: '/', icon: <Home className="text-primary" size={20} /> },
+  { title: 'Home', path: '/', icon: <Home className="text-primary" size={20} /> },
   { title: 'Vods', path: '/vods', icon: <Video className="text-primary" size={20} /> },
   { title: 'Library', path: '/library', icon: <Library className="text-primary" size={20} /> },
-    {
-      title: 'Issues',
-      path: `${import.meta.env.VITE_GITHUB}/issues`,
-      icon: <AlertCircle className="text-primary" size={20} />,
-    },
+  {
+    title: 'Issues',
+    path: `${import.meta.env.VITE_GITHUB}/issues`,
+    icon: <AlertCircle className="text-primary" size={20} />,
+  },
   { title: 'Game Jam', path: 'https://jam.moon2.tv', icon: <Gamepad2 className="text-primary" size={20} /> },
 ];
 

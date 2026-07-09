@@ -72,13 +72,7 @@ export default function Navbar({ channel, logo }: NavbarProps) {
               <div className="mr-2">
                 <CustomLink href="/vods">
                   <div className="flex justify-center items-center gap-1">
-                    <svg
-                      className="text-primary mr-0.5"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
+                    <svg className="text-primary mr-0.5" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8 12.5v-9l6 4.5-6 4.5z" />
                     </svg>
                     <span className="text-primary font-semibold text-lg">Vods</span>
@@ -116,13 +110,7 @@ export default function Navbar({ channel, logo }: NavbarProps) {
               <div className="mr-2">
                 <CustomLink href={`${import.meta.env.VITE_GITHUB}/issues`}>
                   <div className="flex justify-center items-center gap-1">
-                    <svg
-                      className="text-primary mr-0.5"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
+                    <svg className="text-primary mr-0.5" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
                     </svg>
                     <span className="text-primary font-semibold text-lg">Issues</span>

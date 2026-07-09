@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import X from 'lucide-react/dist/esm/icons/x.mjs';
-import { useEffect, useState, useRef, startTransition } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { type LoaderFunctionArgs, useSearchParams, useLocation } from 'react-router-dom';
 import type SimpleBarCore from 'simplebar-core';
 import SimpleBar from 'simplebar-react';
@@ -12,7 +12,7 @@ import PaginationControls from '../utils/PaginationControls';
 import { queryClient } from '../utils/queryClient';
 import { useChapters, prefetchNextPageChapters } from '../utils/useChapters';
 import { useMediaQuery } from '../utils/useMediaQuery';
-import Chapter from './Chapter';
+import GameCard from './GameCard';
 
 export const chaptersLoader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
@@ -55,10 +55,12 @@ export default function ChaptersLibrary() {
   const limit = 20;
 
   const [inputSearch, setInputSearch] = useState(searchTerm);
-  const nativeInputRef = useRef<HTMLInputElement>(null);
+  const isTypingRef = useRef(false);
 
   useEffect(() => {
-    setInputSearch(searchTerm);
+    if (!isTypingRef.current) {
+      setInputSearch(searchTerm);
+    }
   }, [searchTerm]);
 
   useEffect(() => {
@@ -91,20 +93,18 @@ export default function ChaptersLibrary() {
   }, [page, location.key]);
 
   const updateUrlParams = (updates: Record<string, string | null>) => {
-    startTransition(() => {
-      setSearchParams(
-        (prev) => {
-          const nextParams = new URLSearchParams(prev);
+    setSearchParams(
+      (prev) => {
+        const nextParams = new URLSearchParams(prev);
 
-          for (const [key, val] of Object.entries(updates)) {
-            if (val) nextParams.set(key, val);
-            else nextParams.delete(key);
-          }
-          return nextParams;
-        },
-        { replace: true }
-      );
-    });
+        for (const [key, val] of Object.entries(updates)) {
+          if (val) nextParams.set(key, val);
+          else nextParams.delete(key);
+        }
+        return nextParams;
+      },
+      { replace: true }
+    );
   };
 
   const debouncedSetSearchTerm = useDebouncedSetter((val: string) => {
@@ -148,7 +148,6 @@ export default function ChaptersLibrary() {
   const handleClearSearch = () => {
     setInputSearch('');
     updateUrlParams({ search: null, page: '1' });
-    if (nativeInputRef.current) nativeInputRef.current.value = '';
   };
 
   return (
@@ -163,12 +162,15 @@ export default function ChaptersLibrary() {
           <div className="flex justify-between items-center py-1 pb-2 gap-2">
             <div className="w-52 relative">
               <input
-                ref={nativeInputRef}
                 type="text"
                 placeholder="Search by Game"
                 onChange={(e) => {
+                  isTypingRef.current = true;
                   setInputSearch(e.target.value);
                   debouncedSetSearchTerm(e.target.value);
+                  setTimeout(() => {
+                    isTypingRef.current = false;
+                  }, 500);
                 }}
                 value={inputSearch}
                 className="w-full bg-dark-light border border-border rounded px-3 py-1.5 text-sm text-white placeholder-muted-dim pr-8"
@@ -207,8 +209,14 @@ export default function ChaptersLibrary() {
                 gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(5, 1fr)',
               }}
             >
-              {chapters.map((chapter, index) => (
-                <Chapter key={chapter.game_id} chapter={chapter} priority={index < (isMobile ? 4 : 10)} />
+              {chapters.map((chapter) => (
+                <GameCard
+                  key={chapter.game_id}
+                  game_id={chapter.game_id}
+                  name={chapter.name}
+                  image={chapter.image}
+                  count={chapter.count}
+                />
               ))}
             </div>
           )}

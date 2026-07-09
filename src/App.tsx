@@ -7,6 +7,7 @@ import {
   Outlet,
   type LoaderFunctionArgs,
 } from 'react-router-dom';
+import Frontpage from './Frontpage';
 import ChaptersLibrary, { chaptersLoader } from './library/ChaptersLibrary';
 import Navbar from './navbar/navbar';
 import { getVod } from './utils/archive-client';
@@ -62,7 +63,7 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <Route hydrateFallbackElement={<Loading />}>
       <Route element={<MainLayout />}>
-        <Route path="/" element={<Vods />} loader={vodsLoader} />
+        <Route path="/" element={<Frontpage />} />
         <Route path="/vods" element={<Vods />} loader={vodsLoader} />
         <Route path="/library" element={<ChaptersLibrary />} loader={chaptersLoader} />
         <Route path="*" element={<NotFound channel={channel} logo={logo} />} />
