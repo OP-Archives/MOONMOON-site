@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
 import Frontpage from './Frontpage';
 import Navbar from './navbar/navbar';
 import ErrorBoundary from './utils/ErrorBoundary';
@@ -15,78 +15,87 @@ const archiveApiBase = import.meta.env.VITE_ARCHIVE_API_BASE;
 const defaultDelay = Number(import.meta.env.VITE_DEFAULT_DELAY);
 const twitchId = Number(import.meta.env.VITE_TWITCH_ID);
 
-function AppLayout() {
+function Layout() {
   return (
     <>
       <Navbar channel={channel} logo={logo} />
       <main className="relative mx-auto flex min-h-0 w-full flex-1 flex-col max-w-full">
-        <Routes>
-          <Route path="/" element={<Frontpage />} />
-          <Route path="/vods" element={<Vods />} />
-          <Route path="/library" element={<ChaptersLibrary />} />
-          <Route
-            path="/vods/:vodId"
-            element={
-              <YoutubeVod
-                type="vod"
-                logo={logo}
-                origin={origin}
-                channel={channel}
-                archiveApiBase={archiveApiBase}
-                defaultDelay={defaultDelay}
-                twitchId={twitchId}
-              />
-            }
-          />
-          <Route
-            path="/live/:vodId"
-            element={
-              <YoutubeVod
-                type="live"
-                logo={logo}
-                origin={origin}
-                channel={channel}
-                archiveApiBase={archiveApiBase}
-                defaultDelay={defaultDelay}
-                twitchId={twitchId}
-              />
-            }
-          />
-          <Route
-            path="/youtube/:vodId"
-            element={
-              <YoutubeVod
-                logo={logo}
-                origin={origin}
-                channel={channel}
-                archiveApiBase={archiveApiBase}
-                defaultDelay={defaultDelay}
-                twitchId={twitchId}
-              />
-            }
-          />
-          <Route
-            path="/games/:vodId"
-            element={
-              <Games channel={channel} logo={logo} origin={origin} archiveApiBase={archiveApiBase} twitchId={twitchId} />
-            }
-          />
-          <Route
-            path="/manual/:vodId"
-            element={
-              <CustomVod
-                type="manual"
-                logo={logo}
-                channel={channel}
-                archiveApiBase={archiveApiBase}
-                twitchId={twitchId}
-              />
-            }
-          />
-          <Route path="*" element={<NotFound channel={channel} logo={logo} />} />
-        </Routes>
+        <Outlet />
       </main>
     </>
+  );
+}
+
+function AppLayout() {
+  return (
+    <Routes>
+      <Route element={<Layout />}>
+        <Route path="/" element={<Frontpage />} />
+        <Route path="/vods" element={<Vods />} />
+        <Route path="/library" element={<ChaptersLibrary />} />
+      </Route>
+
+      <Route
+        path="/vods/:vodId"
+        element={
+          <YoutubeVod
+            type="vod"
+            logo={logo}
+            origin={origin}
+            channel={channel}
+            archiveApiBase={archiveApiBase}
+            defaultDelay={defaultDelay}
+            twitchId={twitchId}
+          />
+        }
+      />
+      <Route
+        path="/live/:vodId"
+        element={
+          <YoutubeVod
+            type="live"
+            logo={logo}
+            origin={origin}
+            channel={channel}
+            archiveApiBase={archiveApiBase}
+            defaultDelay={defaultDelay}
+            twitchId={twitchId}
+          />
+        }
+      />
+      <Route
+        path="/youtube/:vodId"
+        element={
+          <YoutubeVod
+            logo={logo}
+            origin={origin}
+            channel={channel}
+            archiveApiBase={archiveApiBase}
+            defaultDelay={defaultDelay}
+            twitchId={twitchId}
+          />
+        }
+      />
+      <Route
+        path="/games/:vodId"
+        element={
+          <Games channel={channel} logo={logo} origin={origin} archiveApiBase={archiveApiBase} twitchId={twitchId} />
+        }
+      />
+      <Route
+        path="/manual/:vodId"
+        element={
+          <CustomVod
+            type="manual"
+            logo={logo}
+            channel={channel}
+            archiveApiBase={archiveApiBase}
+            twitchId={twitchId}
+          />
+        }
+      />
+      <Route path="*" element={<NotFound channel={channel} logo={logo} />} />
+    </Routes>
   );
 }
 
