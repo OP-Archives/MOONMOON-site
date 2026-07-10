@@ -93,13 +93,13 @@ function AppLayout() {
 export default function App() {
   return (
     <div className="fixed inset-0 overflow-hidden flex flex-col bg-dark">
-      <ErrorBoundary channel={channel} logo={logo}>
-        <BrowserRouter>
+      <BrowserRouter>
+        <ErrorBoundary channel={channel} logo={logo}>
           <div className="flex min-h-0 flex-1 flex-col">
             <AppLayout />
           </div>
-        </BrowserRouter>
-      </ErrorBoundary>
+        </ErrorBoundary>
+      </BrowserRouter>
     </div>
   );
 }

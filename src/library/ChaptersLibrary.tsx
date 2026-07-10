@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query';
 import { X } from 'lucide-react';
 import { useEffect, useState, useRef, useMemo } from 'react';
 import { useSearchParams, useLocation } from 'react-router-dom';
@@ -10,13 +9,13 @@ import Loading from '../utils/Loading';
 import PaginationControls from '../utils/PaginationControls';
 import { useChapters, prefetchNextPageChapters } from '../utils/useChapters';
 import { useListFilters } from '../utils/useListFilters';
+import { queryClient } from '../utils/queryClient';
 import { useMediaQuery } from '../utils/useMediaQuery';
 import GameCard from './GameCard';
 
 const SORTS = ['Recently Played', 'Most Played', 'Game Name'];
 
 export default function ChaptersLibrary() {
-  const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
   const isMobile = useMediaQuery('(max-width: 900px)');
   const location = useLocation();
